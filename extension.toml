@@ -1,10 +1,11 @@
-id = "solidity"
-name = "Solidity"
-version = "0.2.2"
+id = "foundry-sol"
+name = "Foundry Sol"
+version = "0.3.0"
 schema_version = 1
-authors = ["Daniel Zarifpour <z@rifpour.xyz>", "Jacob Czepluch <zed-solidity.gulp938@passmail.net>"]
-description = "💠 Solidity language support for Zed. ✰ and report issues ➩"
-repository = "https://github.com/zarifpour/zed-solidity"
+authors = ["Copernicium282"]
+description = "Solidity language support for Zed, built for Foundry projects"
+repository = "https://github.com/Copernicium282/foundry-sol"
+snippets = "./snippets/solidity.json"
 
 [language_servers.solidity]
 name = "Solidity Language Server"

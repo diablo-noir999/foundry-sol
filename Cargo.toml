@@ -1,12 +1,12 @@
 [package]
-name = "zed_solidity"
-version = "0.1.6"
+name = "foundry_sol"
+version = "0.3.0"
 edition = "2021"
 publish = false
 license = "MIT"
 
 [lib]
-path = "src/solidity.rs"
+path = "src/foundry_sol.rs"
 crate-type = ["cdylib"]
 
 [dependencies]

@@ -90,6 +90,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "foundry_sol"
+version = "0.3.0"
+dependencies = [
+ "zed_extension_api",
+]
+
+[[package]]
 name = "futures"
 version = "0.3.31"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -739,13 +746,6 @@ dependencies = [
  "serde",
  "serde_json",
  "wit-bindgen",
-]
-
-[[package]]
-name = "zed_solidity"
-version = "0.1.6"
-dependencies = [
- "zed_extension_api",
 ]
 
 [[package]]

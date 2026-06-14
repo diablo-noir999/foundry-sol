@@ -1,125 +1,118 @@
-# 💠 Solidity Language Support for Zed
+# foundry-sol
 
-Enhance Zed with Solidity language support, including syntax highlighting and language server features such as diagnostics and more!
+Solidity language support for Zed, built for Foundry projects.
 
 ## Features
 
-### Solidity (`.sol`)
+- **Syntax highlighting** — tree-sitter grammar for `.sol` and `.yul`
+- **LSP** — go-to-definition, hover, diagnostics, completions via
+  `@nomicfoundation/solidity-language-server` (auto-installed)
+- **Foundry project detection** — reads `foundry.toml`, resolves remappings
+  via `forge remappings` automatically
+- **32 snippets** — core Solidity patterns, ERC interfaces (ERC20/721/1155),
+  NatSpec block templates (`natfunc`, `natcontract`, `natvar`, `natevent`)
+- **Code outline** — contracts, functions, events, errors in the symbol tree
 
-- Syntax highlighting via [tree-sitter-solidity](https://github.com/JoranHonig/tree-sitter-solidity)
-- Diagnostics, completions, go-to-definition, and other LSP features via [@nomicfoundation/solidity-language-server](https://github.com/NomicFoundation/hardhat-vscode/tree/main/server)
-- Code outline, indentation, and bracket matching
+## Installation
 
-### Yul (`.yul`)
+Search `foundry-sol` in `zed: extensions`.
 
-- Syntax highlighting via [tree-sitter-yul](https://github.com/czepluch/tree-sitter-yul), including recognition of EVM builtins
-- Code outline, indentation, and bracket matching
-- No LSP support (the Nomic Foundation language server does not support standalone `.yul` files)
+Requires Foundry installed (`curl -L https://foundry.paradigm.xyz | bash`).
 
-> [!Tip]
-> For the best experience, it is highly recommended to use [XY-Zed](https://github.com/zarifpour/xy-zed). This extension has been built on top of the XY-Zed theme, ensuring that all colors are thoughtfully chosen to provide intelligent syntax highlighting.
+## Snippets
 
----
+| Prefix | Expands to |
+|--------|------------|
+| `con` | Contract declaration |
+| `func` | Function |
+| `funcr` | Function with return |
+| `funcrview` | View function |
+| `mod` | Modifier |
+| `ev` | Event |
+| `error` | Custom error |
+| `const` | Constructor |
+| `map` | Mapping |
+| `interf` | Interface |
+| `lib` | Library |
+| `spdx` | SPDX license identifier |
+| `pragm` | Pragma statement |
+| `import` | Import statement |
+| `enum` | Enum |
+| `ife` | If/else |
+| `for` | For loop |
+| `unchecked` | Unchecked block |
+| `natfunc` | NatSpec function doc block |
+| `natcontract` | NatSpec contract doc block |
+| `natvar` | NatSpec variable doc block |
+| `natevent` | NatSpec event doc block |
+| `erc20i` | ERC20 interface |
+| `erc20` | ERC20 example implementation |
+| `erc721i` | ERC721 interface |
+| `erc1155i` | ERC1155 interface |
+| `erc165i` | ERC165 interface |
+| `erc777i` | ERC777 interface |
+| `erc173i-draft` | ERC173 ownership interface |
+| `erc1820` | ERC1820 registry interface |
 
-![CleanShot 2024-02-28 at 02 40 51 on Zed — example sol — zed-solidity@2x](public/screenshot.png)
+## Formatting
 
----
+`forge fmt` isn't wirable from the extension API directly. Add this to your
+Zed `settings.json`:
 
-## Tasks
-
-Example tasks for different test frameworks can be found in [.zed/tasks.json](.zed/tasks.json).
-
-How to set up Foundry to run tests via a runnable (the play button next to tests
-in the UI) and via keyboard shortcut.
-
-Example task that connect with the definitions in [runnables.scm](languages/solidity/runnables.scm) via tags.
 ```json
-[
-  // Individual test.
-  {
-    "label": "forge test: $ZED_SYMBOL",
-    "command": "forge",
-    "args": ["test", "--match-test", "$ZED_SYMBOL", "-vvvvv"],
-    "tags": ["solidity-test"],
-    "reveal": "always",
-    "use_new_terminal": false
-  },
-  // Contract test.
-  {
-    "label": "forge test: $ZED_SYMBOL (contract)",
-    "command": "forge",
-    "args": ["test", "--match-contract", "$ZED_SYMBOL", "-vvvvv"],
-    "tags": ["solidity-contract-test"],
-    "reveal": "always",
-    "use_new_terminal": false
-  }
-]
-```
-
-Example keymap to run Forge test for the symbol under the cursor.
-```json
-[
-  {
-    "context": "Editor && extension==sol",
-    "bindings": {
-      "alt-g": ["task::Spawn", { "task_name": "forge test: $ZED_SYMBOL" }]
+{
+  "languages": {
+    "Solidity": {
+      "formatter": {
+        "external": {
+          "command": "forge",
+          "arguments": ["fmt", "--raw", "-"]
+        }
+      }
     }
   }
-]
+}
 ```
 
-## 🛠️ Development Setup
+## Fetching verified contracts
 
-### 1. Clone the repository
+Use Foundry's `cast` tool:
 
-```shell
-git clone https://github.com/zarifpour/zed-solidity
+```bash
+export ETHERSCAN_API_KEY="your-key"
+cast source <ADDRESS> --chain mainnet          # print source
+cast source <ADDRESS> --chain mainnet --flatten # single file
+cast source <ADDRESS> --chain mainnet -d ./lib/<name> # output to dir
 ```
 
-### 2. Uninstall the existing extension
+## Known limitations
 
-If you have the existing extension installed, you need to uninstall it before installing the development version.
+### Hardhat config in vendored dependencies
+If your project depends on `chainlink-evm` (or any `lib/` dependency that
+ships its own `hardhat.config.ts`), the LSP may log:
 
-### 3. Load the extension
+```
+[contracts] Cannot find module 'hardhat/internal/lsp-helpers'
+```
 
-- Open `zed: extensions`.
-- Click `Install Dev Extension`.
-- Select the `zed-solidity` directory.
+This is an upstream bug in `@nomicfoundation/solidity-language-server` —
+it scans `lib/` for Hardhat configs and tries to initialize them.
 
-### 4. Rebuild the extension as needed
+**Impact**: go-to-definition into `lib/chainlink-evm/` files may not work.
+Your own contracts are unaffected.
 
-As you make changes to the extension, you may need to rebuild it. To do so:
+**Workaround**:
+```bash
+bash scripts/patch-hardhat-indexer.sh \
+  ~/.local/share/zed/extensions/work/foundry-sol/node_modules/@nomicfoundation/solidity-language-server/out/index.js
+```
 
-- Open `zed: extensions`.
-- Click the `Rebuild` button next to the extension.
+Re-apply after the LSP server updates.
 
-## 🎸 Contributing
+### Hover
+Hover sometimes returns nothing for cross-file symbols. Pre-existing
+limitation in the LSP server's analyzer — not specific to this extension.
 
-Contributions are welcome!
+## Fork history
 
-To contribute:
-
-1. Fork the repo and create a new branch.
-2. Make changes and test them.
-3. Submit a pull request with a clear description.
-
-Check open issues for areas needing improvement. Thanks for helping improve Solidity support in Zed!
-
-<a href="https://github.com/zarifpour/zed-solidity/graphs/contributors">
-  <img alt="contrib.rocks" src="https://contrib.rocks/image?repo=zarifpour/zed-solidity" />
-</a>
-
-## 🏆 Acknowledgments
-
-- [@JoranHonig](https://github.com/JoranHonig) for providing the [tree-sitter-solidity](https://github.com/JoranHonig/tree-sitter-solidity) repository.
-- [@meetmangukiya](https://github.com/meetmangukiya) and [@tomholford](https://github.com/tomholford) for inspiration with their PRs to the main Zed repo.
-
----
-
-<div align=center>
-
-Made with 🩵 by <a href="https://zarifpour.xyz">Daniel Zarifpour</a>
-
-<a href="https://www.buymeacoffee.com/zarifpour"><img src="https://img.buymeacoffee.com/button-api/?text=Help me love&emoji=♥️&slug=zarifpour&button_colour=ffbbb6&font_colour=000000&font_family=Cookie&outline_colour=FF0000&coffee_colour=FFDD00" /></a>
-
-</div>
+Forked from [zarifpour/zed-solidity](https://github.com/zarifpour/zed-solidity).
