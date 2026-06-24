@@ -32,6 +32,35 @@ Requires:
 - Node.js (for LSP server)
 - Foundry (auto-installed if missing)
 
+### Development Setup
+
+For developing the extension locally:
+
+```bash
+# Setup dev extension (builds and copies to Zed)
+./scripts/setup-dev.sh
+
+# Restart Zed to load changes
+```
+
+Or manually:
+
+```bash
+# Build LSP
+cd foundry-lsp && npm run build
+
+# Build WASM
+cargo component build --target wasm32-wasip1 --release
+cp target/wasm32-wasip1/release/foundry_sol.wasm extension.wasm
+
+# Copy to Zed extension directory
+EXTENSION_DIR="$HOME/.local/share/zed/extensions/work/foundry-sol"
+mkdir -p "$EXTENSION_DIR/foundry-lsp"
+cp foundry-lsp/out/server.js "$EXTENSION_DIR/foundry-lsp/out/"
+cp foundry-lsp/package.json "$EXTENSION_DIR/foundry-lsp/"
+cp -r foundry-lsp/node_modules "$EXTENSION_DIR/foundry-lsp/"
+```
+
 ## LSP Features
 
 ### Completion

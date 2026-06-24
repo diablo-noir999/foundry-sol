@@ -1,46 +1,45 @@
 use zed_extension_api::{self as zed, Result};
-use std::process::Command;
+use std::path::Path;
 
 struct FoundryExtension;
 
 impl FoundryExtension {
-    fn check_dependencies() -> Vec<String> {
-        let mut missing = Vec::new();
+    fn ensure_lsp_built(server_dir: &Path) -> Result<()> {
+        let out_dir = server_dir.join("out");
+        let server_js = out_dir.join("server.js");
 
-        // Check forge
-        if Command::new("forge").arg("--version").output().is_err() {
-            missing.push("forge".to_string());
+        // Already built
+        if server_js.exists() {
+            return Ok(());
         }
 
-        // Check node
-        if Command::new("node").arg("--version").output().is_err() {
-            missing.push("node".to_string());
-        }
+        // Build LSP
+        eprintln!("foundry-sol: Building LSP server...");
 
-        missing
-    }
-
-    fn install_foundry() -> Result<()> {
-        // Try to install foundry using foundryup
-        let output = Command::new("curl")
-            .args(["-L", "https://foundry.paradigm.xyz"])
-            .stdout(std::process::Stdio::piped())
-            .output();
-
-        match output {
-            Ok(output) => {
-                let script = String::from_utf8_lossy(&output.stdout);
-                let install = Command::new("bash")
-                    .arg("-c")
-                    .arg(&*script)
-                    .output();
-
-                match install {
-                    Ok(_) => Ok(()),
-                    Err(e) => Err(format!("Failed to run foundryup: {}", e).into()),
-                }
+        // Run npm install if node_modules doesn't exist
+        if !server_dir.join("node_modules").exists() {
+            let status = std::process::Command::new("npm")
+                .arg("install")
+                .arg("--production")
+                .current_dir(server_dir)
+                .status();
+            if status.is_err() || !status.unwrap().success() {
+                return Err("Failed to run npm install for LSP".into());
             }
-            Err(e) => Err(format!("Failed to download foundryup: {}", e).into()),
+        }
+
+        // Run tsc
+        let status = std::process::Command::new("npx")
+            .arg("tsc")
+            .current_dir(server_dir)
+            .status();
+
+        match status {
+            Ok(s) if s.success() => {
+                eprintln!("foundry-sol: LSP built successfully");
+                Ok(())
+            }
+            _ => Err("Failed to build LSP server (tsc failed)".into()),
         }
     }
 }
@@ -55,33 +54,22 @@ impl zed::Extension for FoundryExtension {
         _language_server_id: &zed::LanguageServerId,
         _worktree: &zed::Worktree,
     ) -> Result<zed::Command> {
-        // Check dependencies on startup
-        let missing = Self::check_dependencies();
-        if !missing.is_empty() {
-            let msg = format!(
-                "Foundry Sol: Missing dependencies: {}. Please install them to use the LSP.",
-                missing.join(", ")
-            );
-            eprintln!("{}", msg);
-
-            // Try to auto-install foundry if it's the only missing dependency
-            if missing.contains(&"forge".to_string()) && missing.len() == 1 {
-                eprintln!("Foundry Sol: Attempting to install Foundry...");
-                if let Err(e) = Self::install_foundry() {
-                    eprintln!("Foundry Sol: Auto-install failed: {}", e);
-                }
-            }
-        }
-
-        // The server is bundled in the extension's installed directory
-        let server_path = std::env::current_dir()
+        let server_dir = std::env::current_dir()
             .map_err(|e| format!("Failed to get current dir: {}", e))?
-            .join("foundry-lsp")
-            .join("out")
-            .join("server.js");
+            .join("foundry-lsp");
+
+        // Ensure LSP is built
+        Self::ensure_lsp_built(&server_dir)?;
+
+        // Find node binary
+        let node_path = which::which("node")
+            .map(|p| p.to_string_lossy().to_string())
+            .unwrap_or_else(|_| "/usr/bin/node".to_string());
+
+        let server_path = server_dir.join("out").join("server.js");
 
         Ok(zed::Command {
-            command: "node".to_string(),
+            command: node_path,
             args: vec![server_path.to_string_lossy().to_string()],
             env: Default::default(),
         })
@@ -92,17 +80,9 @@ impl zed::Extension for FoundryExtension {
         _language_server_id: &zed::LanguageServerId,
         _worktree: &zed::Worktree,
     ) -> Result<Option<zed_extension_api::serde_json::Value>> {
-        // Check if forge is available and include in init options
-        let forge_available = Command::new("forge").arg("--version").output().is_ok();
-        let node_available = Command::new("node").arg("--version").output().is_ok();
-
         Ok(Some(zed_extension_api::serde_json::json!({
             "extensionName": "foundry-sol",
             "extensionVersion": env!("CARGO_PKG_VERSION"),
-            "capabilities": {
-                "forge": forge_available,
-                "node": node_available
-            }
         })))
     }
 }

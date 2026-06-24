@@ -99,16 +99,10 @@ connection.onExit(() => {
 documents.onDidOpen((event) => {
   const uri = event.document.uri;
   const content = event.document.getText();
-  connection.console.log(`Document opened: ${uri}`);
 
   compilerManager.compile(uri, content).then((result) => {
     if (result) {
       pushDiagnostics(uri, 'compiler', result.diagnostics);
-      connection.console.log(
-        `Compiled ${uri}: ${result.diagnostics.length} diagnostics, ast=${result.ast ? 'yes' : 'no'}`
-      );
-    } else {
-      connection.console.log(`Compile returned null for ${uri}`);
     }
   });
 

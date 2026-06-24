@@ -27,7 +27,6 @@ export class CompilerManager {
 
     const project = projectManager.getProject(uri);
     if (!project) {
-      console.error(`No project found for ${uri}`);
       return null;
     }
 

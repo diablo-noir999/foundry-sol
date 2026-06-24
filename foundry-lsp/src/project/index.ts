@@ -1,4 +1,5 @@
 import * as path from 'path';
+import * as fs from 'fs';
 import { WorkspaceFolder } from 'vscode-languageserver';
 import { URI } from 'vscode-uri';
 import { parseFoundryToml, FoundryConfig } from './foundry';
@@ -25,8 +26,38 @@ export class ProjectManager {
     for (const folder of workspaceFolders) {
       const root = URI.parse(folder.uri).fsPath;
       this.workspaceFolders.push(root);
-      this.loadProject(root);
+      // Search for foundry.toml upward from workspace root
+      const projectRoot = this.findProjectRoot(root);
+      this.loadProject(projectRoot);
     }
+  }
+
+  private findProjectRoot(startDir: string): string {
+    // First search upward for foundry.toml
+    let dir = startDir;
+    while (true) {
+      if (fs.existsSync(path.join(dir, 'foundry.toml'))) {
+        return dir;
+      }
+      const parent = path.dirname(dir);
+      if (parent === dir) break;
+      dir = parent;
+    }
+
+    // If not found upward, search immediate children (one level deep)
+    try {
+      const entries = fs.readdirSync(startDir, { withFileTypes: true });
+      for (const entry of entries) {
+        if (entry.isDirectory() && !entry.name.startsWith('.') && entry.name !== 'node_modules') {
+          const childDir = path.join(startDir, entry.name);
+          if (fs.existsSync(path.join(childDir, 'foundry.toml'))) {
+            return childDir;
+          }
+        }
+      }
+    } catch {}
+
+    return startDir; // fallback to workspace root
   }
 
   getProject(uri: string): FoundryProject | undefined {

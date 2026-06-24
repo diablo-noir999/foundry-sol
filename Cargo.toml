@@ -11,3 +11,4 @@ crate-type = ["cdylib"]
 
 [dependencies]
 zed_extension_api = "0.7.0"
+which = "7.0"
