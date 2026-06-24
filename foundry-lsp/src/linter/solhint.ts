@@ -1,6 +1,7 @@
 import { Diagnostic, DiagnosticSeverity, Range } from 'vscode-languageserver';
 import { spawn } from 'child_process';
 import * as fs from 'fs';
+import * as os from 'os';
 import * as path from 'path';
 
 interface SolhintWarning {
@@ -40,8 +41,9 @@ export class SolhintLinter {
   ): void {
     const projectRoot = path.dirname(filePath);
 
-    // Write content to a temp file for solhint
-    const tmpFile = filePath + '.solhint-tmp';
+    // Write content to a temp file for solhint in OS temp directory
+    const tmpDir = os.tmpdir();
+    const tmpFile = path.join(tmpDir, `solhint-${path.basename(filePath)}.${Date.now()}`);
     try {
       fs.writeFileSync(tmpFile, content, 'utf-8');
     } catch {
@@ -75,7 +77,7 @@ export class SolhintLinter {
       try {
         const results: SolhintWarning[] = JSON.parse(stdout);
         const diagnostics = results
-          .filter((w) => w.filePath === tmpFile || w.filePath === path.basename(tmpFile))
+          .filter((w) => w.filePath === tmpFile || w.filePath === path.basename(filePath))
           .map((w) => this.convertWarning(w, content));
         callback(diagnostics);
       } catch {

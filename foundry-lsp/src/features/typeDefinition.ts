@@ -1,3 +1,4 @@
+import * as fs from 'fs';
 import { Definition, Location, Position, Range } from 'vscode-languageserver';
 import { TextDocument } from 'vscode-languageserver-textdocument';
 import { URI } from 'vscode-uri';
@@ -42,7 +43,8 @@ export function provideTypeDefinition(
     .concat(globalIndex.findByNameAndKind(typeName, 'interface'))
     .concat(globalIndex.findByNameAndKind(typeName, 'library'))
     .concat(globalIndex.findByNameAndKind(typeName, 'struct'))
-    .concat(globalIndex.findByNameAndKind(typeName, 'enum'));
+    .concat(globalIndex.findByNameAndKind(typeName, 'enum'))
+    .concat(globalIndex.findByNameAndKind(typeName, 'typedef'));
 
   if (indexed.length > 0) {
     const entry = indexed[0];
@@ -68,8 +70,25 @@ function extractTypeName(node: AstNode): string | null {
 
   // Identifier — try to resolve its type
   if (isIdentifier(node)) {
-    // The identifier's name might be a type
-    return node.name ?? null;
+    // Use the node's typeDescriptions if available
+    if (node.typeDescriptions?.typeString) {
+      const typeStr = node.typeDescriptions.typeString;
+      // For user-defined types like contract/struct/enum, extract the name
+      const match = typeStr.match(/(?:contract|struct|enum|library|interface)\s+(\w+)/);
+      if (match) return match[1];
+      // Plain type name (e.g. "ContractName" without prefix)
+      if (typeStr && !typeStr.startsWith('uint') && !typeStr.startsWith('int') &&
+          !typeStr.startsWith('bytes') && !typeStr.startsWith('address') &&
+          !typeStr.startsWith('bool') && !typeStr.startsWith('string') &&
+          !typeStr.startsWith('mapping') && !typeStr.startsWith('tuple')) {
+        return typeStr;
+      }
+    }
+    // Fallback: referencedDeclaration may point to the actual type definition
+    if (node.referencedDeclaration !== undefined && node.referencedDeclaration !== -1) {
+      return null; // Will be resolved via GlobalIndex
+    }
+    return null;
   }
 
   // State variable — extract type from typeName
@@ -109,7 +128,9 @@ function findTypeDefinition(ast: AstNode, typeName: string): AstNode | null {
       node.name === typeName &&
       (node.nodeType === 'ContractDefinition' ||
         node.nodeType === 'StructDefinition' ||
-        node.nodeType === 'EnumDefinition')
+        node.nodeType === 'EnumDefinition' ||
+        node.nodeType === 'LibraryDefinition' ||
+        node.nodeType === 'UserDefinedValueTypeDefinition')
     ) {
       found = node;
       return false;
@@ -117,7 +138,21 @@ function findTypeDefinition(ast: AstNode, typeName: string): AstNode | null {
     return true;
   });
 
-  return found;
+  if (found) return found;
+
+  // GlobalIndex fallback
+  const indexed = globalIndex.findByNameAndKind(typeName, 'contract')
+    .concat(globalIndex.findByNameAndKind(typeName, 'interface'))
+    .concat(globalIndex.findByNameAndKind(typeName, 'library'))
+    .concat(globalIndex.findByNameAndKind(typeName, 'struct'))
+    .concat(globalIndex.findByNameAndKind(typeName, 'enum'))
+    .concat(globalIndex.findByNameAndKind(typeName, 'typedef'));
+
+  if (indexed.length > 0) {
+    return indexed[0].node;
+  }
+
+  return null;
 }
 
 function resolveUri(node: AstNode, compileResult: CompileResult): string {
@@ -139,7 +174,6 @@ function resolveUri(node: AstNode, compileResult: CompileResult): string {
 
 function readFileContent(filePath: string): string | null {
   try {
-    const fs = require('fs');
     return fs.readFileSync(filePath, 'utf-8');
   } catch {
     return null;

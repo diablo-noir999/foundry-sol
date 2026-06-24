@@ -47,65 +47,73 @@ export class GlobalIndex {
   }
 
   indexFile(filePath: string, ast: AstNode): void {
-    const uri = URI.file(filePath).toString();
-    const entries: IndexEntry[] = [];
+    try {
+      const uri = URI.file(filePath).toString();
+      const entries: IndexEntry[] = [];
 
-    walkAst(ast, (node) => {
-      let kind: SymbolKind | null = null;
+      walkAst(ast, (node) => {
+        try {
+          let kind: SymbolKind | null = null;
 
-      if (isContractDefinition(node)) {
-        const contractKind = (node as any).contractKind;
-        if (contractKind === 'interface') kind = 'interface';
-        else if (contractKind === 'library') kind = 'library';
-        else kind = 'contract';
-      } else if (isFunctionDefinition(node)) {
-        kind = 'function';
-      } else if (isStateVariableDeclaration(node)) {
-        kind = 'variable';
-      } else if (isStructDefinition(node)) {
-        kind = 'struct';
-      } else if (isEnumDefinition(node)) {
-        kind = 'enum';
-      } else if (isEventDefinition(node)) {
-        kind = 'event';
-      } else if (isErrorDefinition(node)) {
-        kind = 'error';
-      } else if (isModifierDefinition(node)) {
-        kind = 'modifier';
-      } else if ((node as any).nodeType === 'UserDefinedValueTypeDefinition') {
-        kind = 'typedef';
-      } else if ((node as any).nodeType === 'VariableDeclaration' && (node as any).stateVariable) {
-        kind = 'constant';
-      }
+          if (isContractDefinition(node)) {
+            const contractKind = (node as any).contractKind;
+            if (contractKind === 'interface') kind = 'interface';
+            else if (contractKind === 'library') kind = 'library';
+            else kind = 'contract';
+          } else if (isFunctionDefinition(node)) {
+            kind = 'function';
+          } else if (isStateVariableDeclaration(node)) {
+            kind = 'variable';
+          } else if (isStructDefinition(node)) {
+            kind = 'struct';
+          } else if (isEnumDefinition(node)) {
+            kind = 'enum';
+          } else if (isEventDefinition(node)) {
+            kind = 'event';
+          } else if (isErrorDefinition(node)) {
+            kind = 'error';
+          } else if (isModifierDefinition(node)) {
+            kind = 'modifier';
+          } else if ((node as any).nodeType === 'UserDefinedValueTypeDefinition') {
+            kind = 'typedef';
+          } else if ((node as any).nodeType === 'VariableDeclaration' && (node as any).stateVariable) {
+            kind = 'constant';
+          }
 
-      if (kind && node.name) {
-        const entry: IndexEntry = {
-          name: node.name,
-          kind,
-          node,
-          uri,
-          filePath,
-          nodeId: node.id,
-        };
-        entries.push(entry);
+          if (kind && node.name) {
+            const entry: IndexEntry = {
+              name: node.name,
+              kind,
+              node,
+              uri,
+              filePath,
+              nodeId: node.id,
+            };
+            entries.push(entry);
 
-        const key = node.name.toLowerCase();
-        const existing = this.symbols.get(key);
-        if (existing) {
-          existing.push(entry);
-        } else {
-          this.symbols.set(key, [entry]);
+            const key = node.name;
+            const existing = this.symbols.get(key);
+            if (existing) {
+              existing.push(entry);
+            } else {
+              this.symbols.set(key, [entry]);
+            }
+
+            if (node.id !== undefined) {
+              this.nodeMap.set(node.id, entry);
+            }
+          }
+        } catch {
+          // Skip individual node errors
         }
 
-        if (node.id !== undefined) {
-          this.nodeMap.set(node.id, entry);
-        }
-      }
+        return true;
+      });
 
-      return true;
-    });
-
-    this.fileIndex.set(uri, entries);
+      this.fileIndex.set(uri, entries);
+    } catch {
+      // Ignore file indexing errors
+    }
   }
 
   findByNodeId(nodeId: number): IndexEntry | undefined {
@@ -123,7 +131,7 @@ export class GlobalIndex {
   }
 
   findByName(name: string): IndexEntry[] {
-    return this.symbols.get(name.toLowerCase()) ?? [];
+    return this.symbols.get(name) ?? [];
   }
 
   findByNameAndKind(name: string, kind: SymbolKind): IndexEntry[] {
@@ -131,10 +139,9 @@ export class GlobalIndex {
   }
 
   searchByPrefix(prefix: string): IndexEntry[] {
-    const lower = prefix.toLowerCase();
     const results: IndexEntry[] = [];
     for (const [key, entries] of this.symbols) {
-      if (key.startsWith(lower)) {
+      if (key.startsWith(prefix)) {
         results.push(...entries);
       }
     }
@@ -142,10 +149,9 @@ export class GlobalIndex {
   }
 
   searchByName(query: string): IndexEntry[] {
-    const lower = query.toLowerCase();
     const results: IndexEntry[] = [];
     for (const [key, entries] of this.symbols) {
-      if (key.includes(lower)) {
+      if (key.includes(query)) {
         results.push(...entries);
       }
     }
@@ -153,8 +159,7 @@ export class GlobalIndex {
   }
 
   searchFuzzy(query: string): IndexEntry[] {
-    const lower = query.toLowerCase();
-    const words = lower.split(/\s+/).filter(Boolean);
+    const words = query.split(/\s+/).filter(Boolean);
     const results: IndexEntry[] = [];
 
     for (const [key, entries] of this.symbols) {

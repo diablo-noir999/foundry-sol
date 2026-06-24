@@ -1,48 +1,8 @@
-use zed_extension_api::{self as zed, Result};
-use std::path::Path;
+use zed_extension_api::{self as zed, node_binary_path, Result};
+
+const SERVER_JS: &str = include_str!("../foundry-lsp/out/server.js");
 
 struct FoundryExtension;
-
-impl FoundryExtension {
-    fn ensure_lsp_built(server_dir: &Path) -> Result<()> {
-        let out_dir = server_dir.join("out");
-        let server_js = out_dir.join("server.js");
-
-        // Already built
-        if server_js.exists() {
-            return Ok(());
-        }
-
-        // Build LSP
-        eprintln!("foundry-sol: Building LSP server...");
-
-        // Run npm install if node_modules doesn't exist
-        if !server_dir.join("node_modules").exists() {
-            let status = std::process::Command::new("npm")
-                .arg("install")
-                .arg("--production")
-                .current_dir(server_dir)
-                .status();
-            if status.is_err() || !status.unwrap().success() {
-                return Err("Failed to run npm install for LSP".into());
-            }
-        }
-
-        // Run tsc
-        let status = std::process::Command::new("npx")
-            .arg("tsc")
-            .current_dir(server_dir)
-            .status();
-
-        match status {
-            Ok(s) if s.success() => {
-                eprintln!("foundry-sol: LSP built successfully");
-                Ok(())
-            }
-            _ => Err("Failed to build LSP server (tsc failed)".into()),
-        }
-    }
-}
 
 impl zed::Extension for FoundryExtension {
     fn new() -> Self {
@@ -54,23 +14,27 @@ impl zed::Extension for FoundryExtension {
         _language_server_id: &zed::LanguageServerId,
         _worktree: &zed::Worktree,
     ) -> Result<zed::Command> {
-        let server_dir = std::env::current_dir()
-            .map_err(|e| format!("Failed to get current dir: {}", e))?
-            .join("foundry-lsp");
+        let server_path = "server.js";
 
-        // Ensure LSP is built
-        Self::ensure_lsp_built(&server_dir)?;
+        // Write the embedded server.js to the extension working directory (WASI sandbox)
+        if std::fs::File::open(server_path).is_err() {
+            std::fs::create_dir_all("foundry-lsp/out").ok();
+            std::fs::write(server_path, SERVER_JS)
+                .map_err(|e| format!("Failed to write LSP server: {e}"))?;
+        }
 
-        // Find node binary
-        let node_path = which::which("node")
-            .map(|p| p.to_string_lossy().to_string())
-            .unwrap_or_else(|_| "/usr/bin/node".to_string());
+        // Resolve to absolute path so node finds it regardless of process CWD
+        let abs_path = std::env::current_dir()
+            .map_err(|e| format!("Failed to get cwd: {e}"))?
+            .join(server_path);
+        let abs_str = abs_path.to_string_lossy().to_string();
 
-        let server_path = server_dir.join("out").join("server.js");
+        let node_path = node_binary_path()
+            .map_err(|e| format!("Node.js not found: {e}"))?;
 
         Ok(zed::Command {
             command: node_path,
-            args: vec![server_path.to_string_lossy().to_string()],
+            args: vec![abs_str],
             env: Default::default(),
         })
     }

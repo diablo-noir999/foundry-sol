@@ -162,16 +162,6 @@ function diagnosticToCodeAction(diag: Diagnostic, document: TextDocument, allDia
       { line: insertLine, character: 0 }, `pragma solidity ^${version};\n`);
   }
 
-  // Invalid checksum
-  if (msg.includes('checksum') || msg.includes('invalid checksum')) {
-    const match = lineText.match(/0x([0-9a-fA-F]{40})/);
-    if (match) {
-      const checksummed = checksumAddress(match[0]);
-      return createReplaceAction(document, diag, 'Fix address checksum',
-        diag.range, checksummed);
-    }
-  }
-
   // Multiple base contracts need override
   if (msg.includes('multiple') && msg.includes('override')) {
     const editRange = findAfterFunctionSig(document, line);
@@ -299,17 +289,11 @@ function findBeforeVariableName(document: TextDocument, line: number): { line: n
     start: { line, character: 0 },
     end: { line: line + 1, character: 0 },
   });
-  const match = lineText.match(/;\s*$/);
+  const match = lineText.match(/(\w+)\s*;/);
   if (match) {
     return { line, character: match.index! };
   }
   return { line, character: lineText.trimEnd().length };
-}
-
-function checksumAddress(address: string): string {
-  // Simple checksum: capitalize hex digits where keccak hash bit is 1
-  // For a quick fix, we just return the address as-is (client can verify)
-  return address;
 }
 
 function fullRange(document: TextDocument): Range {

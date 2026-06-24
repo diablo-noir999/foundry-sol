@@ -100,7 +100,6 @@ function getContractSymbolKind(node: AstNode): SymbolKind {
 function nodeToSymbol(node: AstNode, content: string): DocumentSymbol | null {
   if (isFunctionDefinition(node)) return createFunctionSymbol(node, content);
   if (isStateVariableDeclaration(node)) {
-    // 11.6: Constants get their own symbol kind
     if ((node as any).constant) {
       return createConstantSymbol(node, content);
     }
@@ -118,13 +117,15 @@ function nodeToSymbol(node: AstNode, content: string): DocumentSymbol | null {
 }
 
 function createFunctionSymbol(node: AstNode, content: string): DocumentSymbol | null {
-  if (!node.name) return null;
+  const kind = (node as any).kind;
+  const name = kind === 'constructor' ? 'constructor' : node.name;
+  if (!name) return null;
   const range = safeRange(node.src, content);
-  const kind = getFunctionSymbolKind(node);
+  const symbolKind = getFunctionSymbolKind(node);
 
   return {
-    name: node.name,
-    kind,
+    name,
+    kind: symbolKind,
     range,
     selectionRange: range,
   };

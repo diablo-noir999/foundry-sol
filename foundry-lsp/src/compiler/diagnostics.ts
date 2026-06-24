@@ -88,13 +88,23 @@ function readFileContent(
 
 function offsetToLineCol(
   content: string,
-  offset: number
+  byteOffset: number
 ): { line: number; character: number } {
   let line = 0;
   let character = 0;
+  let currentByte = 0;
 
-  for (let i = 0; i < offset && i < content.length; i++) {
-    if (content[i] === '\n') {
+  for (let i = 0; i < content.length; i++) {
+    const char = content[i];
+    const charBytes = Buffer.byteLength(char, 'utf-8');
+
+    if (currentByte + charBytes > byteOffset) {
+      break;
+    }
+
+    currentByte += charBytes;
+
+    if (char === '\n') {
       line++;
       character = 0;
     } else {

@@ -549,7 +549,7 @@ function extractTypeName(node: AstNode, content: string): string {
   }
 
   if (isUserDefinedTypeName(node)) {
-    return node.name!;
+    return node.name ?? (node as any).pathNode?.name ?? 'unknown';
   }
 
   if (isMapping(node)) {
@@ -610,6 +610,7 @@ function findNodeById(ast: AstNode, id: number): AstNode | null {
   let found: AstNode | null = null;
 
   const walk = (node: AstNode) => {
+    if (found) return;
     if (node.id === id) {
       found = node;
       return;
@@ -618,6 +619,28 @@ function findNodeById(ast: AstNode, id: number): AstNode | null {
       for (const child of node.nodes) {
         walk(child);
       }
+    }
+    if (node.body && typeof node.body === 'object' && 'nodeType' in node.body) {
+      walk(node.body as AstNode);
+    }
+    if (Array.isArray(node.statements)) {
+      for (const stmt of node.statements) {
+        if (stmt && typeof stmt === 'object' && 'nodeType' in stmt) walk(stmt as AstNode);
+      }
+    }
+    if (Array.isArray(node.parameters)) {
+      for (const p of node.parameters) {
+        if (p && typeof p === 'object' && 'nodeType' in p) walk(p as AstNode);
+      }
+    }
+    if (node.expression && typeof node.expression === 'object' && 'nodeType' in node.expression) {
+      walk(node.expression as AstNode);
+    }
+    if (node.subExpression && typeof node.subExpression === 'object' && 'nodeType' in node.subExpression) {
+      walk(node.subExpression as AstNode);
+    }
+    if (node.typeName && typeof node.typeName === 'object' && 'nodeType' in node.typeName) {
+      walk(node.typeName as AstNode);
     }
   };
 

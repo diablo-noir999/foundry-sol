@@ -35,7 +35,7 @@ const SOLIDITY_KEYWORDS: [string, string][] = [
   ['contract', 'contract ${1:Name} {\n\t$0\n}'],
   ['interface', 'interface ${1:Name} {\n\t$0\n}'],
   ['library', 'library ${1:Name} {\n\t$0\n}'],
-  ['function', 'function ${1:name}(${2:params}) ${3:public} ${4:nonpayable} {\n\t$0\n}'],
+  ['function', 'function ${1:name}(${2:params}) ${3|public,external,internal,private|} {\n\t$0\n}'],
   ['struct', 'struct ${1:Name} {\n\t${2:type} ${3:name};\n\t$0\n}'],
   ['enum', 'enum ${1:Name} {\n\t${2:VALUE1},\n\t$0\n}'],
   ['event', 'event ${1:Name}(${2:params});'],
@@ -66,7 +66,6 @@ const SOLIDITY_KEYWORDS: [string, string][] = [
   ['pure', 'pure'],
   ['view', 'view'],
   ['payable', 'payable'],
-  ['nonpayable', 'nonpayable'],
   ['virtual', 'virtual'],
   ['override', 'override'],
   ['abstract', 'abstract'],
@@ -139,104 +138,31 @@ const ELEMENTARY_TYPES: [string, string][] = [
   ['bool', 'Boolean type'],
   ['string', 'Dynamic byte array string'],
   ['bytes', 'Dynamic byte array'],
-  ['int', 'Signed integer (alias for int256)'],
   ['uint', 'Unsigned integer (alias for uint256)'],
-  ['int8', 'Signed integer (8 bits)'],
-  ['int16', 'Signed integer (16 bits)'],
-  ['int24', 'Signed integer (24 bits)'],
-  ['int32', 'Signed integer (32 bits)'],
-  ['int40', 'Signed integer (40 bits)'],
-  ['int48', 'Signed integer (48 bits)'],
-  ['int56', 'Signed integer (56 bits)'],
-  ['int64', 'Signed integer (64 bits)'],
-  ['int72', 'Signed integer (72 bits)'],
-  ['int80', 'Signed integer (80 bits)'],
-  ['int88', 'Signed integer (88 bits)'],
-  ['int96', 'Signed integer (96 bits)'],
-  ['int104', 'Signed integer (104 bits)'],
-  ['int112', 'Signed integer (112 bits)'],
-  ['int120', 'Signed integer (120 bits)'],
-  ['int128', 'Signed integer (128 bits)'],
-  ['int136', 'Signed integer (136 bits)'],
-  ['int144', 'Signed integer (144 bits)'],
-  ['int152', 'Signed integer (152 bits)'],
-  ['int160', 'Signed integer (160 bits)'],
-  ['int168', 'Signed integer (168 bits)'],
-  ['int176', 'Signed integer (176 bits)'],
-  ['int184', 'Signed integer (184 bits)'],
-  ['int192', 'Signed integer (192 bits)'],
-  ['int200', 'Signed integer (200 bits)'],
-  ['int208', 'Signed integer (208 bits)'],
-  ['int216', 'Signed integer (216 bits)'],
-  ['int224', 'Signed integer (224 bits)'],
-  ['int232', 'Signed integer (232 bits)'],
-  ['int240', 'Signed integer (240 bits)'],
-  ['int248', 'Signed integer (248 bits)'],
-  ['int256', 'Signed integer (256 bits)'],
-  ['uint8', 'Unsigned integer (8 bits)'],
-  ['uint16', 'Unsigned integer (16 bits)'],
-  ['uint24', 'Unsigned integer (24 bits)'],
-  ['uint32', 'Unsigned integer (32 bits)'],
-  ['uint40', 'Unsigned integer (40 bits)'],
-  ['uint48', 'Unsigned integer (48 bits)'],
-  ['uint56', 'Unsigned integer (56 bits)'],
-  ['uint64', 'Unsigned integer (64 bits)'],
-  ['uint72', 'Unsigned integer (72 bits)'],
-  ['uint80', 'Unsigned integer (80 bits)'],
-  ['uint88', 'Unsigned integer (88 bits)'],
-  ['uint96', 'Unsigned integer (96 bits)'],
-  ['uint104', 'Unsigned integer (104 bits)'],
-  ['uint112', 'Unsigned integer (112 bits)'],
-  ['uint120', 'Unsigned integer (120 bits)'],
-  ['uint128', 'Unsigned integer (128 bits)'],
-  ['uint136', 'Unsigned integer (136 bits)'],
-  ['uint144', 'Unsigned integer (144 bits)'],
-  ['uint152', 'Unsigned integer (152 bits)'],
-  ['uint160', 'Unsigned integer (160 bits)'],
-  ['uint168', 'Unsigned integer (168 bits)'],
-  ['uint176', 'Unsigned integer (176 bits)'],
-  ['uint184', 'Unsigned integer (184 bits)'],
-  ['uint192', 'Unsigned integer (192 bits)'],
-  ['uint200', 'Unsigned integer (200 bits)'],
-  ['uint208', 'Unsigned integer (208 bits)'],
-  ['uint216', 'Unsigned integer (216 bits)'],
-  ['uint224', 'Unsigned integer (224 bits)'],
-  ['uint232', 'Unsigned integer (232 bits)'],
-  ['uint240', 'Unsigned integer (240 bits)'],
-  ['uint248', 'Unsigned integer (248 bits)'],
   ['uint256', 'Unsigned integer (256 bits)'],
-  ['bytes1', 'Fixed-size byte array (1 byte)'],
-  ['bytes2', 'Fixed-size byte array (2 bytes)'],
-  ['bytes3', 'Fixed-size byte array (3 bytes)'],
+  ['uint128', 'Unsigned integer (128 bits)'],
+  ['uint64', 'Unsigned integer (64 bits)'],
+  ['uint32', 'Unsigned integer (32 bits)'],
+  ['uint16', 'Unsigned integer (16 bits)'],
+  ['uint8', 'Unsigned integer (8 bits)'],
+  ['int', 'Signed integer (alias for int256)'],
+  ['int256', 'Signed integer (256 bits)'],
+  ['int128', 'Signed integer (128 bits)'],
+  ['int64', 'Signed integer (64 bits)'],
+  ['int32', 'Signed integer (32 bits)'],
+  ['int16', 'Signed integer (16 bits)'],
+  ['int8', 'Signed integer (8 bits)'],
   ['bytes4', 'Fixed-size byte array (4 bytes)'],
-  ['bytes5', 'Fixed-size byte array (5 bytes)'],
-  ['bytes6', 'Fixed-size byte array (6 bytes)'],
-  ['bytes7', 'Fixed-size byte array (7 bytes)'],
   ['bytes8', 'Fixed-size byte array (8 bytes)'],
-  ['bytes9', 'Fixed-size byte array (9 bytes)'],
-  ['bytes10', 'Fixed-size byte array (10 bytes)'],
-  ['bytes11', 'Fixed-size byte array (11 bytes)'],
-  ['bytes12', 'Fixed-size byte array (12 bytes)'],
-  ['bytes13', 'Fixed-size byte array (13 bytes)'],
-  ['bytes14', 'Fixed-size byte array (14 bytes)'],
-  ['bytes15', 'Fixed-size byte array (15 bytes)'],
   ['bytes16', 'Fixed-size byte array (16 bytes)'],
-  ['bytes17', 'Fixed-size byte array (17 bytes)'],
-  ['bytes18', 'Fixed-size byte array (18 bytes)'],
-  ['bytes19', 'Fixed-size byte array (19 bytes)'],
   ['bytes20', 'Fixed-size byte array (20 bytes)'],
-  ['bytes21', 'Fixed-size byte array (21 bytes)'],
-  ['bytes22', 'Fixed-size byte array (22 bytes)'],
-  ['bytes23', 'Fixed-size byte array (23 bytes)'],
-  ['bytes24', 'Fixed-size byte array (24 bytes)'],
-  ['bytes25', 'Fixed-size byte array (25 bytes)'],
-  ['bytes26', 'Fixed-size byte array (26 bytes)'],
-  ['bytes27', 'Fixed-size byte array (27 bytes)'],
-  ['bytes28', 'Fixed-size byte array (28 bytes)'],
-  ['bytes29', 'Fixed-size byte array (29 bytes)'],
-  ['bytes30', 'Fixed-size byte array (30 bytes)'],
-  ['bytes31', 'Fixed-size byte array (31 bytes)'],
   ['bytes32', 'Fixed-size byte array (32 bytes)'],
+  ['uint96', 'Unsigned integer (96 bits)'],
+  ['uint112', 'Unsigned integer (112 bits)'],
+  ['uint160', 'Unsigned integer (160 bits)'],
+  ['int96', 'Signed integer (96 bits)'],
+  ['int112', 'Signed integer (112 bits)'],
+  ['int160', 'Signed integer (160 bits)'],
 ];
 
 const GLOBAL_OBJECT_MEMBERS: Record<string, [string, string, string][]> = {
@@ -413,6 +339,34 @@ export function provideCompletion(
   const idItems = collectIdentifiers(ast, content, prefix);
   items.push(...idItems);
 
+  // Sort: prefix matches first, then by kind priority, then alphabetically
+  items.sort((a, b) => {
+    const aLabel = a.label.toLowerCase();
+    const bLabel = b.label.toLowerCase();
+    const pfx = prefix?.toLowerCase() ?? '';
+
+    // Prefix match priority
+    const aStarts = aLabel.startsWith(pfx) ? 0 : 1;
+    const bStarts = bLabel.startsWith(pfx) ? 0 : 1;
+    if (aStarts !== bStarts) return aStarts - bStarts;
+
+    // Kind priority (higher priority first)
+    const kindPriority: Record<number, number> = {
+      [CompletionItemKind.Variable]: 1,
+      [CompletionItemKind.Function]: 2,
+      [CompletionItemKind.Keyword]: 3,
+      [CompletionItemKind.TypeParameter]: 4,
+      [CompletionItemKind.Module]: 5,
+      [CompletionItemKind.Unit]: 6,
+    };
+    const aPriority = kindPriority[a.kind ?? 0] ?? 10;
+    const bPriority = kindPriority[b.kind ?? 0] ?? 10;
+    if (aPriority !== bPriority) return aPriority - bPriority;
+
+    // Alphabetical
+    return aLabel.localeCompare(bLabel);
+  });
+
   return items;
 }
 
@@ -581,7 +535,7 @@ function provideDotCompletion(
   }
 
   // 11.3: Global object sub-properties (msg., block., tx., abi.)
-  if (parts.length === 2 && GLOBAL_OBJECT_MEMBERS[rootName]) {
+  if (parts.length >= 1 && parts.length <= 2 && GLOBAL_OBJECT_MEMBERS[rootName]) {
     const members = GLOBAL_OBJECT_MEMBERS[rootName];
     return members.map(([name, insertTextOrType, desc]) => {
       // abi members use snippet format, others use type
@@ -934,9 +888,8 @@ function findTypeByName(ast: AstNode, name: string): AstNode | null {
 
 function extractTypeName(node: AstNode): string {
   if (!node) return 'unknown';
-  if (node.name) return node.name;
   if (node.nodeType === 'ElementaryTypeName') return node.name!;
-  if (node.nodeType === 'UserDefinedTypeName') return node.name!;
+  if (node.nodeType === 'UserDefinedTypeName') return node.name ?? (node as any).pathNode?.name ?? 'unknown';
   if (node.nodeType === 'Mapping') {
     const key = extractTypeName(node.keyType as AstNode);
     const value = extractTypeName(node.valueType as AstNode);
@@ -1093,10 +1046,12 @@ function findEnclosingFunction(ast: AstNode, position: Position, content: string
 }
 
 function positionToOffset(content: string, position: Position): number {
-  let offset = 0;
   const lines = content.split('\n');
+  let byteOffset = 0;
   for (let i = 0; i < position.line && i < lines.length; i++) {
-    offset += lines[i].length + 1; // +1 for \n
+    byteOffset += Buffer.byteLength(lines[i], 'utf-8') + 1;
   }
-  return offset + position.character;
+  const targetLine = lines[position.line] || '';
+  byteOffset += Buffer.byteLength(targetLine.substring(0, position.character), 'utf-8');
+  return byteOffset;
 }

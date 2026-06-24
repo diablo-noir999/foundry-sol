@@ -29,6 +29,15 @@ import { provideWorkspaceSymbols } from './features/workspaceSymbol';
 import { provideImplementation } from './features/implementation';
 import { solhintLinter } from './linter/solhint';
 
+// Global error handler
+process.on('uncaughtException', (err) => {
+  try { require('fs').appendFileSync('/tmp/lsp-crash.log', new Date().toISOString() + ' ' + err.stack + '\n'); } catch {}
+  process.exit(1);
+});
+process.on('unhandledRejection', (reason) => {
+  try { require('fs').appendFileSync('/tmp/lsp-crash.log', new Date().toISOString() + ' UNHANDLED: ' + String(reason) + '\n'); } catch {}
+});
+
 // Diagnostics manager: merge compiler + solhint diagnostics per URI
 const diagnosticStore = new Map<string, { compiler: Diagnostic[]; solhint: Diagnostic[] }>();
 
@@ -104,6 +113,8 @@ documents.onDidOpen((event) => {
     if (result) {
       pushDiagnostics(uri, 'compiler', result.diagnostics);
     }
+  }).catch((error) => {
+    connection.console.error(`[compiler] Compile failed for ${uri}: ${error}`);
   });
 
   // Also run solhint linter
@@ -122,6 +133,8 @@ documents.onDidChangeContent((change) => {
 
   compilerManager.compileWithDebounce(uri, content, (diagnostics) => {
     pushDiagnostics(uri, 'compiler', diagnostics);
+  }).catch((error) => {
+    connection.console.error(`[compiler] Debounced compile failed for ${uri}: ${error}`);
   });
 
   // Also run solhint linter
@@ -157,14 +170,21 @@ connection.onHover((params): Hover | null => {
   try {
     const uri = params.textDocument.uri;
     const document = documents.get(uri);
-    if (!document) return null;
+    if (!document) {
+      connection.console.log(`[hover] No document for ${uri}`);
+      return null;
+    }
 
     const result = compilerManager.getCachedResult(uri);
 
-    if (!result?.ast) return null;
+    if (!result?.ast) {
+      connection.console.log(`[hover] No AST for ${uri}`);
+      return null;
+    }
 
     return provideHover(result.ast, document, params.position, result);
   } catch (error) {
+    connection.console.log(`[hover] Error: ${error}`);
     return null;
   }
 });
@@ -173,15 +193,23 @@ connection.onDefinition((params): Definition | null => {
   try {
     const uri = params.textDocument.uri;
     const document = documents.get(uri);
-    if (!document) return null;
+    if (!document) {
+      connection.console.log(`[def] No document for ${uri}`);
+      return null;
+    }
 
     const project = projectManager.getProject(uri);
     const result = compilerManager.getCachedResult(uri);
 
-    if (!result?.ast) return null;
+    if (!result?.ast) {
+      connection.console.log(`[def] No AST for ${uri}`);
+      return null;
+    }
 
+    connection.console.log(`[def] Resolving definition at ${params.position.line}:${params.position.character}`);
     return provideDefinition(result.ast, document, params.position, result, project);
   } catch (error) {
+    connection.console.log(`[def] Error: ${error}`);
     return null;
   }
 });
@@ -246,7 +274,7 @@ connection.onDocumentFormatting(async (params) => {
     const document = documents.get(uri);
     if (!document) return [];
 
-    return await provideFormatting(document);
+    return await provideFormatting(document, connection);
   } catch (error) {
     return [];
   }
@@ -358,6 +386,7 @@ documents.onDidClose((event) => {
   const uri = event.document.uri;
   compilerManager.invalidate(uri);
   diagnosticStore.delete(uri);
+  connection.sendDiagnostics({ uri, diagnostics: [] });
   connection.console.log(`Document closed: ${uri}`);
 });
 

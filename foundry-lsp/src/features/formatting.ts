@@ -1,10 +1,11 @@
-import { TextEdit } from 'vscode-languageserver';
+import { Connection, TextEdit } from 'vscode-languageserver';
 import { TextDocument } from 'vscode-languageserver-textdocument';
 import { spawn } from 'child_process';
 import { projectManager } from '../project';
 
 export async function provideFormatting(
-  document: TextDocument
+  document: TextDocument,
+  connection: Connection
 ): Promise<TextEdit[]> {
   const content = document.getText();
   const uri = document.uri;
@@ -15,7 +16,7 @@ export async function provideFormatting(
   }
 
   return new Promise((resolve) => {
-    const child = spawn('forge', ['fmt', '--raw', '-'], {
+    const child = spawn('forge', ['fmt', '-'], {
       cwd: project.root,
       stdio: ['pipe', 'pipe', 'pipe'],
       timeout: 10000,
@@ -47,12 +48,16 @@ export async function provideFormatting(
             stdout
           ),
         ]);
+      } else if (code !== 0) {
+        connection.window.showErrorMessage(`Formatting failed: ${stderr || 'forge exited with code ' + code}`);
+        resolve([]);
       } else {
         resolve([]);
       }
     });
 
     child.on('error', () => {
+      connection.window.showErrorMessage('Formatting failed: forge not found or unavailable');
       resolve([]);
     });
 

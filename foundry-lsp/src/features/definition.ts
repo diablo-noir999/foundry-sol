@@ -157,7 +157,20 @@ function resolveMemberAccess(
 ): Location | null {
   const memberName = node.memberName;
 
-  // Find all definitions with that name
+  // First try referencedDeclaration (cross-file resolution)
+  const refId = (node as any).referencedDeclaration;
+  if (typeof refId === 'number' && refId !== -1) {
+    const def = findNodeById(ast, refId);
+    if (def?.src) {
+      const range = srcToRange(def.src, content);
+      if (range) {
+        const uri = documentUri(def, sourceFileMap);
+        if (uri) return Location.create(uri, range);
+      }
+    }
+  }
+
+  // Find all definitions with that name in current file
   const results: Location[] = [];
 
   const walk = (n: AstNode) => {
@@ -189,7 +202,26 @@ function resolveMemberAccess(
   };
 
   walk(ast);
-  return results.length > 0 ? results[0] : null;
+  if (results.length > 0) return results[0];
+
+  // Fallback: search by name in all indexed files
+  if (project) {
+    const { globalIndex } = require('../indexer');
+    const entries = globalIndex.findByName(memberName);
+    for (const entry of entries) {
+      if (entry.node.src) {
+        const entryContent = readFileContent(entry.filePath);
+        if (entryContent) {
+          const range = srcToRange(entry.node.src, entryContent);
+          if (range) {
+            return Location.create(entry.uri, range);
+          }
+        }
+      }
+    }
+  }
+
+  return null;
 }
 
 // ─── Helpers ───
@@ -311,6 +343,23 @@ function findNodeById(ast: AstNode, id: number): AstNode | null {
         walk(child);
       }
     }
+    if (node.body && typeof node.body === 'object' && 'nodeType' in node.body) {
+      walk(node.body as AstNode);
+    }
+    if (Array.isArray(node.statements)) {
+      for (const stmt of node.statements) {
+        if (stmt && typeof stmt === 'object' && 'nodeType' in stmt) walk(stmt as AstNode);
+      }
+    }
+    if (node.expression && typeof node.expression === 'object' && 'nodeType' in node.expression) {
+      walk(node.expression as AstNode);
+    }
+    if (node.subExpression && typeof node.subExpression === 'object' && 'nodeType' in node.subExpression) {
+      walk(node.subExpression as AstNode);
+    }
+    if (node.typeName && typeof node.typeName === 'object' && 'nodeType' in node.typeName) {
+      walk(node.typeName as AstNode);
+    }
   };
 
   walk(ast);
@@ -380,4 +429,12 @@ function documentUri(node: AstNode, sourceFileMap: Map<number, string>): string 
   }
 
   return '';
+}
+
+function readFileContent(filePath: string): string | null {
+  try {
+    return fs.readFileSync(filePath, 'utf-8');
+  } catch {
+    return null;
+  }
 }

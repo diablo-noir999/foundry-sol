@@ -3,13 +3,23 @@ import { AstNode } from './types';
 
 export function offsetToPosition(
   content: string,
-  offset: number
+  byteOffset: number
 ): Position {
   let line = 0;
   let character = 0;
+  let currentByte = 0;
 
-  for (let i = 0; i < offset && i < content.length; i++) {
-    if (content[i] === '\n') {
+  for (let i = 0; i < content.length; i++) {
+    const char = content[i];
+    const charBytes = Buffer.byteLength(char, 'utf-8');
+
+    if (currentByte + charBytes > byteOffset) {
+      break;
+    }
+
+    currentByte += charBytes;
+
+    if (char === '\n') {
       line++;
       character = 0;
     } else {
@@ -48,20 +58,17 @@ export function parseSrc(src: string): { start: number; length: number } | null 
 }
 
 export function positionToOffset(content: string, position: Position): number {
-  let offset = 0;
-  let line = 0;
+  const lines = content.split('\n');
+  let byteOffset = 0;
 
-  for (let i = 0; i < content.length; i++) {
-    if (line === position.line) {
-      return offset + position.character;
-    }
-    if (content[i] === '\n') {
-      line++;
-      offset = i + 1;
-    }
+  for (let i = 0; i < position.line && i < lines.length; i++) {
+    byteOffset += Buffer.byteLength(lines[i], 'utf-8') + 1; // +1 for \n
   }
 
-  return offset;
+  const targetLine = lines[position.line] || '';
+  byteOffset += Buffer.byteLength(targetLine.substring(0, position.character), 'utf-8');
+
+  return byteOffset;
 }
 
 export function walkAst(
@@ -94,100 +101,69 @@ function walkAstInternal(
   }
 }
 
-function nodeTypeHasChildren(node: AstNode): boolean {
-  const t = node.nodeType;
-  return (
-    t === 'Block' ||
-    t === 'ParameterList' ||
-    t === 'InheritanceSpecifier' ||
-    t === 'OverrideSpecifier' ||
-    t === 'FunctionCall' ||
-    t === 'MemberAccess' ||
-    t === 'Mapping' ||
-    t === 'ArrayTypeName' ||
-    t === 'UserDefinedTypeName' ||
-    t === 'StateVariableDeclaration' ||
-    t === 'VariableDeclaration' ||
-    t === 'StructDefinition' ||
-    t === 'EnumDefinition' ||
-    t === 'EventDefinition' ||
-    t === 'ErrorDefinition' ||
-    t === 'ModifierDefinition' ||
-    t === 'ContractDefinition' ||
-    t === 'FunctionDefinition' ||
-    t === 'ImportDirective' ||
-    t === 'SourceUnit'
-  );
+function nodeTypeHasChildren(_node: AstNode): boolean {
+  return true;
 }
 
 function getChildren(node: AstNode): AstNode[] {
   const children: AstNode[] = [];
 
-  if (node.body && typeof node.body === 'object' && 'nodeType' in node.body) {
-    children.push(node.body as unknown as AstNode);
-  }
-  if (node.parameters && typeof node.parameters === 'object' && 'nodeType' in node.parameters) {
-    children.push(node.parameters as unknown as AstNode);
-  }
-  if (node.returnParameters && typeof node.returnParameters === 'object' && 'nodeType' in node.returnParameters) {
-    children.push(node.returnParameters as unknown as AstNode);
-  }
-  if (node.typeName && typeof node.typeName === 'object' && 'nodeType' in node.typeName) {
-    children.push(node.typeName as unknown as AstNode);
-  }
-  if (node.keyType && typeof node.keyType === 'object' && 'nodeType' in node.keyType) {
-    children.push(node.keyType as unknown as AstNode);
-  }
-  if (node.valueType && typeof node.valueType === 'object' && 'nodeType' in node.valueType) {
-    children.push(node.valueType as unknown as AstNode);
-  }
-  if (node.baseType && typeof node.baseType === 'object' && 'nodeType' in node.baseType) {
-    children.push(node.baseType as unknown as AstNode);
-  }
-  if (node.expression && typeof node.expression === 'object' && 'nodeType' in node.expression) {
-    children.push(node.expression as unknown as AstNode);
-  }
-  if (node.baseName && typeof node.baseName === 'object' && 'nodeType' in node.baseName) {
-    children.push(node.baseName as unknown as AstNode);
-  }
-  if (node.pathNode && typeof node.pathNode === 'object' && 'nodeType' in node.pathNode) {
-    children.push(node.pathNode as unknown as AstNode);
-  }
-  if (Array.isArray(node.arguments)) {
-    for (const arg of node.arguments) {
-      if (arg && typeof arg === 'object' && 'nodeType' in arg) {
-        children.push(arg as AstNode);
+  const pushChild = (val: unknown) => {
+    if (val && typeof val === 'object' && 'nodeType' in val) {
+      children.push(val as AstNode);
+    }
+  };
+
+  const pushArray = (arr: unknown) => {
+    if (Array.isArray(arr)) {
+      for (const item of arr) {
+        if (item && typeof item === 'object' && 'nodeType' in item) {
+          children.push(item as AstNode);
+        }
       }
     }
-  }
-  if (Array.isArray(node.members)) {
-    for (const member of node.members) {
-      if (member && typeof member === 'object' && 'nodeType' in member) {
-        children.push(member as AstNode);
-      }
-    }
-  }
-  if (Array.isArray(node.baseContracts)) {
-    for (const base of node.baseContracts) {
-      if (base && typeof base === 'object' && 'nodeType' in base) {
-        children.push(base as AstNode);
-      }
-    }
-  }
-  if (Array.isArray(node.overrides)) {
-    for (const override of node.overrides) {
-      if (override && typeof override === 'object' && 'nodeType' in override) {
-        children.push(override as AstNode);
-      }
-    }
-  }
-  if (Array.isArray(node.statements)) {
-    for (const stmt of node.statements) {
-      if (stmt && typeof stmt === 'object' && 'nodeType' in stmt) {
-        children.push(stmt as AstNode);
-      }
-    }
-  }
+  };
+
+  pushChild(node.body);
+  pushChild(node.parameters);
+  pushChild(node.returnParameters);
+  pushChild(node.typeName);
+  pushChild(node.keyType);
+  pushChild(node.valueType);
+  pushChild(node.baseType);
+  pushChild(node.expression);
+  pushChild(node.baseName);
+  pushChild(node.pathNode);
+  pushChild(node.subExpression);
+  pushChild(node.condition);
+  pushChild(node.trueBody);
+  pushChild(node.falseBody);
+  pushChild(node.leftHandSide);
+  pushChild(node.rightHandSide);
+  pushChild(node.leftExpression);
+  pushChild(node.rightExpression);
+  pushChild(node.baseExpression);
+  pushChild(node.indexExpression);
+  pushChild(node.initialValue);
+  pushChild(node.eventCall);
+  pushChild(node.errorCall);
+  pushChild(node.block);
+  pushChild(node.externalCall);
+  pushChild(node.loopExpression);
+  pushChild(node.trueExp);
+  pushChild(node.falseExp);
+
+  pushArray(node.arguments);
+  pushArray(node.members);
+  pushArray(node.baseContracts);
+  pushArray(node.overrides);
+  pushArray(node.statements);
+  pushArray(node.modifiers);
+  pushArray(node.declarations);
+  pushArray(node.initializations);
+  pushArray(node.clauses);
+  pushArray(node.assignments);
+
   if (Array.isArray(node.symbolAliases)) {
     for (const alias of node.symbolAliases) {
       if (alias?.local && typeof alias.local === 'object' && 'nodeType' in alias.local) {

@@ -13,10 +13,42 @@ import {
   isEventDefinition,
   isErrorDefinition,
 } from '../ast/types';
-import { findNodeAtPosition, walkAst, parseSrc, offsetToPosition, positionToOffset } from '../ast/traversal';
+import { findNodeAtPosition, walkAst, parseSrc, positionToOffset } from '../ast/traversal';
 import { CompileResult } from '../compiler/cache';
 import { globalIndex } from '../indexer';
 import * as fs from 'fs';
+
+const BUILTINS: Record<string, SignatureInformation> = {
+  require: {
+    label: 'function require(bool condition, string memory reason)',
+    documentation: 'Reverts the transaction with the given error message if the condition is false.',
+    parameters: [
+      { label: [19, 43] as [number, number], documentation: 'The condition to check' },
+      { label: [45, 73] as [number, number], documentation: 'Error message if condition is false' },
+    ],
+  },
+  assert: {
+    label: 'function assert(bool condition)',
+    documentation: 'Reverts the transaction with Panic error if the condition is false. Used for internal errors.',
+    parameters: [
+      { label: [14, 38] as [number, number], documentation: 'The condition to check' },
+    ],
+  },
+  revert: {
+    label: 'function revert(string memory reason)',
+    documentation: 'Reverts the transaction with the given error message.',
+    parameters: [
+      { label: [17, 45] as [number, number], documentation: 'Error message' },
+    ],
+  },
+  blockhash: {
+    label: 'function blockhash(uint256 blockNumber) returns (bytes32)',
+    documentation: 'Get the hash of the given block number.',
+    parameters: [
+      { label: [20, 41] as [number, number], documentation: 'Block number' },
+    ],
+  },
+};
 
 export function provideSignatureHelp(
   ast: AstNode,
@@ -35,6 +67,17 @@ export function provideSignatureHelp(
   if (!expr?.name) return null;
 
   const funcName = expr.name;
+
+  // Check built-in functions first
+  const builtin = BUILTINS[funcName];
+  if (builtin) {
+    const activeParam = countCommasBeforePosition(content, position, callNode);
+    return {
+      signatures: [builtin],
+      activeSignature: 0,
+      activeParameter: Math.min(activeParam, (builtin.parameters?.length ?? 1) - 1),
+    };
+  }
 
   // Find the function definition (current file or indexed)
   const funcDef = findFunctionDefinition(funcName, ast, content, compileResult);
@@ -58,34 +101,25 @@ function findFunctionCallAtPosition(ast: AstNode, content: string, position: Pos
   let found: AstNode | null = null;
   let bestRange = Infinity;
 
+  const cursorOffset = positionToOffset(content, position);
+
   walkAst(ast, (node) => {
     if (isFunctionCall(node) && node.src) {
       const parsed = parseSrc(node.src);
       if (parsed) {
-        const pos = offsetToPosition(content, parsed.start);
-        const nodeLine = pos.line;
-        const cursorLine = position.line;
+        const nodeContent = content.substring(parsed.start, parsed.start + parsed.length);
+        const openParen = nodeContent.indexOf('(');
+        const closeParen = nodeContent.lastIndexOf(')');
 
-        // Check if cursor is within the call (same line, within src range)
-        if (cursorLine >= nodeLine) {
-          const nodeContent = content.substring(parsed.start, parsed.start + parsed.length);
-          const openParen = nodeContent.indexOf('(');
-          const closeParen = nodeContent.lastIndexOf(')');
+        if (openParen >= 0 && closeParen >= 0) {
+          const absOpen = parsed.start + openParen;
+          const absClose = parsed.start + closeParen;
 
-          if (openParen >= 0 && closeParen >= 0) {
-            const absOpen = parsed.start + openParen;
-            const absClose = parsed.start + closeParen;
-            const cursorOffset = offsetToPosition(content, positionToOffset(content, position)).line === nodeLine
-              ? position.character + (position.line * 1000)
-              : 0;
-            const nodeStart = pos.line * 1000 + pos.character;
-
-            if (cursorOffset >= nodeStart && cursorOffset <= (absClose * 1)) {
-              const rangeSize = parsed.length;
-              if (rangeSize < bestRange) {
-                bestRange = rangeSize;
-                found = node;
-              }
+          if (cursorOffset >= absOpen && cursorOffset <= absClose) {
+            const rangeSize = parsed.length;
+            if (rangeSize < bestRange) {
+              bestRange = rangeSize;
+              found = node;
             }
           }
         }
@@ -239,12 +273,11 @@ function countCommasBeforePosition(content: string, position: Position, callNode
   const openParen = content.indexOf('(', parsed.start);
   if (openParen < 0) return 0;
 
-  // Count commas between openParen and cursor position
-  const cursorOffset = position.line * 1000 + position.character;
+  const cursorOffset = positionToOffset(content, position);
   let count = 0;
-  for (let i = openParen + 1; i < content.length; i++) {
+  for (let i = openParen + 1; i < content.length && i < cursorOffset; i++) {
     const ch = content[i];
-    if (ch === '(') break; // nested call
+    if (ch === '(') break;
     if (ch === ')') break;
     if (ch === ',') count++;
   }

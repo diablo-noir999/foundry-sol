@@ -204,7 +204,8 @@ export function isFunctionDefinition(node: AstNode): node is FunctionDefinition 
 export function isStateVariableDeclaration(
   node: AstNode
 ): node is StateVariableDeclaration {
-  return node.nodeType === 'StateVariableDeclaration';
+  return node.nodeType === 'StateVariableDeclaration' ||
+    (node.nodeType === 'VariableDeclaration' && !!(node as any).visibility);
 }
 
 export function isStructDefinition(node: AstNode): node is StructDefinition {

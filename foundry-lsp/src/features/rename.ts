@@ -77,11 +77,13 @@ function collectRenamesInAst(
     if (node.id === targetId && node.name === oldName && node.src) {
       const parsed = parseSrc(node.src);
       if (parsed) {
-        const startOffset = parsed.start;
-        const nameOffset = content.indexOf(oldName, startOffset);
-        if (nameOffset >= 0) {
-          const namePos = offsetToPosition(content, nameOffset);
-          const nameEndPos = offsetToPosition(content, nameOffset + oldName.length);
+        const startPos = offsetToPosition(content, parsed.start);
+        const lines = content.split('\n');
+        const lineText = lines[startPos.line] || '';
+        const nameIdx = lineText.indexOf(oldName, startPos.character);
+        if (nameIdx >= 0) {
+          const namePos = { line: startPos.line, character: nameIdx };
+          const nameEndPos = { line: startPos.line, character: nameIdx + oldName.length };
           edits.push(TextEdit.replace({ start: namePos, end: nameEndPos }, newName));
         }
       }
@@ -94,10 +96,13 @@ function collectRenamesInAst(
     if (isIdentifier(node) && node.referencedDeclaration === targetId && node.src) {
       const parsed = parseSrc(node.src);
       if (parsed) {
-        const nameOffset = content.indexOf(node.name!, parsed.start);
-        if (nameOffset >= 0) {
-          const namePos = offsetToPosition(content, nameOffset);
-          const nameEndPos = offsetToPosition(content, nameOffset + node.name!.length);
+        const startPos = offsetToPosition(content, parsed.start);
+        const lines = content.split('\n');
+        const lineText = lines[startPos.line] || '';
+        const nameIdx = lineText.indexOf(node.name!, startPos.character);
+        if (nameIdx >= 0) {
+          const namePos = { line: startPos.line, character: nameIdx };
+          const nameEndPos = { line: startPos.line, character: nameIdx + node.name!.length };
           edits.push(TextEdit.replace({ start: namePos, end: nameEndPos }, newName));
         }
       }

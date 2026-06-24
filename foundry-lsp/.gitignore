@@ -1,8 +1,10 @@
 node_modules/
-out/
+out/*
+!out/server.js
 *.js.map
 *.tsbuildinfo
 test-project/out/
 test-project/cache/
 test-project/lib/
 test-project/*.solhint-tmp
+test-server.js

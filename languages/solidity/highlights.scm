@@ -171,6 +171,7 @@
   "fallback"
   "receive"
   "as"
+  "anonymous"
   (unchecked)
   (virtual)
 ] @keyword
@@ -198,6 +199,7 @@
   "pure"
   "view"
   "payable"
+  "nonpayable"
   (immutable)
 ] @keyword.modifier
 

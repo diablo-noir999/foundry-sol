@@ -5,6 +5,7 @@ schema_version = 1
 authors = ["Copernicium282"]
 description = "Solidity language support for Zed, built for Foundry projects"
 repository = "https://github.com/Copernicium282/foundry-sol"
+languages = ["languages/solidity"]
 snippets = "./snippets/solidity.json"
 
 [language_servers.solidity]
