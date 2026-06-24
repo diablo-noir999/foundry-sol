@@ -1,0 +1,8 @@
+node_modules/
+out/
+*.js.map
+*.tsbuildinfo
+test-project/out/
+test-project/cache/
+test-project/lib/
+test-project/*.solhint-tmp

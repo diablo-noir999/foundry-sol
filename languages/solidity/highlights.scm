@@ -75,8 +75,20 @@
   (expression
     (identifier)) @type)
 
+; Error declarations
+(error_declaration
+  name: (identifier) @type)
+
+; User-defined type aliases (type MyUint is uint256)
+(type_alias
+  (identifier) @type)
+
 ; Handles ContractA, ContractB in function foo() override(ContractA, contractB) {}
 (override_specifier
+  (user_defined_type) @type)
+
+; Inheritance specifiers (contract Foo is Bar, Baz {})
+(inheritance_specifier
   (user_defined_type) @type)
 
 ; Functions and parameters
@@ -125,6 +137,10 @@
   (yul_identifier) @function
   (yul_identifier) @variable.parameter)
 
+; Using-for library references (using SafeMath for uint256)
+(using_directive
+  (type_name) @type)
+
 (meta_type_expression
   "type" @keyword)
 
@@ -151,7 +167,6 @@
   "modifier"
   "var"
   "let"
-  "emit"
   "error"
   "fallback"
   "receive"
@@ -262,8 +277,7 @@
   "."
   ","
   ":"
-  ; FIXME: update grammar
-  ; (semicolon)
+  ";"
   "->"
   "=>"
 ] @punctuation.delimiter
@@ -292,8 +306,6 @@
   ">"
   "!"
   "~"
-  "-"
-  "+"
   "++"
   "--"
   ":="
@@ -310,11 +322,17 @@
 ; Comments
 (comment) @comment
 
+; Single-line NatSpec (/// ...)
 ((comment) @comment.documentation
-  (#match? @comment.documentation "^///[^/]"))
+  (#match? @comment.documentation "^///"))
+
+; Multi-line NatSpec (/** ... */)
+((comment) @comment.documentation
+  (#match? @comment.documentation "^/\\*\\*"))
+
+; NatSpec tags inside documentation comments
+((comment) @comment.documentation
+  (#match? @comment.documentation "@(title|author|notice|dev|param|return|inheritdoc|custom)"))
 
 ((comment) @comment.documentation
-  (#match? @comment.documentation "^///$"))
-
-((comment) @comment.documentation
-  (#match? @comment.documentation "^/\\*\\*[^*].*\\*/$"))
+  (#match? @comment.documentation "@(title|author|notice|dev|param|return|inheritdoc|custom):"))

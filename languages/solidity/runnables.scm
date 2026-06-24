@@ -19,6 +19,16 @@
   (#set! tag solidity-test)
 )
 
+; Match setUp functions (Foundry test setup)
+(
+  (
+    (function_definition
+      name: (identifier) @run
+      (#match? @run "^setUp$"))
+  ) @_
+  (#set! tag solidity-test)
+)
+
 ; Match entire contract for running all tests in a contract
 (
   (contract_declaration

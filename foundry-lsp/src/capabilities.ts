@@ -1,0 +1,71 @@
+import { ServerCapabilities, TextDocumentSyncKind } from 'vscode-languageserver';
+
+export const SERVER_CAPABILITIES: ServerCapabilities = {
+  textDocumentSync: TextDocumentSyncKind.Incremental,
+  completionProvider: {
+    triggerCharacters: ['.', '"', '/'],
+    resolveProvider: false,
+  },
+  definitionProvider: true,
+  hoverProvider: true,
+  codeActionProvider: {
+    codeActionKinds: [
+      'quickfix',
+      'refactor',
+    ],
+  },
+  documentSymbolProvider: true,
+  referencesProvider: true,
+  documentFormattingProvider: true,
+  renameProvider: {
+    prepareProvider: true,
+  },
+  typeDefinitionProvider: true,
+  semanticTokensProvider: {
+    legend: {
+      tokenTypes: [
+        'namespace',
+        'type',
+        'class',
+        'enum',
+        'interface',
+        'struct',
+        'typeParameter',
+        'parameter',
+        'variable',
+        'property',
+        'enumMember',
+        'event',
+        'function',
+        'method',
+        'constructor',
+        'string',
+        'number',
+        'regexp',
+        'operator',
+        'keyword',
+        'comment',
+        'modifier',
+        'decorator',
+      ],
+      tokenModifiers: [
+        'declaration',
+        'definition',
+        'readonly',
+        'static',
+        'deprecated',
+        'abstract',
+        'async',
+        'modification',
+        'documentation',
+        'defaultLibrary',
+      ],
+    },
+    full: true,
+  },
+  signatureHelpProvider: {
+    triggerCharacters: ['(', ','],
+  },
+  workspaceSymbolProvider: true,
+  implementationProvider: true,
+};

@@ -1,8 +1,6 @@
 [
     (block_statement)
     (if_statement)
-    (emit_statement)
-    (revert_statement)
     (try_statement)
     (catch_clause)
     (for_statement)
@@ -11,6 +9,11 @@
     (call_expression)
     (error_declaration)
     (enum_declaration)
+    (struct_declaration)
+    (contract_body)
+    (function_body)
+    (assembly_statement)
+    (yul_block)
 ] @indent.begin
 
 (_ "[" "]" @end) @indent
