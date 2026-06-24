@@ -183,5 +183,204 @@
     "prefix": "erc173i-draft",
     "body": "// https://eips.ethereum.org/EIPS/eip-173\r\n// https://github.com/0xcert/ethereum-erc721/blob/master/src/contracts/ownership/ownable.sol (this example)\r\n// https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/access/Ownable.sol\r\n// https://github.com/FriendlyUser/solidity-smart-contracts//blob/v0.2.0/contracts/other/CredVert/Ownable.sol\r\n// SPDX-License-Identifier: MIT\r\npragma solidity >=0.5.0 <0.8.0;\r\n\r\n/// @title ERC-173 Contract Ownership Standard\r\n/// @dev See https://github.com/ethereum/EIPs/blob/master/EIPS/eip-173.md\r\n///  Note: the ERC-165 identifier for this interface is 0x7f5828d0\r\ninterface ERC173 /* is ERC165 */ {\r\n    /// @dev This emits when ownership of a contract changes\r\n    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);\r\n\r\n    /// @notice Get the address of the owner\r\n    /// @return The address of the owner.\r\n    function owner() external view returns (address);\r\n    /// @notice Set the address of the new owner of the contract\r\n    /// @dev Set _newOwner to address(0) to renounce any ownership.\r\n    /// @param _newOwner The address of the new owner of the contract\r\n    function transferOwnership(address _newOwner) external;\r\n}\r\n\r\ninterface ERC165 {\r\n    /// @notice Query if a contract implements an interface\r\n    /// @param interfaceID The interface identifier, as specified in ERC-165\r\n    /// @dev Interface identification is specified in ERC-165. This function\r\n    ///  uses less than 30,000 gas.\r\n    /// @return `true` if the contract implements `interfaceID` and\r\n    ///  `interfaceID` is not 0xffffffff, `false` otherwise\r\n    function supportsInterface(bytes4 interfaceID) external view returns (bool);\r\n}",
     "description": "Draft: EIP-173 Interface for Contract Ownership Standard, A standard interface for ownership of contracts."
+  },
+  "Forge Test": {
+    "prefix": "forge-test",
+    "body": [
+      "// SPDX-License-Identifier: MIT",
+      "pragma solidity ^0.8.0;",
+      "",
+      "import \"forge-std/Test.sol\";",
+      "",
+      "contract ${1:MyTest} is Test {",
+      "\tfunction setUp() public {",
+      "\t\t$0",
+      "\t}",
+      "",
+      "\tfunction test${2:Basic}() public {",
+      "\t\tassertTrue(true);",
+      "\t}",
+      "}"
+    ],
+    "description": "Forge test contract template"
+  },
+  "Forge Script": {
+    "prefix": "forge-script",
+    "body": [
+      "// SPDX-License-Identifier: MIT",
+      "pragma solidity ^0.8.0;",
+      "",
+      "import \"forge-std/Script.sol\";",
+      "",
+      "contract ${1:MyScript} is Script {",
+      "\tfunction run() external {",
+      "\t\tuint256 deployerPrivateKey = vm.envUint(\"PRIVATE_KEY\");",
+      "\t\tvm.startBroadcast(deployerPrivateKey);",
+      "\t\t$0",
+      "\t\tvm.stopBroadcast();",
+      "\t}",
+      "}"
+    ],
+    "description": "Forge script template"
+  },
+  "Console Log": {
+    "prefix": "clog",
+    "body": "console.log(\"${1:message}\");",
+    "description": "console.log for debugging"
+  },
+  "Console Log Address": {
+    "prefix": "cloga",
+    "body": "console.log(\"${1:label}:\", ${2:address});",
+    "description": "console.log for address"
+  },
+  "Console Log Uint": {
+    "prefix": "clogu",
+    "body": "console.log(\"${1:label}:\", ${2:uintValue});",
+    "description": "console.log for uint"
+  },
+  "Ownable Pattern": {
+    "prefix": "ownable",
+    "body": [
+      "// SPDX-License-Identifier: MIT",
+      "pragma solidity ^0.8.0;",
+      "",
+      "abstract contract Ownable {",
+      "\taddress public owner;",
+      "",
+      "\tevent OwnershipTransferred(address indexed previousOwner, address indexed newOwner);",
+      "",
+      "\tconstructor(address initialOwner) {",
+      "\t\towner = initialOwner;",
+      "\t\temit OwnershipTransferred(address(0), initialOwner);",
+      "\t}",
+      "",
+      "\tmodifier onlyOwner() {",
+      "\t\trequire(msg.sender == owner, \"Ownable: caller is not the owner\");",
+      "\t\t_;",
+      "\t}",
+      "",
+      "\tfunction transferOwnership(address newOwner) public onlyOwner {",
+      "\t\trequire(newOwner != address(0), \"Ownable: new owner is the zero address\");",
+      "\t\temit OwnershipTransferred(owner, newOwner);",
+      "\t\towner = newOwner;",
+      "\t}",
+      "",
+      "\tfunction renounceOwnership() public onlyOwner {",
+      "\t\temit OwnershipTransferred(owner, address(0));",
+      "\t\towner = address(0);",
+      "\t}",
+      "}"
+    ],
+    "description": "Ownable access control pattern"
+  },
+  "Pausable Pattern": {
+    "prefix": "pausable",
+    "body": [
+      "bool public paused;",
+      "",
+      "event Paused(address account);",
+      "event Unpaused(address account);",
+      "",
+      "modifier whenNotPaused() {",
+      "\trequire(!paused, \"Pausable: paused\");",
+      "\t_;",
+      "}",
+      "",
+      "modifier whenPaused() {",
+      "\trequire(paused, \"Pausable: not paused\");",
+      "\t_;",
+      "}",
+      "",
+      "function _pause() internal whenNotPaused {",
+      "\tpaused = true;",
+      "\temit Paused(msg.sender);",
+      "}",
+      "",
+      "function _unpause() internal whenPaused {",
+      "\tpaused = false;",
+      "\temit Unpaused(msg.sender);",
+      "}"
+    ],
+    "description": "Pausable pattern snippet"
+  },
+  "ReentrancyGuard Pattern": {
+    "prefix": "reentrancy",
+    "body": [
+      "uint256 private _locked = 1;",
+      "",
+      "modifier nonReentrant() {",
+      "\trequire(_locked == 1, \"ReentrancyGuard: reentrant call\");",
+      "\t_locked = 2;",
+      "\t_;",
+      "\t_locked = 1;",
+      "}"
+    ],
+    "description": "ReentrancyGuard pattern snippet"
+  },
+  "ERC4626 Interface": {
+    "prefix": "erc4626i",
+    "body": [
+      "// SPDX-License-Identifier: MIT",
+      "pragma solidity ^0.8.0;",
+      "",
+      "interface IERC4626 {",
+      "\tevent Deposit(address indexed sender, address indexed owner, uint256 assets, uint256 shares);",
+      "\tevent Withdraw(address indexed sender, address indexed receiver, address indexed owner, uint256 assets, uint256 shares);",
+      "",
+      "\tfunction totalAssets() external view returns (uint256);",
+      "\tfunction convertToShares(uint256 assets) external view returns (uint256);",
+      "\tfunction convertToAssets(uint256 shares) external view returns (uint256);",
+      "\tfunction maxDeposit(address receiver) external view returns (uint256);",
+      "\tfunction maxMint(address receiver) external view returns (uint256);",
+      "\tfunction maxWithdraw(address owner) external view returns (uint256);",
+      "\tfunction maxRedeem(address owner) external view returns (uint256);",
+      "\tfunction previewDeposit(uint256 assets) external view returns (uint256);",
+      "\tfunction previewMint(uint256 shares) external view returns (uint256);",
+      "\tfunction previewWithdraw(uint256 assets) external view returns (uint256);",
+      "\tfunction previewRedeem(uint256 shares) external view returns (uint256);",
+      "\tfunction deposit(uint256 assets, address receiver) external returns (uint256);",
+      "\tfunction mint(uint256 shares, address receiver) external returns (uint256);",
+      "\tfunction withdraw(uint256 assets, address receiver, address owner) external returns (uint256);",
+      "\tfunction redeem(uint256 shares, address receiver, address owner) external returns (uint256);",
+      "}"
+    ],
+    "description": "ERC-4626 Tokenized Vault Standard interface"
+  },
+  "ERC2981 Interface": {
+    "prefix": "erc2981i",
+    "body": [
+      "// SPDX-License-Identifier: MIT",
+      "pragma solidity ^0.8.0;",
+      "",
+      "interface IERC2981 {",
+      "\tevent RoyaltyReceived(address indexed sender, uint256 indexed amount);",
+      "",
+      "\tfunction royaltyInfo(uint256 tokenId, uint256 salePrice) external view returns (address receiver, uint256 royaltyAmount);",
+      "\tsupportsInterface(bytes4 interfaceId) external view returns (bool);",
+      "}"
+    ],
+    "description": "ERC-2981 NFT Royalty Standard interface"
+  },
+  "ERC1167 Minimal Proxy": {
+    "prefix": "erc1167",
+    "body": [
+      "// SPDX-License-Identifier: MIT",
+      "pragma solidity ^0.8.0;",
+      "",
+      "/// @title ERC-1167 Minimal Proxy Clone",
+      "/// @dev See https://eips.ethereum.org/EIPS/eip-1167",
+      "library Clones {",
+      "\tfunction clone(address implementation) internal returns (address instance) {",
+      "\t\tassembly {",
+      "\t\t\tlet ptr := mload(0x40)",
+      "\t\t\tmstore(ptr, 0x3d602d80600a3d3981f3363d3d373d3d3d363d73000000000000000000000000)",
+      "\t\t\tmstore(add(ptr, 0x14), shl(0x60, implementation))",
+      "\t\t\tmstore(add(ptr, 0x28), 0x5af43d82803e903d91602b57fd5bf30000000000000000000000000000000000)",
+      "\t\t\tinstance := create(ptr, 0, 0x37)",
+      "\t\t}",
+      "\t}",
+      "}"
+    ],
+    "description": "ERC-1167 minimal proxy clone pattern"
   }
 }

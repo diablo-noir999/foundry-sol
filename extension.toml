@@ -1,6 +1,6 @@
 id = "foundry-sol"
 name = "Foundry Sol"
-version = "0.3.0"
+version = "0.4.0"
 schema_version = 1
 authors = ["Copernicium282"]
 description = "Solidity language support for Zed, built for Foundry projects"

@@ -51,6 +51,24 @@ connection.onInitialize((params: InitializeParams): InitializeResult => {
     `workspace folders: ${JSON.stringify(params.workspaceFolders)}`
   );
 
+  // Check capabilities from extension
+  const initOptions = params.initializationOptions as any;
+  const capabilities = initOptions?.capabilities ?? {};
+  if (capabilities.forge === false) {
+    connection.console.warn('foundry-lsp: forge not found — compilation will not work');
+    connection.sendNotification('window/showMessage', {
+      type: 2, // Warning
+      message: 'Foundry Sol: forge not found. Please install Foundry (https://getfoundry.sh) for compilation support.',
+    });
+  }
+  if (capabilities.node === false) {
+    connection.console.error('foundry-lsp: node not found — LSP cannot function');
+    connection.sendNotification('window/showMessage', {
+      type: 1, // Error
+      message: 'Foundry Sol: Node.js not found. Please install Node.js to use the LSP.',
+    });
+  }
+
   projectManager.init(params.workspaceFolders ?? null);
 
   return {
