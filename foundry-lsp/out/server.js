@@ -5,15 +5,8 @@ var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropNames = Object.getOwnPropertyNames;
 var __getProtoOf = Object.getPrototypeOf;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
-var __esm = (fn, res) => function __init() {
-  return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
-};
 var __commonJS = (cb, mod) => function __require() {
   return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
-};
-var __export = (target, all) => {
-  for (var name in all)
-    __defProp(target, name, { get: all[name], enumerable: true });
 };
 var __copyProps = (to, from, except, desc) => {
   if (from && typeof from === "object" || typeof from === "function") {
@@ -31,7 +24,6 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
   isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
   mod
 ));
-var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
 // node_modules/vscode-languageserver/lib/common/utils/is.js
 var require_is = __commonJS({
@@ -3089,8 +3081,8 @@ var require_main = __commonJS({
     exports2.createMessageConnection = exports2.createServerSocketTransport = exports2.createClientSocketTransport = exports2.createServerPipeTransport = exports2.createClientPipeTransport = exports2.generateRandomPipeName = exports2.StreamMessageWriter = exports2.StreamMessageReader = exports2.SocketMessageWriter = exports2.SocketMessageReader = exports2.PortMessageWriter = exports2.PortMessageReader = exports2.IPCMessageWriter = exports2.IPCMessageReader = void 0;
     var ril_1 = require_ril();
     ril_1.default.install();
-    var path11 = require("path");
-    var os = require("os");
+    var path12 = require("path");
+    var os4 = require("os");
     var crypto_1 = require("crypto");
     var net_1 = require("net");
     var api_1 = require_api();
@@ -3225,9 +3217,9 @@ var require_main = __commonJS({
       }
       let result;
       if (XDG_RUNTIME_DIR) {
-        result = path11.join(XDG_RUNTIME_DIR, `vscode-ipc-${randomSuffix}.sock`);
+        result = path12.join(XDG_RUNTIME_DIR, `vscode-ipc-${randomSuffix}.sock`);
       } else {
-        result = path11.join(os.tmpdir(), `vscode-${randomSuffix}.sock`);
+        result = path12.join(os4.tmpdir(), `vscode-${randomSuffix}.sock`);
       }
       const limit = safeIpcPathLengths.get(process.platform);
       if (limit !== void 0 && result.length > limit) {
@@ -8317,7 +8309,7 @@ var require_files = __commonJS({
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.resolveModulePath = exports2.FileSystem = exports2.resolveGlobalYarnPath = exports2.resolveGlobalNodePath = exports2.resolve = exports2.uriToFilePath = void 0;
     var url = require("url");
-    var path11 = require("path");
+    var path12 = require("path");
     var fs12 = require("fs");
     var child_process_1 = require("child_process");
     function uriToFilePath(uri) {
@@ -8336,7 +8328,7 @@ var require_files = __commonJS({
           segments.shift();
         }
       }
-      return path11.normalize(segments.join("/"));
+      return path12.normalize(segments.join("/"));
     }
     exports2.uriToFilePath = uriToFilePath;
     function isWindows() {
@@ -8367,7 +8359,7 @@ var require_files = __commonJS({
         Object.keys(env).forEach((key) => newEnv[key] = env[key]);
         if (nodePath && fs12.existsSync(nodePath)) {
           if (newEnv[nodePathKey]) {
-            newEnv[nodePathKey] = nodePath + path11.delimiter + newEnv[nodePathKey];
+            newEnv[nodePathKey] = nodePath + path12.delimiter + newEnv[nodePathKey];
           } else {
             newEnv[nodePathKey] = nodePath;
           }
@@ -8440,9 +8432,9 @@ var require_files = __commonJS({
         }
         if (prefix.length > 0) {
           if (isWindows()) {
-            return path11.join(prefix, "node_modules");
+            return path12.join(prefix, "node_modules");
           } else {
-            return path11.join(prefix, "lib", "node_modules");
+            return path12.join(prefix, "lib", "node_modules");
           }
         }
         return void 0;
@@ -8482,7 +8474,7 @@ var require_files = __commonJS({
           try {
             let yarn = JSON.parse(line);
             if (yarn.type === "log") {
-              return path11.join(yarn.data, "node_modules");
+              return path12.join(yarn.data, "node_modules");
             }
           } catch (e) {
           }
@@ -8512,17 +8504,17 @@ var require_files = __commonJS({
       FileSystem2.isCaseSensitive = isCaseSensitive;
       function isParent(parent, child) {
         if (isCaseSensitive()) {
-          return path11.normalize(child).indexOf(path11.normalize(parent)) === 0;
+          return path12.normalize(child).indexOf(path12.normalize(parent)) === 0;
         } else {
-          return path11.normalize(child).toLowerCase().indexOf(path11.normalize(parent).toLowerCase()) === 0;
+          return path12.normalize(child).toLowerCase().indexOf(path12.normalize(parent).toLowerCase()) === 0;
         }
       }
       FileSystem2.isParent = isParent;
     })(FileSystem || (exports2.FileSystem = FileSystem = {}));
     function resolveModulePath(workspaceRoot, moduleName, nodePath, tracer) {
       if (nodePath) {
-        if (!path11.isAbsolute(nodePath)) {
-          nodePath = path11.join(workspaceRoot, nodePath);
+        if (!path12.isAbsolute(nodePath)) {
+          nodePath = path12.join(workspaceRoot, nodePath);
         }
         return resolve2(moduleName, nodePath, nodePath, tracer).then((value) => {
           if (FileSystem.isParent(nodePath, value)) {
@@ -10882,7 +10874,7 @@ var require_toml = __commonJS({
 var require_constants = __commonJS({
   "node_modules/picomatch/lib/constants.js"(exports2, module2) {
     "use strict";
-    var path11 = require("path");
+    var path12 = require("path");
     var WIN_SLASH = "\\\\/";
     var WIN_NO_SLASH = `[^${WIN_SLASH}]`;
     var DEFAULT_MAX_EXTGLOB_RECURSION = 0;
@@ -11056,7 +11048,7 @@ var require_constants = __commonJS({
       /* | */
       CHAR_ZERO_WIDTH_NOBREAK_SPACE: 65279,
       /* \uFEFF */
-      SEP: path11.sep,
+      SEP: path12.sep,
       /**
        * Create EXTGLOB_CHARS
        */
@@ -11083,7 +11075,7 @@ var require_constants = __commonJS({
 var require_utils = __commonJS({
   "node_modules/picomatch/lib/utils.js"(exports2) {
     "use strict";
-    var path11 = require("path");
+    var path12 = require("path");
     var win32 = process.platform === "win32";
     var {
       REGEX_BACKSLASH,
@@ -11112,7 +11104,7 @@ var require_utils = __commonJS({
       if (options && typeof options.windows === "boolean") {
         return options.windows;
       }
-      return win32 === true || path11.sep === "\\";
+      return win32 === true || path12.sep === "\\";
     };
     exports2.escapeLast = (input, char, lastIdx) => {
       const idx = input.lastIndexOf(char, lastIdx);
@@ -11474,7 +11466,7 @@ var require_scan = __commonJS({
 var require_parse2 = __commonJS({
   "node_modules/picomatch/lib/parse.js"(exports2, module2) {
     "use strict";
-    var constants = require_constants();
+    var constants2 = require_constants();
     var utils = require_utils();
     var {
       MAX_LENGTH,
@@ -11482,7 +11474,7 @@ var require_parse2 = __commonJS({
       REGEX_NON_SPECIAL_CHARS,
       REGEX_SPECIAL_CHARS_BACKREF,
       REPLACEMENTS
-    } = constants;
+    } = constants2;
     var expandRange = (args, options) => {
       if (typeof options.expandRange === "function") {
         return options.expandRange(...args, options);
@@ -11688,7 +11680,7 @@ var require_parse2 = __commonJS({
       if (options.maxExtglobRecursion === false) {
         return { risky: false };
       }
-      const max = typeof options.maxExtglobRecursion === "number" ? options.maxExtglobRecursion : constants.DEFAULT_MAX_EXTGLOB_RECURSION;
+      const max = typeof options.maxExtglobRecursion === "number" ? options.maxExtglobRecursion : constants2.DEFAULT_MAX_EXTGLOB_RECURSION;
       const branches = splitTopLevel(body).map((branch) => branch.trim());
       if (branches.length > 1) {
         if (branches.some((branch) => branch === "") || branches.some((branch) => /^[*?]+$/.test(branch)) || hasRepeatedCharPrefixOverlap(branches)) {
@@ -11721,8 +11713,8 @@ var require_parse2 = __commonJS({
       const tokens = [bos];
       const capture = opts.capture ? "" : "?:";
       const win32 = utils.isWindows(options);
-      const PLATFORM_CHARS = constants.globChars(win32);
-      const EXTGLOB_CHARS = constants.extglobChars(PLATFORM_CHARS);
+      const PLATFORM_CHARS = constants2.globChars(win32);
+      const EXTGLOB_CHARS = constants2.extglobChars(PLATFORM_CHARS);
       const {
         DOT_LITERAL,
         PLUS_LITERAL,
@@ -12421,7 +12413,7 @@ var require_parse2 = __commonJS({
         NO_DOTS_SLASH,
         STAR,
         START_ANCHOR
-      } = constants.globChars(win32);
+      } = constants2.globChars(win32);
       const nodot = opts.dot ? NO_DOTS : NO_DOT;
       const slashDot = opts.dot ? NO_DOTS_SLASH : NO_DOT;
       const capture = opts.capture ? "" : "?:";
@@ -12476,11 +12468,11 @@ var require_parse2 = __commonJS({
 var require_picomatch = __commonJS({
   "node_modules/picomatch/lib/picomatch.js"(exports2, module2) {
     "use strict";
-    var path11 = require("path");
+    var path12 = require("path");
     var scan = require_scan();
     var parse2 = require_parse2();
     var utils = require_utils();
-    var constants = require_constants();
+    var constants2 = require_constants();
     var isObject = (val) => val && typeof val === "object" && !Array.isArray(val);
     var picomatch = (glob, options, returnState = false) => {
       if (Array.isArray(glob)) {
@@ -12561,7 +12553,7 @@ var require_picomatch = __commonJS({
     };
     picomatch.matchBase = (input, glob, options, posix = utils.isWindows(options)) => {
       const regex = glob instanceof RegExp ? glob : picomatch.makeRe(glob, options);
-      return regex.test(path11.basename(input));
+      return regex.test(path12.basename(input));
     };
     picomatch.isMatch = (str, patterns, options) => picomatch(patterns, options)(str);
     picomatch.parse = (pattern, options) => {
@@ -12608,7 +12600,7 @@ var require_picomatch = __commonJS({
         return /$^/;
       }
     };
-    picomatch.constants = constants;
+    picomatch.constants = constants2;
     module2.exports = picomatch;
   }
 });
@@ -12628,12 +12620,12 @@ var require_readdirp = __commonJS({
     var fs12 = require("fs");
     var { Readable } = require("stream");
     var sysPath = require("path");
-    var { promisify: promisify2 } = require("util");
+    var { promisify: promisify3 } = require("util");
     var picomatch = require_picomatch2();
-    var readdir = promisify2(fs12.readdir);
-    var stat = promisify2(fs12.stat);
-    var lstat = promisify2(fs12.lstat);
-    var realpath = promisify2(fs12.realpath);
+    var readdir = promisify3(fs12.readdir);
+    var stat = promisify3(fs12.stat);
+    var lstat = promisify3(fs12.lstat);
+    var realpath = promisify3(fs12.realpath);
     var BANG = "!";
     var RECURSIVE_ERROR_CODE = "READDIRP_RECURSIVE_ERROR";
     var NORMAL_FLOW_ERRORS = /* @__PURE__ */ new Set(["ENOENT", "EPERM", "EACCES", "ELOOP", RECURSIVE_ERROR_CODE]);
@@ -12677,8 +12669,8 @@ var require_readdirp = __commonJS({
         return {
           root: ".",
           /* eslint-disable no-unused-vars */
-          fileFilter: (path11) => true,
-          directoryFilter: (path11) => true,
+          fileFilter: (path12) => true,
+          directoryFilter: (path12) => true,
           /* eslint-enable no-unused-vars */
           type: FILE_TYPE,
           lstat: false,
@@ -12698,7 +12690,7 @@ var require_readdirp = __commonJS({
         this._directoryFilter = normalizeFilter(opts.directoryFilter);
         const statMethod = opts.lstat ? lstat : stat;
         if (wantBigintFsStats) {
-          this._stat = (path11) => statMethod(path11, { bigint: true });
+          this._stat = (path12) => statMethod(path12, { bigint: true });
         } else {
           this._stat = statMethod;
         }
@@ -12719,9 +12711,9 @@ var require_readdirp = __commonJS({
         this.reading = true;
         try {
           while (!this.destroyed && batch > 0) {
-            const { path: path11, depth, files = [] } = this.parent || {};
+            const { path: path12, depth, files = [] } = this.parent || {};
             if (files.length > 0) {
-              const slice = files.splice(0, batch).map((dirent) => this._formatEntry(dirent, path11));
+              const slice = files.splice(0, batch).map((dirent) => this._formatEntry(dirent, path12));
               for (const entry of await Promise.all(slice)) {
                 if (this.destroyed) return;
                 const entryType = await this._getEntryType(entry);
@@ -12756,20 +12748,20 @@ var require_readdirp = __commonJS({
           this.reading = false;
         }
       }
-      async _exploreDir(path11, depth) {
+      async _exploreDir(path12, depth) {
         let files;
         try {
-          files = await readdir(path11, this._rdOptions);
+          files = await readdir(path12, this._rdOptions);
         } catch (error) {
           this._onError(error);
         }
-        return { files, depth, path: path11 };
+        return { files, depth, path: path12 };
       }
-      async _formatEntry(dirent, path11) {
+      async _formatEntry(dirent, path12) {
         let entry;
         try {
           const basename6 = this._isDirent ? dirent.name : dirent;
-          const fullPath = sysPath.resolve(sysPath.join(path11, basename6));
+          const fullPath = sysPath.resolve(sysPath.join(path12, basename6));
           entry = { path: sysPath.relative(this._root, fullPath), fullPath, basename: basename6 };
           entry[this._statsProp] = this._isDirent ? dirent : await this._stat(fullPath);
         } catch (err) {
@@ -12854,22 +12846,22 @@ var require_readdirp = __commonJS({
 // node_modules/normalize-path/index.js
 var require_normalize_path = __commonJS({
   "node_modules/normalize-path/index.js"(exports2, module2) {
-    module2.exports = function(path11, stripTrailing) {
-      if (typeof path11 !== "string") {
+    module2.exports = function(path12, stripTrailing) {
+      if (typeof path12 !== "string") {
         throw new TypeError("expected path to be a string");
       }
-      if (path11 === "\\" || path11 === "/") return "/";
-      var len = path11.length;
-      if (len <= 1) return path11;
+      if (path12 === "\\" || path12 === "/") return "/";
+      var len = path12.length;
+      if (len <= 1) return path12;
       var prefix = "";
-      if (len > 4 && path11[3] === "\\") {
-        var ch = path11[2];
-        if ((ch === "?" || ch === ".") && path11.slice(0, 2) === "\\\\") {
-          path11 = path11.slice(2);
+      if (len > 4 && path12[3] === "\\") {
+        var ch = path12[2];
+        if ((ch === "?" || ch === ".") && path12.slice(0, 2) === "\\\\") {
+          path12 = path12.slice(2);
           prefix = "//";
         }
       }
-      var segs = path11.split(/[/\\]+/);
+      var segs = path12.split(/[/\\]+/);
       if (stripTrailing !== false && segs[segs.length - 1] === "") {
         segs.pop();
       }
@@ -12907,17 +12899,17 @@ var require_anymatch = __commonJS({
       if (!isList2 && typeof _path !== "string") {
         throw new TypeError("anymatch: second argument must be a string: got " + Object.prototype.toString.call(_path));
       }
-      const path11 = normalizePath(_path, false);
+      const path12 = normalizePath(_path, false);
       for (let index = 0; index < negPatterns.length; index++) {
         const nglob = negPatterns[index];
-        if (nglob(path11)) {
+        if (nglob(path12)) {
           return returnIndex ? -1 : false;
         }
       }
-      const applied = isList2 && [path11].concat(args.slice(1));
+      const applied = isList2 && [path12].concat(args.slice(1));
       for (let index = 0; index < patterns.length; index++) {
         const pattern = patterns[index];
-        if (isList2 ? pattern(...applied) : pattern(path11)) {
+        if (isList2 ? pattern(...applied) : pattern(path12)) {
           return returnIndex ? index : true;
         }
       }
@@ -14484,10 +14476,10 @@ var require_binary_extensions2 = __commonJS({
 var require_is_binary_path = __commonJS({
   "node_modules/is-binary-path/index.js"(exports2, module2) {
     "use strict";
-    var path11 = require("path");
+    var path12 = require("path");
     var binaryExtensions = require_binary_extensions2();
     var extensions = new Set(binaryExtensions);
-    module2.exports = (filePath) => extensions.has(path11.extname(filePath).slice(1).toLowerCase());
+    module2.exports = (filePath) => extensions.has(path12.extname(filePath).slice(1).toLowerCase());
   }
 });
 
@@ -14497,7 +14489,7 @@ var require_constants3 = __commonJS({
     "use strict";
     var { sep } = require("path");
     var { platform } = process;
-    var os = require("os");
+    var os4 = require("os");
     exports2.EV_ALL = "all";
     exports2.EV_READY = "ready";
     exports2.EV_ADD = "add";
@@ -14551,7 +14543,7 @@ var require_constants3 = __commonJS({
     exports2.isWindows = platform === "win32";
     exports2.isMacos = platform === "darwin";
     exports2.isLinux = platform === "linux";
-    exports2.isIBMi = os.type() === "OS400";
+    exports2.isIBMi = os4.type() === "OS400";
   }
 });
 
@@ -14561,7 +14553,7 @@ var require_nodefs_handler = __commonJS({
     "use strict";
     var fs12 = require("fs");
     var sysPath = require("path");
-    var { promisify: promisify2 } = require("util");
+    var { promisify: promisify3 } = require("util");
     var isBinaryPath = require_is_binary_path();
     var {
       isWindows,
@@ -14582,11 +14574,11 @@ var require_nodefs_handler = __commonJS({
       STAR
     } = require_constants3();
     var THROTTLE_MODE_WATCH = "watch";
-    var open = promisify2(fs12.open);
-    var stat = promisify2(fs12.stat);
-    var lstat = promisify2(fs12.lstat);
-    var close = promisify2(fs12.close);
-    var fsrealpath = promisify2(fs12.realpath);
+    var open = promisify3(fs12.open);
+    var stat = promisify3(fs12.stat);
+    var lstat = promisify3(fs12.lstat);
+    var close = promisify3(fs12.close);
+    var fsrealpath = promisify3(fs12.realpath);
     var statMethods = { lstat, stat };
     var foreach = (val, fn) => {
       if (val instanceof Set) {
@@ -14620,20 +14612,20 @@ var require_nodefs_handler = __commonJS({
     };
     var isEmptySet = (val) => val instanceof Set ? val.size === 0 : !val;
     var FsWatchInstances = /* @__PURE__ */ new Map();
-    function createFsWatchInstance(path11, options, listener, errHandler, emitRaw) {
+    function createFsWatchInstance(path12, options, listener, errHandler, emitRaw) {
       const handleEvent = (rawEvent, evPath) => {
-        listener(path11);
-        emitRaw(rawEvent, evPath, { watchedPath: path11 });
-        if (evPath && path11 !== evPath) {
+        listener(path12);
+        emitRaw(rawEvent, evPath, { watchedPath: path12 });
+        if (evPath && path12 !== evPath) {
           fsWatchBroadcast(
-            sysPath.resolve(path11, evPath),
+            sysPath.resolve(path12, evPath),
             KEY_LISTENERS,
-            sysPath.join(path11, evPath)
+            sysPath.join(path12, evPath)
           );
         }
       };
       try {
-        return fs12.watch(path11, options, handleEvent);
+        return fs12.watch(path12, options, handleEvent);
       } catch (error) {
         errHandler(error);
       }
@@ -14645,13 +14637,13 @@ var require_nodefs_handler = __commonJS({
         listener(val1, val2, val3);
       });
     };
-    var setFsWatchListener = (path11, fullPath, options, handlers) => {
+    var setFsWatchListener = (path12, fullPath, options, handlers) => {
       const { listener, errHandler, rawEmitter } = handlers;
       let cont = FsWatchInstances.get(fullPath);
       let watcher;
       if (!options.persistent) {
         watcher = createFsWatchInstance(
-          path11,
+          path12,
           options,
           listener,
           errHandler,
@@ -14665,7 +14657,7 @@ var require_nodefs_handler = __commonJS({
         addAndConvert(cont, KEY_RAW, rawEmitter);
       } else {
         watcher = createFsWatchInstance(
-          path11,
+          path12,
           options,
           fsWatchBroadcast.bind(null, fullPath, KEY_LISTENERS),
           errHandler,
@@ -14678,7 +14670,7 @@ var require_nodefs_handler = __commonJS({
           cont.watcherUnusable = true;
           if (isWindows && error.code === "EPERM") {
             try {
-              const fd = await open(path11, "r");
+              const fd = await open(path12, "r");
               await close(fd);
               broadcastErr(error);
             } catch (err) {
@@ -14709,7 +14701,7 @@ var require_nodefs_handler = __commonJS({
       };
     };
     var FsWatchFileInstances = /* @__PURE__ */ new Map();
-    var setFsWatchFileListener = (path11, fullPath, options, handlers) => {
+    var setFsWatchFileListener = (path12, fullPath, options, handlers) => {
       const { listener, rawEmitter } = handlers;
       let cont = FsWatchFileInstances.get(fullPath);
       let listeners = /* @__PURE__ */ new Set();
@@ -14735,7 +14727,7 @@ var require_nodefs_handler = __commonJS({
             });
             const currmtime = curr.mtimeMs;
             if (curr.size !== prev.size || currmtime > prev.mtimeMs || currmtime === 0) {
-              foreach(cont.listeners, (listener2) => listener2(path11, curr));
+              foreach(cont.listeners, (listener2) => listener2(path12, curr));
             }
           })
         };
@@ -14766,24 +14758,24 @@ var require_nodefs_handler = __commonJS({
        * @param {Function} listener on fs change
        * @returns {Function} closer for the watcher instance
        */
-      _watchWithNodeFs(path11, listener) {
+      _watchWithNodeFs(path12, listener) {
         const opts = this.fsw.options;
-        const directory = sysPath.dirname(path11);
-        const basename6 = sysPath.basename(path11);
+        const directory = sysPath.dirname(path12);
+        const basename6 = sysPath.basename(path12);
         const parent = this.fsw._getWatchedDir(directory);
         parent.add(basename6);
-        const absolutePath = sysPath.resolve(path11);
+        const absolutePath = sysPath.resolve(path12);
         const options = { persistent: opts.persistent };
         if (!listener) listener = EMPTY_FN;
         let closer;
         if (opts.usePolling) {
           options.interval = opts.enableBinaryInterval && isBinaryPath(basename6) ? opts.binaryInterval : opts.interval;
-          closer = setFsWatchFileListener(path11, absolutePath, options, {
+          closer = setFsWatchFileListener(path12, absolutePath, options, {
             listener,
             rawEmitter: this.fsw._emitRaw
           });
         } else {
-          closer = setFsWatchListener(path11, absolutePath, options, {
+          closer = setFsWatchListener(path12, absolutePath, options, {
             listener,
             errHandler: this._boundHandleError,
             rawEmitter: this.fsw._emitRaw
@@ -14807,7 +14799,7 @@ var require_nodefs_handler = __commonJS({
         const parent = this.fsw._getWatchedDir(dirname6);
         let prevStats = stats;
         if (parent.has(basename6)) return;
-        const listener = async (path11, newStats) => {
+        const listener = async (path12, newStats) => {
           if (!this.fsw._throttle(THROTTLE_MODE_WATCH, file, 5)) return;
           if (!newStats || newStats.mtimeMs === 0) {
             try {
@@ -14819,9 +14811,9 @@ var require_nodefs_handler = __commonJS({
                 this.fsw._emit(EV_CHANGE, file, newStats2);
               }
               if (isLinux && prevStats.ino !== newStats2.ino) {
-                this.fsw._closeFile(path11);
+                this.fsw._closeFile(path12);
                 prevStats = newStats2;
-                this.fsw._addPathCloser(path11, this._watchWithNodeFs(file, listener));
+                this.fsw._addPathCloser(path12, this._watchWithNodeFs(file, listener));
               } else {
                 prevStats = newStats2;
               }
@@ -14852,7 +14844,7 @@ var require_nodefs_handler = __commonJS({
        * @param {String} item basename of this item
        * @returns {Promise<Boolean>} true if no more processing is needed for this entry.
        */
-      async _handleSymlink(entry, directory, path11, item) {
+      async _handleSymlink(entry, directory, path12, item) {
         if (this.fsw.closed) {
           return;
         }
@@ -14862,7 +14854,7 @@ var require_nodefs_handler = __commonJS({
           this.fsw._incrReadyCount();
           let linkPath;
           try {
-            linkPath = await fsrealpath(path11);
+            linkPath = await fsrealpath(path12);
           } catch (e) {
             this.fsw._emitReady();
             return true;
@@ -14871,12 +14863,12 @@ var require_nodefs_handler = __commonJS({
           if (dir.has(item)) {
             if (this.fsw._symlinkPaths.get(full) !== linkPath) {
               this.fsw._symlinkPaths.set(full, linkPath);
-              this.fsw._emit(EV_CHANGE, path11, entry.stats);
+              this.fsw._emit(EV_CHANGE, path12, entry.stats);
             }
           } else {
             dir.add(item);
             this.fsw._symlinkPaths.set(full, linkPath);
-            this.fsw._emit(EV_ADD, path11, entry.stats);
+            this.fsw._emit(EV_ADD, path12, entry.stats);
           }
           this.fsw._emitReady();
           return true;
@@ -14904,9 +14896,9 @@ var require_nodefs_handler = __commonJS({
             return;
           }
           const item = entry.path;
-          let path11 = sysPath.join(directory, item);
+          let path12 = sysPath.join(directory, item);
           current.add(item);
-          if (entry.stats.isSymbolicLink() && await this._handleSymlink(entry, directory, path11, item)) {
+          if (entry.stats.isSymbolicLink() && await this._handleSymlink(entry, directory, path12, item)) {
             return;
           }
           if (this.fsw.closed) {
@@ -14915,8 +14907,8 @@ var require_nodefs_handler = __commonJS({
           }
           if (item === target || !target && !previous.has(item)) {
             this.fsw._incrReadyCount();
-            path11 = sysPath.join(dir, sysPath.relative(dir, path11));
-            this._addToNodeFs(path11, initialAdd, wh, depth + 1);
+            path12 = sysPath.join(dir, sysPath.relative(dir, path12));
+            this._addToNodeFs(path12, initialAdd, wh, depth + 1);
           }
         }).on(EV_ERROR, this._boundHandleError);
         return new Promise(
@@ -14986,13 +14978,13 @@ var require_nodefs_handler = __commonJS({
        * @param {String=} target Child path actually targeted for watch
        * @returns {Promise}
        */
-      async _addToNodeFs(path11, initialAdd, priorWh, depth, target) {
+      async _addToNodeFs(path12, initialAdd, priorWh, depth, target) {
         const ready = this.fsw._emitReady;
-        if (this.fsw._isIgnored(path11) || this.fsw.closed) {
+        if (this.fsw._isIgnored(path12) || this.fsw.closed) {
           ready();
           return false;
         }
-        const wh = this.fsw._getWatchHelpers(path11, depth);
+        const wh = this.fsw._getWatchHelpers(path12, depth);
         if (!wh.hasGlob && priorWh) {
           wh.hasGlob = priorWh.hasGlob;
           wh.globFilter = priorWh.globFilter;
@@ -15006,11 +14998,11 @@ var require_nodefs_handler = __commonJS({
             ready();
             return false;
           }
-          const follow = this.fsw.options.followSymlinks && !path11.includes(STAR) && !path11.includes(BRACE_START);
+          const follow = this.fsw.options.followSymlinks && !path12.includes(STAR) && !path12.includes(BRACE_START);
           let closer;
           if (stats.isDirectory()) {
-            const absPath = sysPath.resolve(path11);
-            const targetPath = follow ? await fsrealpath(path11) : path11;
+            const absPath = sysPath.resolve(path12);
+            const targetPath = follow ? await fsrealpath(path12) : path12;
             if (this.fsw.closed) return;
             closer = await this._handleDir(wh.watchPath, stats, initialAdd, depth, target, wh, targetPath);
             if (this.fsw.closed) return;
@@ -15018,26 +15010,26 @@ var require_nodefs_handler = __commonJS({
               this.fsw._symlinkPaths.set(absPath, targetPath);
             }
           } else if (stats.isSymbolicLink()) {
-            const targetPath = follow ? await fsrealpath(path11) : path11;
+            const targetPath = follow ? await fsrealpath(path12) : path12;
             if (this.fsw.closed) return;
             const parent = sysPath.dirname(wh.watchPath);
             this.fsw._getWatchedDir(parent).add(wh.watchPath);
             this.fsw._emit(EV_ADD, wh.watchPath, stats);
-            closer = await this._handleDir(parent, stats, initialAdd, depth, path11, wh, targetPath);
+            closer = await this._handleDir(parent, stats, initialAdd, depth, path12, wh, targetPath);
             if (this.fsw.closed) return;
             if (targetPath !== void 0) {
-              this.fsw._symlinkPaths.set(sysPath.resolve(path11), targetPath);
+              this.fsw._symlinkPaths.set(sysPath.resolve(path12), targetPath);
             }
           } else {
             closer = this._handleFile(wh.watchPath, stats, initialAdd);
           }
           ready();
-          this.fsw._addPathCloser(path11, closer);
+          this.fsw._addPathCloser(path12, closer);
           return false;
         } catch (error) {
           if (this.fsw._handleError(error)) {
             ready();
-            return path11;
+            return path12;
           }
         }
       }
@@ -15052,7 +15044,7 @@ var require_fsevents_handler = __commonJS({
     "use strict";
     var fs12 = require("fs");
     var sysPath = require("path");
-    var { promisify: promisify2 } = require("util");
+    var { promisify: promisify3 } = require("util");
     var fsevents;
     try {
       fsevents = require("fsevents");
@@ -15095,9 +15087,9 @@ var require_fsevents_handler = __commonJS({
       IDENTITY_FN
     } = require_constants3();
     var Depth = (value) => isNaN(value) ? {} : { depth: value };
-    var stat = promisify2(fs12.stat);
-    var lstat = promisify2(fs12.lstat);
-    var realpath = promisify2(fs12.realpath);
+    var stat = promisify3(fs12.stat);
+    var lstat = promisify3(fs12.lstat);
+    var realpath = promisify3(fs12.realpath);
     var statMethods = { stat, lstat };
     var FSEventsWatchers = /* @__PURE__ */ new Map();
     var consolidateThreshhold = 10;
@@ -15111,18 +15103,18 @@ var require_fsevents_handler = __commonJS({
       131840,
       262912
     ]);
-    var createFSEventsInstance = (path11, callback) => {
-      const stop = fsevents.watch(path11, callback);
+    var createFSEventsInstance = (path12, callback) => {
+      const stop = fsevents.watch(path12, callback);
       return { stop };
     };
-    function setFSEventsListener(path11, realPath, listener, rawEmitter) {
+    function setFSEventsListener(path12, realPath, listener, rawEmitter) {
       let watchPath = sysPath.extname(realPath) ? sysPath.dirname(realPath) : realPath;
       const parentPath = sysPath.dirname(watchPath);
       let cont = FSEventsWatchers.get(watchPath);
       if (couldConsolidate(parentPath)) {
         watchPath = parentPath;
       }
-      const resolvedPath = sysPath.resolve(path11);
+      const resolvedPath = sysPath.resolve(path12);
       const hasSymlink = resolvedPath !== realPath;
       const filteredListener = (fullPath, flags, info) => {
         if (hasSymlink) fullPath = fullPath.replace(realPath, resolvedPath);
@@ -15167,10 +15159,10 @@ var require_fsevents_handler = __commonJS({
         }
       };
     }
-    var couldConsolidate = (path11) => {
+    var couldConsolidate = (path12) => {
       let count = 0;
       for (const watchPath of FSEventsWatchers.keys()) {
-        if (watchPath.indexOf(path11) === 0) {
+        if (watchPath.indexOf(path12) === 0) {
           count++;
           if (count >= consolidateThreshhold) {
             return true;
@@ -15180,9 +15172,9 @@ var require_fsevents_handler = __commonJS({
       return false;
     };
     var canUse = () => fsevents && FSEventsWatchers.size < 128;
-    var calcDepth = (path11, root) => {
+    var calcDepth = (path12, root) => {
       let i = 0;
-      while (!path11.indexOf(root) && (path11 = sysPath.dirname(path11)) !== root) i++;
+      while (!path12.indexOf(root) && (path12 = sysPath.dirname(path12)) !== root) i++;
       return i;
     };
     var sameTypes = (info, stats) => info.type === FSEVENT_TYPE_DIRECTORY && stats.isDirectory() || info.type === FSEVENT_TYPE_SYMLINK && stats.isSymbolicLink() || info.type === FSEVENT_TYPE_FILE && stats.isFile();
@@ -15193,41 +15185,41 @@ var require_fsevents_handler = __commonJS({
       constructor(fsw) {
         this.fsw = fsw;
       }
-      checkIgnored(path11, stats) {
+      checkIgnored(path12, stats) {
         const ipaths = this.fsw._ignoredPaths;
-        if (this.fsw._isIgnored(path11, stats)) {
-          ipaths.add(path11);
+        if (this.fsw._isIgnored(path12, stats)) {
+          ipaths.add(path12);
           if (stats && stats.isDirectory()) {
-            ipaths.add(path11 + ROOT_GLOBSTAR);
+            ipaths.add(path12 + ROOT_GLOBSTAR);
           }
           return true;
         }
-        ipaths.delete(path11);
-        ipaths.delete(path11 + ROOT_GLOBSTAR);
+        ipaths.delete(path12);
+        ipaths.delete(path12 + ROOT_GLOBSTAR);
       }
-      addOrChange(path11, fullPath, realPath, parent, watchedDir, item, info, opts) {
+      addOrChange(path12, fullPath, realPath, parent, watchedDir, item, info, opts) {
         const event = watchedDir.has(item) ? EV_CHANGE : EV_ADD;
-        this.handleEvent(event, path11, fullPath, realPath, parent, watchedDir, item, info, opts);
+        this.handleEvent(event, path12, fullPath, realPath, parent, watchedDir, item, info, opts);
       }
-      async checkExists(path11, fullPath, realPath, parent, watchedDir, item, info, opts) {
+      async checkExists(path12, fullPath, realPath, parent, watchedDir, item, info, opts) {
         try {
-          const stats = await stat(path11);
+          const stats = await stat(path12);
           if (this.fsw.closed) return;
           if (sameTypes(info, stats)) {
-            this.addOrChange(path11, fullPath, realPath, parent, watchedDir, item, info, opts);
+            this.addOrChange(path12, fullPath, realPath, parent, watchedDir, item, info, opts);
           } else {
-            this.handleEvent(EV_UNLINK, path11, fullPath, realPath, parent, watchedDir, item, info, opts);
+            this.handleEvent(EV_UNLINK, path12, fullPath, realPath, parent, watchedDir, item, info, opts);
           }
         } catch (error) {
           if (error.code === "EACCES") {
-            this.addOrChange(path11, fullPath, realPath, parent, watchedDir, item, info, opts);
+            this.addOrChange(path12, fullPath, realPath, parent, watchedDir, item, info, opts);
           } else {
-            this.handleEvent(EV_UNLINK, path11, fullPath, realPath, parent, watchedDir, item, info, opts);
+            this.handleEvent(EV_UNLINK, path12, fullPath, realPath, parent, watchedDir, item, info, opts);
           }
         }
       }
-      handleEvent(event, path11, fullPath, realPath, parent, watchedDir, item, info, opts) {
-        if (this.fsw.closed || this.checkIgnored(path11)) return;
+      handleEvent(event, path12, fullPath, realPath, parent, watchedDir, item, info, opts) {
+        if (this.fsw.closed || this.checkIgnored(path12)) return;
         if (event === EV_UNLINK) {
           const isDirectory = info.type === FSEVENT_TYPE_DIRECTORY;
           if (isDirectory || watchedDir.has(item)) {
@@ -15235,16 +15227,16 @@ var require_fsevents_handler = __commonJS({
           }
         } else {
           if (event === EV_ADD) {
-            if (info.type === FSEVENT_TYPE_DIRECTORY) this.fsw._getWatchedDir(path11);
+            if (info.type === FSEVENT_TYPE_DIRECTORY) this.fsw._getWatchedDir(path12);
             if (info.type === FSEVENT_TYPE_SYMLINK && opts.followSymlinks) {
               const curDepth = opts.depth === void 0 ? void 0 : calcDepth(fullPath, realPath) + 1;
-              return this._addToFsEvents(path11, false, true, curDepth);
+              return this._addToFsEvents(path12, false, true, curDepth);
             }
             this.fsw._getWatchedDir(parent).add(item);
           }
           const eventName = info.type === FSEVENT_TYPE_DIRECTORY ? event + DIR_SUFFIX : event;
-          this.fsw._emit(eventName, path11);
-          if (eventName === EV_ADD_DIR) this._addToFsEvents(path11, false, true);
+          this.fsw._emit(eventName, path12);
+          if (eventName === EV_ADD_DIR) this._addToFsEvents(path12, false, true);
         }
       }
       /**
@@ -15261,41 +15253,41 @@ var require_fsevents_handler = __commonJS({
         const watchCallback = async (fullPath, flags, info) => {
           if (this.fsw.closed) return;
           if (opts.depth !== void 0 && calcDepth(fullPath, realPath) > opts.depth) return;
-          const path11 = transform(sysPath.join(
+          const path12 = transform(sysPath.join(
             watchPath,
             sysPath.relative(watchPath, fullPath)
           ));
-          if (globFilter && !globFilter(path11)) return;
-          const parent = sysPath.dirname(path11);
-          const item = sysPath.basename(path11);
+          if (globFilter && !globFilter(path12)) return;
+          const parent = sysPath.dirname(path12);
+          const item = sysPath.basename(path12);
           const watchedDir = this.fsw._getWatchedDir(
-            info.type === FSEVENT_TYPE_DIRECTORY ? path11 : parent
+            info.type === FSEVENT_TYPE_DIRECTORY ? path12 : parent
           );
           if (wrongEventFlags.has(flags) || info.event === FSEVENT_UNKNOWN) {
             if (typeof opts.ignored === FUNCTION_TYPE) {
               let stats;
               try {
-                stats = await stat(path11);
+                stats = await stat(path12);
               } catch (error) {
               }
               if (this.fsw.closed) return;
-              if (this.checkIgnored(path11, stats)) return;
+              if (this.checkIgnored(path12, stats)) return;
               if (sameTypes(info, stats)) {
-                this.addOrChange(path11, fullPath, realPath, parent, watchedDir, item, info, opts);
+                this.addOrChange(path12, fullPath, realPath, parent, watchedDir, item, info, opts);
               } else {
-                this.handleEvent(EV_UNLINK, path11, fullPath, realPath, parent, watchedDir, item, info, opts);
+                this.handleEvent(EV_UNLINK, path12, fullPath, realPath, parent, watchedDir, item, info, opts);
               }
             } else {
-              this.checkExists(path11, fullPath, realPath, parent, watchedDir, item, info, opts);
+              this.checkExists(path12, fullPath, realPath, parent, watchedDir, item, info, opts);
             }
           } else {
             switch (info.event) {
               case FSEVENT_CREATED:
               case FSEVENT_MODIFIED:
-                return this.addOrChange(path11, fullPath, realPath, parent, watchedDir, item, info, opts);
+                return this.addOrChange(path12, fullPath, realPath, parent, watchedDir, item, info, opts);
               case FSEVENT_DELETED:
               case FSEVENT_MOVED:
-                return this.checkExists(path11, fullPath, realPath, parent, watchedDir, item, info, opts);
+                return this.checkExists(path12, fullPath, realPath, parent, watchedDir, item, info, opts);
             }
           }
         };
@@ -15327,12 +15319,12 @@ var require_fsevents_handler = __commonJS({
             return this.fsw._emitReady();
           }
           this.fsw._incrReadyCount();
-          this._addToFsEvents(linkTarget || linkPath, (path11) => {
+          this._addToFsEvents(linkTarget || linkPath, (path12) => {
             let aliasedPath = linkPath;
             if (linkTarget && linkTarget !== DOT_SLASH) {
-              aliasedPath = path11.replace(linkTarget, linkPath);
-            } else if (path11 !== DOT_SLASH) {
-              aliasedPath = sysPath.join(linkPath, path11);
+              aliasedPath = path12.replace(linkTarget, linkPath);
+            } else if (path12 !== DOT_SLASH) {
+              aliasedPath = sysPath.join(linkPath, path12);
             }
             return transform(aliasedPath);
           }, false, curDepth);
@@ -15359,7 +15351,7 @@ var require_fsevents_handler = __commonJS({
           this.fsw._emit(isDir ? EV_ADD_DIR : EV_ADD, pp, stats);
         }
       }
-      initWatch(realPath, path11, wh, processPath) {
+      initWatch(realPath, path12, wh, processPath) {
         if (this.fsw.closed) return;
         const closer = this._watchWithFsEvents(
           wh.watchPath,
@@ -15367,7 +15359,7 @@ var require_fsevents_handler = __commonJS({
           processPath,
           wh.globFilter
         );
-        this.fsw._addPathCloser(path11, closer);
+        this.fsw._addPathCloser(path12, closer);
       }
       /**
        * Handle added path with fsevents
@@ -15377,13 +15369,13 @@ var require_fsevents_handler = __commonJS({
        * @param {Number=} priorDepth Level of subdirectories already traversed.
        * @returns {Promise<void>}
        */
-      async _addToFsEvents(path11, transform, forceAdd, priorDepth) {
+      async _addToFsEvents(path12, transform, forceAdd, priorDepth) {
         if (this.fsw.closed) {
           return;
         }
         const opts = this.fsw.options;
         const processPath = typeof transform === FUNCTION_TYPE ? transform : IDENTITY_FN;
-        const wh = this.fsw._getWatchHelpers(path11);
+        const wh = this.fsw._getWatchHelpers(path12);
         try {
           const stats = await statMethods[wh.statMethod](wh.watchPath);
           if (this.fsw.closed) return;
@@ -15391,7 +15383,7 @@ var require_fsevents_handler = __commonJS({
             throw null;
           }
           if (stats.isDirectory()) {
-            if (!wh.globFilter) this.emitAdd(processPath(path11), stats, processPath, opts, forceAdd);
+            if (!wh.globFilter) this.emitAdd(processPath(path12), stats, processPath, opts, forceAdd);
             if (priorDepth && priorDepth > opts.depth) return;
             this.fsw._readdirp(wh.watchPath, {
               fileFilter: (entry) => wh.filterPath(entry),
@@ -15425,14 +15417,14 @@ var require_fsevents_handler = __commonJS({
         }
         if (opts.persistent && forceAdd !== true) {
           if (typeof transform === FUNCTION_TYPE) {
-            this.initWatch(void 0, path11, wh, processPath);
+            this.initWatch(void 0, path12, wh, processPath);
           } else {
             let realPath;
             try {
               realPath = await realpath(wh.watchPath);
             } catch (e) {
             }
-            this.initWatch(realPath, path11, wh, processPath);
+            this.initWatch(realPath, path12, wh, processPath);
           }
         }
       }
@@ -15449,7 +15441,7 @@ var require_chokidar = __commonJS({
     var { EventEmitter } = require("events");
     var fs12 = require("fs");
     var sysPath = require("path");
-    var { promisify: promisify2 } = require("util");
+    var { promisify: promisify3 } = require("util");
     var readdirp = require_readdirp();
     var anymatch = require_anymatch().default;
     var globParent = require_glob_parent();
@@ -15492,8 +15484,8 @@ var require_chokidar = __commonJS({
       isMacos,
       isIBMi
     } = require_constants3();
-    var stat = promisify2(fs12.stat);
-    var readdir = promisify2(fs12.readdir);
+    var stat = promisify3(fs12.stat);
+    var readdir = promisify3(fs12.readdir);
     var arrify = (value = []) => Array.isArray(value) ? value : [value];
     var flatten = (list, result = []) => {
       list.forEach((item) => {
@@ -15526,19 +15518,19 @@ var require_chokidar = __commonJS({
       }
       return str;
     };
-    var normalizePathToUnix = (path11) => toUnix(sysPath.normalize(toUnix(path11)));
-    var normalizeIgnored = (cwd = EMPTY_STR) => (path11) => {
-      if (typeof path11 !== STRING_TYPE) return path11;
-      return normalizePathToUnix(sysPath.isAbsolute(path11) ? path11 : sysPath.join(cwd, path11));
+    var normalizePathToUnix = (path12) => toUnix(sysPath.normalize(toUnix(path12)));
+    var normalizeIgnored = (cwd = EMPTY_STR) => (path12) => {
+      if (typeof path12 !== STRING_TYPE) return path12;
+      return normalizePathToUnix(sysPath.isAbsolute(path12) ? path12 : sysPath.join(cwd, path12));
     };
-    var getAbsolutePath = (path11, cwd) => {
-      if (sysPath.isAbsolute(path11)) {
-        return path11;
+    var getAbsolutePath = (path12, cwd) => {
+      if (sysPath.isAbsolute(path12)) {
+        return path12;
       }
-      if (path11.startsWith(BANG)) {
-        return BANG + sysPath.join(cwd, path11.slice(1));
+      if (path12.startsWith(BANG)) {
+        return BANG + sysPath.join(cwd, path12.slice(1));
       }
-      return sysPath.join(cwd, path11);
+      return sysPath.join(cwd, path12);
     };
     var undef = (opts, key) => opts[key] === void 0;
     var DirEntry = class {
@@ -15594,16 +15586,16 @@ var require_chokidar = __commonJS({
     var STAT_METHOD_F = "stat";
     var STAT_METHOD_L = "lstat";
     var WatchHelper = class {
-      constructor(path11, watchPath, follow, fsw) {
+      constructor(path12, watchPath, follow, fsw) {
         this.fsw = fsw;
-        this.path = path11 = path11.replace(REPLACER_RE, EMPTY_STR);
+        this.path = path12 = path12.replace(REPLACER_RE, EMPTY_STR);
         this.watchPath = watchPath;
         this.fullWatchPath = sysPath.resolve(watchPath);
-        this.hasGlob = watchPath !== path11;
-        if (path11 === EMPTY_STR) this.hasGlob = false;
+        this.hasGlob = watchPath !== path12;
+        if (path12 === EMPTY_STR) this.hasGlob = false;
         this.globSymlink = this.hasGlob && follow ? void 0 : false;
-        this.globFilter = this.hasGlob ? anymatch(path11, void 0, ANYMATCH_OPTS) : false;
-        this.dirParts = this.getDirParts(path11);
+        this.globFilter = this.hasGlob ? anymatch(path12, void 0, ANYMATCH_OPTS) : false;
+        this.dirParts = this.getDirParts(path12);
         this.dirParts.forEach((parts) => {
           if (parts.length > 1) parts.pop();
         });
@@ -15632,12 +15624,12 @@ var require_chokidar = __commonJS({
         const matchesGlob = this.hasGlob && typeof this.globFilter === FUNCTION_TYPE ? this.globFilter(resolvedPath) : true;
         return matchesGlob && this.fsw._isntIgnored(resolvedPath, stats) && this.fsw._hasReadPermissions(stats);
       }
-      getDirParts(path11) {
+      getDirParts(path12) {
         if (!this.hasGlob) return [];
         const parts = [];
-        const expandedPath = path11.includes(BRACE_START) ? braces.expand(path11) : [path11];
-        expandedPath.forEach((path12) => {
-          parts.push(sysPath.relative(this.watchPath, path12).split(SLASH_OR_BACK_SLASH_RE));
+        const expandedPath = path12.includes(BRACE_START) ? braces.expand(path12) : [path12];
+        expandedPath.forEach((path13) => {
+          parts.push(sysPath.relative(this.watchPath, path13).split(SLASH_OR_BACK_SLASH_RE));
         });
         return parts;
       }
@@ -15743,34 +15735,34 @@ var require_chokidar = __commonJS({
         this.closed = false;
         let paths = unifyPaths(paths_);
         if (cwd) {
-          paths = paths.map((path11) => {
-            const absPath = getAbsolutePath(path11, cwd);
-            if (disableGlobbing || !isGlob(path11)) {
+          paths = paths.map((path12) => {
+            const absPath = getAbsolutePath(path12, cwd);
+            if (disableGlobbing || !isGlob(path12)) {
               return absPath;
             }
             return normalizePath(absPath);
           });
         }
-        paths = paths.filter((path11) => {
-          if (path11.startsWith(BANG)) {
-            this._ignoredPaths.add(path11.slice(1));
+        paths = paths.filter((path12) => {
+          if (path12.startsWith(BANG)) {
+            this._ignoredPaths.add(path12.slice(1));
             return false;
           }
-          this._ignoredPaths.delete(path11);
-          this._ignoredPaths.delete(path11 + SLASH_GLOBSTAR);
+          this._ignoredPaths.delete(path12);
+          this._ignoredPaths.delete(path12 + SLASH_GLOBSTAR);
           this._userIgnored = void 0;
           return true;
         });
         if (this.options.useFsEvents && this._fsEventsHandler) {
           if (!this._readyCount) this._readyCount = paths.length;
           if (this.options.persistent) this._readyCount += paths.length;
-          paths.forEach((path11) => this._fsEventsHandler._addToFsEvents(path11));
+          paths.forEach((path12) => this._fsEventsHandler._addToFsEvents(path12));
         } else {
           if (!this._readyCount) this._readyCount = 0;
           this._readyCount += paths.length;
           Promise.all(
-            paths.map(async (path11) => {
-              const res = await this._nodeFsHandler._addToNodeFs(path11, !_internal, 0, 0, _origAdd);
+            paths.map(async (path12) => {
+              const res = await this._nodeFsHandler._addToNodeFs(path12, !_internal, 0, 0, _origAdd);
               if (res) this._emitReady();
               return res;
             })
@@ -15792,15 +15784,15 @@ var require_chokidar = __commonJS({
         if (this.closed) return this;
         const paths = unifyPaths(paths_);
         const { cwd } = this.options;
-        paths.forEach((path11) => {
-          if (!sysPath.isAbsolute(path11) && !this._closers.has(path11)) {
-            if (cwd) path11 = sysPath.join(cwd, path11);
-            path11 = sysPath.resolve(path11);
+        paths.forEach((path12) => {
+          if (!sysPath.isAbsolute(path12) && !this._closers.has(path12)) {
+            if (cwd) path12 = sysPath.join(cwd, path12);
+            path12 = sysPath.resolve(path12);
           }
-          this._closePath(path11);
-          this._ignoredPaths.add(path11);
-          if (this._watched.has(path11)) {
-            this._ignoredPaths.add(path11 + SLASH_GLOBSTAR);
+          this._closePath(path12);
+          this._ignoredPaths.add(path12);
+          if (this._watched.has(path12)) {
+            this._ignoredPaths.add(path12 + SLASH_GLOBSTAR);
           }
           this._userIgnored = void 0;
         });
@@ -15858,36 +15850,36 @@ var require_chokidar = __commonJS({
        * @param {*=} val3
        * @returns the error if defined, otherwise the value of the FSWatcher instance's `closed` flag
        */
-      async _emit(event, path11, val1, val2, val3) {
+      async _emit(event, path12, val1, val2, val3) {
         if (this.closed) return;
         const opts = this.options;
-        if (isWindows) path11 = sysPath.normalize(path11);
-        if (opts.cwd) path11 = sysPath.relative(opts.cwd, path11);
-        const args = [event, path11];
+        if (isWindows) path12 = sysPath.normalize(path12);
+        if (opts.cwd) path12 = sysPath.relative(opts.cwd, path12);
+        const args = [event, path12];
         if (val3 !== void 0) args.push(val1, val2, val3);
         else if (val2 !== void 0) args.push(val1, val2);
         else if (val1 !== void 0) args.push(val1);
         const awf = opts.awaitWriteFinish;
         let pw;
-        if (awf && (pw = this._pendingWrites.get(path11))) {
+        if (awf && (pw = this._pendingWrites.get(path12))) {
           pw.lastChange = /* @__PURE__ */ new Date();
           return this;
         }
         if (opts.atomic) {
           if (event === EV_UNLINK) {
-            this._pendingUnlinks.set(path11, args);
+            this._pendingUnlinks.set(path12, args);
             setTimeout(() => {
-              this._pendingUnlinks.forEach((entry, path12) => {
+              this._pendingUnlinks.forEach((entry, path13) => {
                 this.emit(...entry);
                 this.emit(EV_ALL, ...entry);
-                this._pendingUnlinks.delete(path12);
+                this._pendingUnlinks.delete(path13);
               });
             }, typeof opts.atomic === "number" ? opts.atomic : 100);
             return this;
           }
-          if (event === EV_ADD && this._pendingUnlinks.has(path11)) {
+          if (event === EV_ADD && this._pendingUnlinks.has(path12)) {
             event = args[0] = EV_CHANGE;
-            this._pendingUnlinks.delete(path11);
+            this._pendingUnlinks.delete(path12);
           }
         }
         if (awf && (event === EV_ADD || event === EV_CHANGE) && this._readyEmitted) {
@@ -15905,15 +15897,15 @@ var require_chokidar = __commonJS({
               this.emitWithAll(event, args);
             }
           };
-          this._awaitWriteFinish(path11, awf.stabilityThreshold, event, awfEmit);
+          this._awaitWriteFinish(path12, awf.stabilityThreshold, event, awfEmit);
           return this;
         }
         if (event === EV_CHANGE) {
-          const isThrottled = !this._throttle(EV_CHANGE, path11, 50);
+          const isThrottled = !this._throttle(EV_CHANGE, path12, 50);
           if (isThrottled) return this;
         }
         if (opts.alwaysStat && val1 === void 0 && (event === EV_ADD || event === EV_ADD_DIR || event === EV_CHANGE)) {
-          const fullPath = opts.cwd ? sysPath.join(opts.cwd, path11) : path11;
+          const fullPath = opts.cwd ? sysPath.join(opts.cwd, path12) : path12;
           let stats;
           try {
             stats = await stat(fullPath);
@@ -15944,28 +15936,28 @@ var require_chokidar = __commonJS({
        * @param {Number} timeout duration of time to suppress duplicate actions
        * @returns {Object|false} tracking object or false if action should be suppressed
        */
-      _throttle(actionType, path11, timeout) {
+      _throttle(actionType, path12, timeout) {
         if (!this._throttled.has(actionType)) {
           this._throttled.set(actionType, /* @__PURE__ */ new Map());
         }
         const action = this._throttled.get(actionType);
-        const actionPath = action.get(path11);
+        const actionPath = action.get(path12);
         if (actionPath) {
           actionPath.count++;
           return false;
         }
         let timeoutObject;
         const clear = () => {
-          const item = action.get(path11);
+          const item = action.get(path12);
           const count = item ? item.count : 0;
-          action.delete(path11);
+          action.delete(path12);
           clearTimeout(timeoutObject);
           if (item) clearTimeout(item.timeoutObject);
           return count;
         };
         timeoutObject = setTimeout(clear, timeout);
         const thr = { timeoutObject, clear, count: 0 };
-        action.set(path11, thr);
+        action.set(path12, thr);
         return thr;
       }
       _incrReadyCount() {
@@ -15979,27 +15971,27 @@ var require_chokidar = __commonJS({
        * @param {EventName} event
        * @param {Function} awfEmit Callback to be called when ready for event to be emitted.
        */
-      _awaitWriteFinish(path11, threshold, event, awfEmit) {
+      _awaitWriteFinish(path12, threshold, event, awfEmit) {
         let timeoutHandler;
-        let fullPath = path11;
-        if (this.options.cwd && !sysPath.isAbsolute(path11)) {
-          fullPath = sysPath.join(this.options.cwd, path11);
+        let fullPath = path12;
+        if (this.options.cwd && !sysPath.isAbsolute(path12)) {
+          fullPath = sysPath.join(this.options.cwd, path12);
         }
         const now = /* @__PURE__ */ new Date();
         const awaitWriteFinish = (prevStat) => {
           fs12.stat(fullPath, (err, curStat) => {
-            if (err || !this._pendingWrites.has(path11)) {
+            if (err || !this._pendingWrites.has(path12)) {
               if (err && err.code !== "ENOENT") awfEmit(err);
               return;
             }
             const now2 = Number(/* @__PURE__ */ new Date());
             if (prevStat && curStat.size !== prevStat.size) {
-              this._pendingWrites.get(path11).lastChange = now2;
+              this._pendingWrites.get(path12).lastChange = now2;
             }
-            const pw = this._pendingWrites.get(path11);
+            const pw = this._pendingWrites.get(path12);
             const df = now2 - pw.lastChange;
             if (df >= threshold) {
-              this._pendingWrites.delete(path11);
+              this._pendingWrites.delete(path12);
               awfEmit(void 0, curStat);
             } else {
               timeoutHandler = setTimeout(
@@ -16010,11 +16002,11 @@ var require_chokidar = __commonJS({
             }
           });
         };
-        if (!this._pendingWrites.has(path11)) {
-          this._pendingWrites.set(path11, {
+        if (!this._pendingWrites.has(path12)) {
+          this._pendingWrites.set(path12, {
             lastChange: now,
             cancelWait: () => {
-              this._pendingWrites.delete(path11);
+              this._pendingWrites.delete(path12);
               clearTimeout(timeoutHandler);
               return event;
             }
@@ -16034,20 +16026,20 @@ var require_chokidar = __commonJS({
        * @param {fs.Stats=} stats result of fs.stat
        * @returns {Boolean}
        */
-      _isIgnored(path11, stats) {
-        if (this.options.atomic && DOT_RE.test(path11)) return true;
+      _isIgnored(path12, stats) {
+        if (this.options.atomic && DOT_RE.test(path12)) return true;
         if (!this._userIgnored) {
           const { cwd } = this.options;
           const ign = this.options.ignored;
           const ignored = ign && ign.map(normalizeIgnored(cwd));
-          const paths = arrify(ignored).filter((path12) => typeof path12 === STRING_TYPE && !isGlob(path12)).map((path12) => path12 + SLASH_GLOBSTAR);
+          const paths = arrify(ignored).filter((path13) => typeof path13 === STRING_TYPE && !isGlob(path13)).map((path13) => path13 + SLASH_GLOBSTAR);
           const list = this._getGlobIgnored().map(normalizeIgnored(cwd)).concat(ignored, paths);
           this._userIgnored = anymatch(list, void 0, ANYMATCH_OPTS);
         }
-        return this._userIgnored([path11, stats]);
+        return this._userIgnored([path12, stats]);
       }
-      _isntIgnored(path11, stat2) {
-        return !this._isIgnored(path11, stat2);
+      _isntIgnored(path12, stat2) {
+        return !this._isIgnored(path12, stat2);
       }
       /**
        * Provides a set of common helpers and properties relating to symlink and glob handling.
@@ -16055,10 +16047,10 @@ var require_chokidar = __commonJS({
        * @param {Number=} depth at any depth > 0, this isn't a glob
        * @returns {WatchHelper} object containing helpers for this path
        */
-      _getWatchHelpers(path11, depth) {
-        const watchPath = depth || this.options.disableGlobbing || !isGlob(path11) ? path11 : globParent(path11);
+      _getWatchHelpers(path12, depth) {
+        const watchPath = depth || this.options.disableGlobbing || !isGlob(path12) ? path12 : globParent(path12);
         const follow = this.options.followSymlinks;
-        return new WatchHelper(path11, watchPath, follow, this);
+        return new WatchHelper(path12, watchPath, follow, this);
       }
       // Directory helpers
       // -----------------
@@ -16097,66 +16089,66 @@ var require_chokidar = __commonJS({
        * @returns {void}
       */
       _remove(directory, item, isDirectory) {
-        const path11 = sysPath.join(directory, item);
-        const fullPath = sysPath.resolve(path11);
-        isDirectory = isDirectory != null ? isDirectory : this._watched.has(path11) || this._watched.has(fullPath);
-        if (!this._throttle("remove", path11, 100)) return;
+        const path12 = sysPath.join(directory, item);
+        const fullPath = sysPath.resolve(path12);
+        isDirectory = isDirectory != null ? isDirectory : this._watched.has(path12) || this._watched.has(fullPath);
+        if (!this._throttle("remove", path12, 100)) return;
         if (!isDirectory && !this.options.useFsEvents && this._watched.size === 1) {
           this.add(directory, item, true);
         }
-        const wp = this._getWatchedDir(path11);
+        const wp = this._getWatchedDir(path12);
         const nestedDirectoryChildren = wp.getChildren();
-        nestedDirectoryChildren.forEach((nested) => this._remove(path11, nested));
+        nestedDirectoryChildren.forEach((nested) => this._remove(path12, nested));
         const parent = this._getWatchedDir(directory);
         const wasTracked = parent.has(item);
         parent.remove(item);
         if (this._symlinkPaths.has(fullPath)) {
           this._symlinkPaths.delete(fullPath);
         }
-        let relPath = path11;
-        if (this.options.cwd) relPath = sysPath.relative(this.options.cwd, path11);
+        let relPath = path12;
+        if (this.options.cwd) relPath = sysPath.relative(this.options.cwd, path12);
         if (this.options.awaitWriteFinish && this._pendingWrites.has(relPath)) {
           const event = this._pendingWrites.get(relPath).cancelWait();
           if (event === EV_ADD) return;
         }
-        this._watched.delete(path11);
+        this._watched.delete(path12);
         this._watched.delete(fullPath);
         const eventName = isDirectory ? EV_UNLINK_DIR : EV_UNLINK;
-        if (wasTracked && !this._isIgnored(path11)) this._emit(eventName, path11);
+        if (wasTracked && !this._isIgnored(path12)) this._emit(eventName, path12);
         if (!this.options.useFsEvents) {
-          this._closePath(path11);
+          this._closePath(path12);
         }
       }
       /**
        * Closes all watchers for a path
        * @param {Path} path
        */
-      _closePath(path11) {
-        this._closeFile(path11);
-        const dir = sysPath.dirname(path11);
-        this._getWatchedDir(dir).remove(sysPath.basename(path11));
+      _closePath(path12) {
+        this._closeFile(path12);
+        const dir = sysPath.dirname(path12);
+        this._getWatchedDir(dir).remove(sysPath.basename(path12));
       }
       /**
        * Closes only file-specific watchers
        * @param {Path} path
        */
-      _closeFile(path11) {
-        const closers = this._closers.get(path11);
+      _closeFile(path12) {
+        const closers = this._closers.get(path12);
         if (!closers) return;
         closers.forEach((closer) => closer());
-        this._closers.delete(path11);
+        this._closers.delete(path12);
       }
       /**
        *
        * @param {Path} path
        * @param {Function} closer
        */
-      _addPathCloser(path11, closer) {
+      _addPathCloser(path12, closer) {
         if (!closer) return;
-        let list = this._closers.get(path11);
+        let list = this._closers.get(path12);
         if (!list) {
           list = [];
-          this._closers.set(path11, list);
+          this._closers.set(path12, list);
         }
         list.push(closer);
       }
@@ -16187,917 +16179,11 @@ var require_chokidar = __commonJS({
   }
 });
 
-// src/ast/traversal.ts
-var traversal_exports = {};
-__export(traversal_exports, {
-  findContracts: () => findContracts,
-  findFunctions: () => findFunctions,
-  findImports: () => findImports,
-  findNodeAtOffset: () => findNodeAtOffset,
-  findNodeAtPosition: () => findNodeAtPosition,
-  findNodesByName: () => findNodesByName,
-  findStateVariables: () => findStateVariables,
-  flattenAst: () => flattenAst,
-  offsetToPosition: () => offsetToPosition,
-  parseSrc: () => parseSrc,
-  positionToOffset: () => positionToOffset,
-  srcToRange: () => srcToRange,
-  walkAst: () => walkAst
-});
-function offsetToPosition(content, offset) {
-  let line = 0;
-  let character = 0;
-  for (let i = 0; i < offset && i < content.length; i++) {
-    if (content[i] === "\n") {
-      line++;
-      character = 0;
-    } else {
-      character++;
-    }
-  }
-  return { line, character };
-}
-function srcToRange(src, content) {
-  const parts = src.split(":");
-  if (parts.length < 2) return null;
-  const start = parseInt(parts[0], 10);
-  const length = parseInt(parts[1], 10);
-  if (isNaN(start) || isNaN(length)) return null;
-  return {
-    start: offsetToPosition(content, start),
-    end: offsetToPosition(content, start + length)
-  };
-}
-function parseSrc(src) {
-  const parts = src.split(":");
-  if (parts.length < 2) return null;
-  const start = parseInt(parts[0], 10);
-  const length = parseInt(parts[1], 10);
-  if (isNaN(start) || isNaN(length)) return null;
-  return { start, length };
-}
-function positionToOffset(content, position) {
-  let offset = 0;
-  let line = 0;
-  for (let i = 0; i < content.length; i++) {
-    if (line === position.line) {
-      return offset + position.character;
-    }
-    if (content[i] === "\n") {
-      line++;
-      offset = i + 1;
-    }
-  }
-  return offset;
-}
-function walkAst(node, visitor) {
-  walkAstInternal(node, null, visitor);
-}
-function walkAstInternal(node, parent, visitor) {
-  const result = visitor(node, parent);
-  if (result === false) return;
-  if (node.nodes) {
-    for (const child of node.nodes) {
-      walkAstInternal(child, node, visitor);
-    }
-  }
-  if (nodeTypeHasChildren(node)) {
-    for (const child of getChildren(node)) {
-      if (child && typeof child === "object" && "nodeType" in child) {
-        walkAstInternal(child, node, visitor);
-      }
-    }
-  }
-}
-function nodeTypeHasChildren(node) {
-  const t = node.nodeType;
-  return t === "Block" || t === "ParameterList" || t === "InheritanceSpecifier" || t === "OverrideSpecifier" || t === "FunctionCall" || t === "MemberAccess" || t === "Mapping" || t === "ArrayTypeName" || t === "UserDefinedTypeName" || t === "StateVariableDeclaration" || t === "VariableDeclaration" || t === "StructDefinition" || t === "EnumDefinition" || t === "EventDefinition" || t === "ErrorDefinition" || t === "ModifierDefinition" || t === "ContractDefinition" || t === "FunctionDefinition" || t === "ImportDirective" || t === "SourceUnit";
-}
-function getChildren(node) {
-  const children = [];
-  if (node.body && typeof node.body === "object" && "nodeType" in node.body) {
-    children.push(node.body);
-  }
-  if (node.parameters && typeof node.parameters === "object" && "nodeType" in node.parameters) {
-    children.push(node.parameters);
-  }
-  if (node.returnParameters && typeof node.returnParameters === "object" && "nodeType" in node.returnParameters) {
-    children.push(node.returnParameters);
-  }
-  if (node.typeName && typeof node.typeName === "object" && "nodeType" in node.typeName) {
-    children.push(node.typeName);
-  }
-  if (node.keyType && typeof node.keyType === "object" && "nodeType" in node.keyType) {
-    children.push(node.keyType);
-  }
-  if (node.valueType && typeof node.valueType === "object" && "nodeType" in node.valueType) {
-    children.push(node.valueType);
-  }
-  if (node.baseType && typeof node.baseType === "object" && "nodeType" in node.baseType) {
-    children.push(node.baseType);
-  }
-  if (node.expression && typeof node.expression === "object" && "nodeType" in node.expression) {
-    children.push(node.expression);
-  }
-  if (node.baseName && typeof node.baseName === "object" && "nodeType" in node.baseName) {
-    children.push(node.baseName);
-  }
-  if (node.pathNode && typeof node.pathNode === "object" && "nodeType" in node.pathNode) {
-    children.push(node.pathNode);
-  }
-  if (Array.isArray(node.arguments)) {
-    for (const arg of node.arguments) {
-      if (arg && typeof arg === "object" && "nodeType" in arg) {
-        children.push(arg);
-      }
-    }
-  }
-  if (Array.isArray(node.members)) {
-    for (const member of node.members) {
-      if (member && typeof member === "object" && "nodeType" in member) {
-        children.push(member);
-      }
-    }
-  }
-  if (Array.isArray(node.baseContracts)) {
-    for (const base of node.baseContracts) {
-      if (base && typeof base === "object" && "nodeType" in base) {
-        children.push(base);
-      }
-    }
-  }
-  if (Array.isArray(node.overrides)) {
-    for (const override of node.overrides) {
-      if (override && typeof override === "object" && "nodeType" in override) {
-        children.push(override);
-      }
-    }
-  }
-  if (Array.isArray(node.statements)) {
-    for (const stmt of node.statements) {
-      if (stmt && typeof stmt === "object" && "nodeType" in stmt) {
-        children.push(stmt);
-      }
-    }
-  }
-  if (Array.isArray(node.symbolAliases)) {
-    for (const alias of node.symbolAliases) {
-      if (alias?.local && typeof alias.local === "object" && "nodeType" in alias.local) {
-        children.push(alias.local);
-      }
-      if (alias?.foreign && typeof alias.foreign === "object" && "nodeType" in alias.foreign) {
-        children.push(alias.foreign);
-      }
-    }
-  }
-  return children;
-}
-function findNodeAtPosition(ast, content, position) {
-  const offset = positionToOffset(content, position);
-  let best = null;
-  walkAst(ast, (node) => {
-    if (!node.src) return;
-    const parsed = parseSrc(node.src);
-    if (!parsed) return;
-    if (offset >= parsed.start && offset <= parsed.start + parsed.length) {
-      best = node;
-    }
-  });
-  return best;
-}
-function findNodeAtOffset(ast, offset) {
-  let best = null;
-  walkAst(ast, (node) => {
-    if (!node.src) return;
-    const parsed = parseSrc(node.src);
-    if (!parsed) return;
-    if (offset >= parsed.start && offset <= parsed.start + parsed.length) {
-      best = node;
-    }
-  });
-  return best;
-}
-function flattenAst(ast) {
-  const nodes = [];
-  walkAst(ast, (node) => {
-    nodes.push(node);
-  });
-  return nodes;
-}
-function findNodesByName(ast, name, nodeType) {
-  const results = [];
-  walkAst(ast, (node) => {
-    if (node.name === name && (!nodeType || node.nodeType === nodeType)) {
-      results.push(node);
-    }
-  });
-  return results;
-}
-function findContracts(ast) {
-  return findNodesByName(ast, "", "ContractDefinition").filter(
-    (n) => n.name
-  );
-}
-function findFunctions(ast) {
-  return findNodesByName(ast, "", "FunctionDefinition").filter(
-    (n) => n.name && n.name !== ""
-  );
-}
-function findStateVariables(ast) {
-  return findNodesByName(ast, "", "StateVariableDeclaration");
-}
-function findImports(ast) {
-  return findNodesByName(ast, "", "ImportDirective");
-}
-var init_traversal = __esm({
-  "src/ast/traversal.ts"() {
-    "use strict";
-  }
-});
-
-// node_modules/vscode-uri/lib/umd/index.js
-var require_umd = __commonJS({
-  "node_modules/vscode-uri/lib/umd/index.js"(exports2, module2) {
-    !function(t, e) {
-      if ("object" == typeof exports2 && "object" == typeof module2) module2.exports = e();
-      else if ("function" == typeof define && define.amd) define([], e);
-      else {
-        var r = e();
-        for (var n in r) ("object" == typeof exports2 ? exports2 : t)[n] = r[n];
-      }
-    }(exports2, () => (() => {
-      "use strict";
-      var t = { 975: (t2) => {
-        function e2(t3) {
-          if ("string" != typeof t3) throw new TypeError("Path must be a string. Received " + JSON.stringify(t3));
-        }
-        function r2(t3, e3) {
-          for (var r3, n3 = "", i = 0, o = -1, s = 0, a = 0; a <= t3.length; ++a) {
-            if (a < t3.length) r3 = t3.charCodeAt(a);
-            else {
-              if (47 === r3) break;
-              r3 = 47;
-            }
-            if (47 === r3) {
-              if (o === a - 1 || 1 === s) ;
-              else if (o !== a - 1 && 2 === s) {
-                if (n3.length < 2 || 2 !== i || 46 !== n3.charCodeAt(n3.length - 1) || 46 !== n3.charCodeAt(n3.length - 2)) {
-                  if (n3.length > 2) {
-                    var h = n3.lastIndexOf("/");
-                    if (h !== n3.length - 1) {
-                      -1 === h ? (n3 = "", i = 0) : i = (n3 = n3.slice(0, h)).length - 1 - n3.lastIndexOf("/"), o = a, s = 0;
-                      continue;
-                    }
-                  } else if (2 === n3.length || 1 === n3.length) {
-                    n3 = "", i = 0, o = a, s = 0;
-                    continue;
-                  }
-                }
-                e3 && (n3.length > 0 ? n3 += "/.." : n3 = "..", i = 2);
-              } else n3.length > 0 ? n3 += "/" + t3.slice(o + 1, a) : n3 = t3.slice(o + 1, a), i = a - o - 1;
-              o = a, s = 0;
-            } else 46 === r3 && -1 !== s ? ++s : s = -1;
-          }
-          return n3;
-        }
-        var n2 = { resolve: function() {
-          for (var t3, n3 = "", i = false, o = arguments.length - 1; o >= -1 && !i; o--) {
-            var s;
-            o >= 0 ? s = arguments[o] : (void 0 === t3 && (t3 = process.cwd()), s = t3), e2(s), 0 !== s.length && (n3 = s + "/" + n3, i = 47 === s.charCodeAt(0));
-          }
-          return n3 = r2(n3, !i), i ? n3.length > 0 ? "/" + n3 : "/" : n3.length > 0 ? n3 : ".";
-        }, normalize: function(t3) {
-          if (e2(t3), 0 === t3.length) return ".";
-          var n3 = 47 === t3.charCodeAt(0), i = 47 === t3.charCodeAt(t3.length - 1);
-          return 0 !== (t3 = r2(t3, !n3)).length || n3 || (t3 = "."), t3.length > 0 && i && (t3 += "/"), n3 ? "/" + t3 : t3;
-        }, isAbsolute: function(t3) {
-          return e2(t3), t3.length > 0 && 47 === t3.charCodeAt(0);
-        }, join: function() {
-          if (0 === arguments.length) return ".";
-          for (var t3, r3 = 0; r3 < arguments.length; ++r3) {
-            var i = arguments[r3];
-            e2(i), i.length > 0 && (void 0 === t3 ? t3 = i : t3 += "/" + i);
-          }
-          return void 0 === t3 ? "." : n2.normalize(t3);
-        }, relative: function(t3, r3) {
-          if (e2(t3), e2(r3), t3 === r3) return "";
-          if ((t3 = n2.resolve(t3)) === (r3 = n2.resolve(r3))) return "";
-          for (var i = 1; i < t3.length && 47 === t3.charCodeAt(i); ++i) ;
-          for (var o = t3.length, s = o - i, a = 1; a < r3.length && 47 === r3.charCodeAt(a); ++a) ;
-          for (var h = r3.length - a, c = s < h ? s : h, f = -1, u = 0; u <= c; ++u) {
-            if (u === c) {
-              if (h > c) {
-                if (47 === r3.charCodeAt(a + u)) return r3.slice(a + u + 1);
-                if (0 === u) return r3.slice(a + u);
-              } else s > c && (47 === t3.charCodeAt(i + u) ? f = u : 0 === u && (f = 0));
-              break;
-            }
-            var l = t3.charCodeAt(i + u);
-            if (l !== r3.charCodeAt(a + u)) break;
-            47 === l && (f = u);
-          }
-          var d = "";
-          for (u = i + f + 1; u <= o; ++u) u !== o && 47 !== t3.charCodeAt(u) || (0 === d.length ? d += ".." : d += "/..");
-          return d.length > 0 ? d + r3.slice(a + f) : (a += f, 47 === r3.charCodeAt(a) && ++a, r3.slice(a));
-        }, _makeLong: function(t3) {
-          return t3;
-        }, dirname: function(t3) {
-          if (e2(t3), 0 === t3.length) return ".";
-          for (var r3 = t3.charCodeAt(0), n3 = 47 === r3, i = -1, o = true, s = t3.length - 1; s >= 1; --s) if (47 === (r3 = t3.charCodeAt(s))) {
-            if (!o) {
-              i = s;
-              break;
-            }
-          } else o = false;
-          return -1 === i ? n3 ? "/" : "." : n3 && 1 === i ? "//" : t3.slice(0, i);
-        }, basename: function(t3, r3) {
-          if (void 0 !== r3 && "string" != typeof r3) throw new TypeError('"ext" argument must be a string');
-          e2(t3);
-          var n3, i = 0, o = -1, s = true;
-          if (void 0 !== r3 && r3.length > 0 && r3.length <= t3.length) {
-            if (r3.length === t3.length && r3 === t3) return "";
-            var a = r3.length - 1, h = -1;
-            for (n3 = t3.length - 1; n3 >= 0; --n3) {
-              var c = t3.charCodeAt(n3);
-              if (47 === c) {
-                if (!s) {
-                  i = n3 + 1;
-                  break;
-                }
-              } else -1 === h && (s = false, h = n3 + 1), a >= 0 && (c === r3.charCodeAt(a) ? -1 == --a && (o = n3) : (a = -1, o = h));
-            }
-            return i === o ? o = h : -1 === o && (o = t3.length), t3.slice(i, o);
-          }
-          for (n3 = t3.length - 1; n3 >= 0; --n3) if (47 === t3.charCodeAt(n3)) {
-            if (!s) {
-              i = n3 + 1;
-              break;
-            }
-          } else -1 === o && (s = false, o = n3 + 1);
-          return -1 === o ? "" : t3.slice(i, o);
-        }, extname: function(t3) {
-          e2(t3);
-          for (var r3 = -1, n3 = 0, i = -1, o = true, s = 0, a = t3.length - 1; a >= 0; --a) {
-            var h = t3.charCodeAt(a);
-            if (47 !== h) -1 === i && (o = false, i = a + 1), 46 === h ? -1 === r3 ? r3 = a : 1 !== s && (s = 1) : -1 !== r3 && (s = -1);
-            else if (!o) {
-              n3 = a + 1;
-              break;
-            }
-          }
-          return -1 === r3 || -1 === i || 0 === s || 1 === s && r3 === i - 1 && r3 === n3 + 1 ? "" : t3.slice(r3, i);
-        }, format: function(t3) {
-          if (null === t3 || "object" != typeof t3) throw new TypeError('The "pathObject" argument must be of type Object. Received type ' + typeof t3);
-          return function(t4, e3) {
-            var r3 = e3.dir || e3.root, n3 = e3.base || (e3.name || "") + (e3.ext || "");
-            return r3 ? r3 === e3.root ? r3 + n3 : r3 + "/" + n3 : n3;
-          }(0, t3);
-        }, parse: function(t3) {
-          e2(t3);
-          var r3 = { root: "", dir: "", base: "", ext: "", name: "" };
-          if (0 === t3.length) return r3;
-          var n3, i = t3.charCodeAt(0), o = 47 === i;
-          o ? (r3.root = "/", n3 = 1) : n3 = 0;
-          for (var s = -1, a = 0, h = -1, c = true, f = t3.length - 1, u = 0; f >= n3; --f) if (47 !== (i = t3.charCodeAt(f))) -1 === h && (c = false, h = f + 1), 46 === i ? -1 === s ? s = f : 1 !== u && (u = 1) : -1 !== s && (u = -1);
-          else if (!c) {
-            a = f + 1;
-            break;
-          }
-          return -1 === s || -1 === h || 0 === u || 1 === u && s === h - 1 && s === a + 1 ? -1 !== h && (r3.base = r3.name = 0 === a && o ? t3.slice(1, h) : t3.slice(a, h)) : (0 === a && o ? (r3.name = t3.slice(1, s), r3.base = t3.slice(1, h)) : (r3.name = t3.slice(a, s), r3.base = t3.slice(a, h)), r3.ext = t3.slice(s, h)), a > 0 ? r3.dir = t3.slice(0, a - 1) : o && (r3.dir = "/"), r3;
-        }, sep: "/", delimiter: ":", win32: null, posix: null };
-        n2.posix = n2, t2.exports = n2;
-      }, 70: (t2, e2) => {
-        if (Object.defineProperty(e2, "__esModule", { value: true }), e2.isWindows = void 0, "object" == typeof process) e2.isWindows = "win32" === process.platform;
-        else if ("object" == typeof navigator) {
-          let t3 = navigator.userAgent;
-          e2.isWindows = t3.indexOf("Windows") >= 0;
-        }
-      }, 231: (t2, e2, r2) => {
-        Object.defineProperty(e2, "__esModule", { value: true }), e2.uriToFsPath = e2.URI = void 0;
-        const n2 = r2(70), i = /^\w[\w\d+.-]*$/, o = /^\//, s = /^\/\//;
-        function a(t3, e3) {
-          if (!t3.scheme && e3) throw new Error(`[UriError]: Scheme is missing: {scheme: "", authority: "${t3.authority}", path: "${t3.path}", query: "${t3.query}", fragment: "${t3.fragment}"}`);
-          if (t3.scheme && !i.test(t3.scheme)) throw new Error("[UriError]: Scheme contains illegal characters.");
-          if (t3.path) {
-            if (t3.authority) {
-              if (!o.test(t3.path)) throw new Error('[UriError]: If a URI contains an authority component, then the path component must either be empty or begin with a slash ("/") character');
-            } else if (s.test(t3.path)) throw new Error('[UriError]: If a URI does not contain an authority component, then the path cannot begin with two slash characters ("//")');
-          }
-        }
-        const h = "", c = "/", f = /^(([^:/?#]+?):)?(\/\/([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?/;
-        class u {
-          static isUri(t3) {
-            return t3 instanceof u || !!t3 && "string" == typeof t3.authority && "string" == typeof t3.fragment && "string" == typeof t3.path && "string" == typeof t3.query && "string" == typeof t3.scheme && "string" == typeof t3.fsPath && "function" == typeof t3.with && "function" == typeof t3.toString;
-          }
-          scheme;
-          authority;
-          path;
-          query;
-          fragment;
-          constructor(t3, e3, r3, n3, i2, o2 = false) {
-            "object" == typeof t3 ? (this.scheme = t3.scheme || h, this.authority = t3.authority || h, this.path = t3.path || h, this.query = t3.query || h, this.fragment = t3.fragment || h) : (this.scheme = /* @__PURE__ */ function(t4, e4) {
-              return t4 || e4 ? t4 : "file";
-            }(t3, o2), this.authority = e3 || h, this.path = function(t4, e4) {
-              switch (t4) {
-                case "https":
-                case "http":
-                case "file":
-                  e4 ? e4[0] !== c && (e4 = c + e4) : e4 = c;
-              }
-              return e4;
-            }(this.scheme, r3 || h), this.query = n3 || h, this.fragment = i2 || h, a(this, o2));
-          }
-          get fsPath() {
-            return v(this, false);
-          }
-          with(t3) {
-            if (!t3) return this;
-            let { scheme: e3, authority: r3, path: n3, query: i2, fragment: o2 } = t3;
-            return void 0 === e3 ? e3 = this.scheme : null === e3 && (e3 = h), void 0 === r3 ? r3 = this.authority : null === r3 && (r3 = h), void 0 === n3 ? n3 = this.path : null === n3 && (n3 = h), void 0 === i2 ? i2 = this.query : null === i2 && (i2 = h), void 0 === o2 ? o2 = this.fragment : null === o2 && (o2 = h), e3 === this.scheme && r3 === this.authority && n3 === this.path && i2 === this.query && o2 === this.fragment ? this : new d(e3, r3, n3, i2, o2);
-          }
-          static parse(t3, e3 = false) {
-            const r3 = f.exec(t3);
-            return r3 ? new d(r3[2] || h, w(r3[4] || h), w(r3[5] || h), w(r3[7] || h), w(r3[9] || h), e3) : new d(h, h, h, h, h);
-          }
-          static file(t3) {
-            let e3 = h;
-            if (n2.isWindows && (t3 = t3.replace(/\\/g, c)), t3[0] === c && t3[1] === c) {
-              const r3 = t3.indexOf(c, 2);
-              -1 === r3 ? (e3 = t3.substring(2), t3 = c) : (e3 = t3.substring(2, r3), t3 = t3.substring(r3) || c);
-            }
-            return new d("file", e3, t3, h, h);
-          }
-          static from(t3) {
-            const e3 = new d(t3.scheme, t3.authority, t3.path, t3.query, t3.fragment);
-            return a(e3, true), e3;
-          }
-          toString(t3 = false) {
-            return y(this, t3);
-          }
-          toJSON() {
-            return this;
-          }
-          static revive(t3) {
-            if (t3) {
-              if (t3 instanceof u) return t3;
-              {
-                const e3 = new d(t3);
-                return e3._formatted = t3.external, e3._fsPath = t3._sep === l ? t3.fsPath : null, e3;
-              }
-            }
-            return t3;
-          }
-        }
-        e2.URI = u;
-        const l = n2.isWindows ? 1 : void 0;
-        class d extends u {
-          _formatted = null;
-          _fsPath = null;
-          get fsPath() {
-            return this._fsPath || (this._fsPath = v(this, false)), this._fsPath;
-          }
-          toString(t3 = false) {
-            return t3 ? y(this, true) : (this._formatted || (this._formatted = y(this, false)), this._formatted);
-          }
-          toJSON() {
-            const t3 = { $mid: 1 };
-            return this._fsPath && (t3.fsPath = this._fsPath, t3._sep = l), this._formatted && (t3.external = this._formatted), this.path && (t3.path = this.path), this.scheme && (t3.scheme = this.scheme), this.authority && (t3.authority = this.authority), this.query && (t3.query = this.query), this.fragment && (t3.fragment = this.fragment), t3;
-          }
-        }
-        const p = { 58: "%3A", 47: "%2F", 63: "%3F", 35: "%23", 91: "%5B", 93: "%5D", 64: "%40", 33: "%21", 36: "%24", 38: "%26", 39: "%27", 40: "%28", 41: "%29", 42: "%2A", 43: "%2B", 44: "%2C", 59: "%3B", 61: "%3D", 32: "%20" };
-        function g(t3, e3, r3) {
-          let n3, i2 = -1;
-          for (let o2 = 0; o2 < t3.length; o2++) {
-            const s2 = t3.charCodeAt(o2);
-            if (s2 >= 97 && s2 <= 122 || s2 >= 65 && s2 <= 90 || s2 >= 48 && s2 <= 57 || 45 === s2 || 46 === s2 || 95 === s2 || 126 === s2 || e3 && 47 === s2 || r3 && 91 === s2 || r3 && 93 === s2 || r3 && 58 === s2) -1 !== i2 && (n3 += encodeURIComponent(t3.substring(i2, o2)), i2 = -1), void 0 !== n3 && (n3 += t3.charAt(o2));
-            else {
-              void 0 === n3 && (n3 = t3.substr(0, o2));
-              const e4 = p[s2];
-              void 0 !== e4 ? (-1 !== i2 && (n3 += encodeURIComponent(t3.substring(i2, o2)), i2 = -1), n3 += e4) : -1 === i2 && (i2 = o2);
-            }
-          }
-          return -1 !== i2 && (n3 += encodeURIComponent(t3.substring(i2))), void 0 !== n3 ? n3 : t3;
-        }
-        function m(t3) {
-          let e3;
-          for (let r3 = 0; r3 < t3.length; r3++) {
-            const n3 = t3.charCodeAt(r3);
-            35 === n3 || 63 === n3 ? (void 0 === e3 && (e3 = t3.substr(0, r3)), e3 += p[n3]) : void 0 !== e3 && (e3 += t3[r3]);
-          }
-          return void 0 !== e3 ? e3 : t3;
-        }
-        function v(t3, e3) {
-          let r3;
-          return r3 = t3.authority && t3.path.length > 1 && "file" === t3.scheme ? `//${t3.authority}${t3.path}` : 47 === t3.path.charCodeAt(0) && (t3.path.charCodeAt(1) >= 65 && t3.path.charCodeAt(1) <= 90 || t3.path.charCodeAt(1) >= 97 && t3.path.charCodeAt(1) <= 122) && 58 === t3.path.charCodeAt(2) ? e3 ? t3.path.substr(1) : t3.path[1].toLowerCase() + t3.path.substr(2) : t3.path, n2.isWindows && (r3 = r3.replace(/\//g, "\\")), r3;
-        }
-        function y(t3, e3) {
-          const r3 = e3 ? m : g;
-          let n3 = "", { scheme: i2, authority: o2, path: s2, query: a2, fragment: h2 } = t3;
-          if (i2 && (n3 += i2, n3 += ":"), (o2 || "file" === i2) && (n3 += c, n3 += c), o2) {
-            let t4 = o2.indexOf("@");
-            if (-1 !== t4) {
-              const e4 = o2.substr(0, t4);
-              o2 = o2.substr(t4 + 1), t4 = e4.lastIndexOf(":"), -1 === t4 ? n3 += r3(e4, false, false) : (n3 += r3(e4.substr(0, t4), false, false), n3 += ":", n3 += r3(e4.substr(t4 + 1), false, true)), n3 += "@";
-            }
-            o2 = o2.toLowerCase(), t4 = o2.lastIndexOf(":"), -1 === t4 ? n3 += r3(o2, false, true) : (n3 += r3(o2.substr(0, t4), false, true), n3 += o2.substr(t4));
-          }
-          if (s2) {
-            if (s2.length >= 3 && 47 === s2.charCodeAt(0) && 58 === s2.charCodeAt(2)) {
-              const t4 = s2.charCodeAt(1);
-              t4 >= 65 && t4 <= 90 && (s2 = `/${String.fromCharCode(t4 + 32)}:${s2.substr(3)}`);
-            } else if (s2.length >= 2 && 58 === s2.charCodeAt(1)) {
-              const t4 = s2.charCodeAt(0);
-              t4 >= 65 && t4 <= 90 && (s2 = `${String.fromCharCode(t4 + 32)}:${s2.substr(2)}`);
-            }
-            n3 += r3(s2, true, false);
-          }
-          return a2 && (n3 += "?", n3 += r3(a2, false, false)), h2 && (n3 += "#", n3 += e3 ? h2 : g(h2, false, false)), n3;
-        }
-        function b(t3) {
-          try {
-            return decodeURIComponent(t3);
-          } catch {
-            return t3.length > 3 ? t3.substr(0, 3) + b(t3.substr(3)) : t3;
-          }
-        }
-        e2.uriToFsPath = v;
-        const C = /(%[0-9A-Za-z][0-9A-Za-z])+/g;
-        function w(t3) {
-          return t3.match(C) ? t3.replace(C, (t4) => b(t4)) : t3;
-        }
-      }, 552: function(t2, e2, r2) {
-        var n2 = this && this.__createBinding || (Object.create ? function(t3, e3, r3, n3) {
-          void 0 === n3 && (n3 = r3);
-          var i2 = Object.getOwnPropertyDescriptor(e3, r3);
-          i2 && !("get" in i2 ? !e3.__esModule : i2.writable || i2.configurable) || (i2 = { enumerable: true, get: function() {
-            return e3[r3];
-          } }), Object.defineProperty(t3, n3, i2);
-        } : function(t3, e3, r3, n3) {
-          void 0 === n3 && (n3 = r3), t3[n3] = e3[r3];
-        }), i = this && this.__setModuleDefault || (Object.create ? function(t3, e3) {
-          Object.defineProperty(t3, "default", { enumerable: true, value: e3 });
-        } : function(t3, e3) {
-          t3.default = e3;
-        }), o = this && this.__importStar || function(t3) {
-          if (t3 && t3.__esModule) return t3;
-          var e3 = {};
-          if (null != t3) for (var r3 in t3) "default" !== r3 && Object.prototype.hasOwnProperty.call(t3, r3) && n2(e3, t3, r3);
-          return i(e3, t3), e3;
-        };
-        Object.defineProperty(e2, "__esModule", { value: true }), e2.Utils = void 0;
-        const s = o(r2(975)), a = s.posix || s, h = "/";
-        var c;
-        !function(t3) {
-          t3.joinPath = function(t4, ...e3) {
-            return t4.with({ path: a.join(t4.path, ...e3) });
-          }, t3.resolvePath = function(t4, ...e3) {
-            let r3 = t4.path, n3 = false;
-            r3[0] !== h && (r3 = h + r3, n3 = true);
-            let i2 = a.resolve(r3, ...e3);
-            return n3 && i2[0] === h && !t4.authority && (i2 = i2.substring(1)), t4.with({ path: i2 });
-          }, t3.dirname = function(t4) {
-            if (0 === t4.path.length || t4.path === h) return t4;
-            let e3 = a.dirname(t4.path);
-            return 1 === e3.length && 46 === e3.charCodeAt(0) && (e3 = ""), t4.with({ path: e3 });
-          }, t3.basename = function(t4) {
-            return a.basename(t4.path);
-          }, t3.extname = function(t4) {
-            return a.extname(t4.path);
-          };
-        }(c || (e2.Utils = c = {}));
-      } }, e = {};
-      function r(n2) {
-        var i = e[n2];
-        if (void 0 !== i) return i.exports;
-        var o = e[n2] = { exports: {} };
-        return t[n2].call(o.exports, o, o.exports, r), o.exports;
-      }
-      var n = {};
-      return (() => {
-        var t2 = n;
-        Object.defineProperty(t2, "__esModule", { value: true }), t2.Utils = t2.URI = void 0;
-        const e2 = r(231);
-        Object.defineProperty(t2, "URI", { enumerable: true, get: function() {
-          return e2.URI;
-        } });
-        const i = r(552);
-        Object.defineProperty(t2, "Utils", { enumerable: true, get: function() {
-          return i.Utils;
-        } });
-      })(), n;
-    })());
-  }
-});
-
-// src/connection.ts
-var import_node = __toESM(require_node3());
-var connection = (0, import_node.createConnection)(import_node.ProposedFeatures.all, process.stdin, process.stdout);
-
-// src/documents.ts
-var import_vscode_languageserver = __toESM(require_main4());
-
-// node_modules/vscode-languageserver-textdocument/lib/esm/main.js
-var FullTextDocument = class _FullTextDocument {
-  constructor(uri, languageId, version, content) {
-    this._uri = uri;
-    this._languageId = languageId;
-    this._version = version;
-    this._content = content;
-    this._lineOffsets = void 0;
-  }
-  get uri() {
-    return this._uri;
-  }
-  get languageId() {
-    return this._languageId;
-  }
-  get version() {
-    return this._version;
-  }
-  getText(range) {
-    if (range) {
-      const start = this.offsetAt(range.start);
-      const end = this.offsetAt(range.end);
-      return this._content.substring(start, end);
-    }
-    return this._content;
-  }
-  update(changes, version) {
-    for (const change of changes) {
-      if (_FullTextDocument.isIncremental(change)) {
-        const range = getWellformedRange(change.range);
-        const startOffset = this.offsetAt(range.start);
-        const endOffset = this.offsetAt(range.end);
-        this._content = this._content.substring(0, startOffset) + change.text + this._content.substring(endOffset, this._content.length);
-        const startLine = Math.max(range.start.line, 0);
-        const endLine = Math.max(range.end.line, 0);
-        let lineOffsets = this._lineOffsets;
-        const addedLineOffsets = computeLineOffsets(change.text, false, startOffset);
-        if (endLine - startLine === addedLineOffsets.length) {
-          for (let i = 0, len = addedLineOffsets.length; i < len; i++) {
-            lineOffsets[i + startLine + 1] = addedLineOffsets[i];
-          }
-        } else {
-          if (addedLineOffsets.length < 1e4) {
-            lineOffsets.splice(startLine + 1, endLine - startLine, ...addedLineOffsets);
-          } else {
-            this._lineOffsets = lineOffsets = lineOffsets.slice(0, startLine + 1).concat(addedLineOffsets, lineOffsets.slice(endLine + 1));
-          }
-        }
-        const diff = change.text.length - (endOffset - startOffset);
-        if (diff !== 0) {
-          for (let i = startLine + 1 + addedLineOffsets.length, len = lineOffsets.length; i < len; i++) {
-            lineOffsets[i] = lineOffsets[i] + diff;
-          }
-        }
-      } else if (_FullTextDocument.isFull(change)) {
-        this._content = change.text;
-        this._lineOffsets = void 0;
-      } else {
-        throw new Error("Unknown change event received");
-      }
-    }
-    this._version = version;
-  }
-  getLineOffsets() {
-    if (this._lineOffsets === void 0) {
-      this._lineOffsets = computeLineOffsets(this._content, true);
-    }
-    return this._lineOffsets;
-  }
-  positionAt(offset) {
-    offset = Math.max(Math.min(offset, this._content.length), 0);
-    const lineOffsets = this.getLineOffsets();
-    let low = 0, high = lineOffsets.length;
-    if (high === 0) {
-      return { line: 0, character: offset };
-    }
-    while (low < high) {
-      const mid = Math.floor((low + high) / 2);
-      if (lineOffsets[mid] > offset) {
-        high = mid;
-      } else {
-        low = mid + 1;
-      }
-    }
-    const line = low - 1;
-    offset = this.ensureBeforeEOL(offset, lineOffsets[line]);
-    return { line, character: offset - lineOffsets[line] };
-  }
-  offsetAt(position) {
-    const lineOffsets = this.getLineOffsets();
-    if (position.line >= lineOffsets.length) {
-      return this._content.length;
-    } else if (position.line < 0) {
-      return 0;
-    }
-    const lineOffset = lineOffsets[position.line];
-    if (position.character <= 0) {
-      return lineOffset;
-    }
-    const nextLineOffset = position.line + 1 < lineOffsets.length ? lineOffsets[position.line + 1] : this._content.length;
-    const offset = Math.min(lineOffset + position.character, nextLineOffset);
-    return this.ensureBeforeEOL(offset, lineOffset);
-  }
-  ensureBeforeEOL(offset, lineOffset) {
-    while (offset > lineOffset && isEOL(this._content.charCodeAt(offset - 1))) {
-      offset--;
-    }
-    return offset;
-  }
-  get lineCount() {
-    return this.getLineOffsets().length;
-  }
-  static isIncremental(event) {
-    const candidate = event;
-    return candidate !== void 0 && candidate !== null && typeof candidate.text === "string" && candidate.range !== void 0 && (candidate.rangeLength === void 0 || typeof candidate.rangeLength === "number");
-  }
-  static isFull(event) {
-    const candidate = event;
-    return candidate !== void 0 && candidate !== null && typeof candidate.text === "string" && candidate.range === void 0 && candidate.rangeLength === void 0;
-  }
-};
-var TextDocument;
-(function(TextDocument2) {
-  function create(uri, languageId, version, content) {
-    return new FullTextDocument(uri, languageId, version, content);
-  }
-  TextDocument2.create = create;
-  function update(document, changes, version) {
-    if (document instanceof FullTextDocument) {
-      document.update(changes, version);
-      return document;
-    } else {
-      throw new Error("TextDocument.update: document must be created by TextDocument.create");
-    }
-  }
-  TextDocument2.update = update;
-  function applyEdits(document, edits) {
-    const text = document.getText();
-    const sortedEdits = mergeSort(edits.map(getWellformedEdit), (a, b) => {
-      const diff = a.range.start.line - b.range.start.line;
-      if (diff === 0) {
-        return a.range.start.character - b.range.start.character;
-      }
-      return diff;
-    });
-    let lastModifiedOffset = 0;
-    const spans = [];
-    for (const e of sortedEdits) {
-      const startOffset = document.offsetAt(e.range.start);
-      if (startOffset < lastModifiedOffset) {
-        throw new Error("Overlapping edit");
-      } else if (startOffset > lastModifiedOffset) {
-        spans.push(text.substring(lastModifiedOffset, startOffset));
-      }
-      if (e.newText.length) {
-        spans.push(e.newText);
-      }
-      lastModifiedOffset = document.offsetAt(e.range.end);
-    }
-    spans.push(text.substr(lastModifiedOffset));
-    return spans.join("");
-  }
-  TextDocument2.applyEdits = applyEdits;
-})(TextDocument || (TextDocument = {}));
-function mergeSort(data, compare) {
-  if (data.length <= 1) {
-    return data;
-  }
-  const p = data.length / 2 | 0;
-  const left = data.slice(0, p);
-  const right = data.slice(p);
-  mergeSort(left, compare);
-  mergeSort(right, compare);
-  let leftIdx = 0;
-  let rightIdx = 0;
-  let i = 0;
-  while (leftIdx < left.length && rightIdx < right.length) {
-    const ret = compare(left[leftIdx], right[rightIdx]);
-    if (ret <= 0) {
-      data[i++] = left[leftIdx++];
-    } else {
-      data[i++] = right[rightIdx++];
-    }
-  }
-  while (leftIdx < left.length) {
-    data[i++] = left[leftIdx++];
-  }
-  while (rightIdx < right.length) {
-    data[i++] = right[rightIdx++];
-  }
-  return data;
-}
-function computeLineOffsets(text, isAtLineStart, textOffset = 0) {
-  const result = isAtLineStart ? [textOffset] : [];
-  for (let i = 0; i < text.length; i++) {
-    const ch = text.charCodeAt(i);
-    if (isEOL(ch)) {
-      if (ch === 13 && i + 1 < text.length && text.charCodeAt(i + 1) === 10) {
-        i++;
-      }
-      result.push(textOffset + i + 1);
-    }
-  }
-  return result;
-}
-function isEOL(char) {
-  return char === 13 || char === 10;
-}
-function getWellformedRange(range) {
-  const start = range.start;
-  const end = range.end;
-  if (start.line > end.line || start.line === end.line && start.character > end.character) {
-    return { start: end, end: start };
-  }
-  return range;
-}
-function getWellformedEdit(textEdit) {
-  const range = getWellformedRange(textEdit.range);
-  if (range !== textEdit.range) {
-    return { newText: textEdit.newText, range };
-  }
-  return textEdit;
-}
-
-// src/documents.ts
-var documents = new import_vscode_languageserver.TextDocuments(TextDocument);
-
-// src/capabilities.ts
-var import_vscode_languageserver2 = __toESM(require_main4());
-var SERVER_CAPABILITIES = {
-  textDocumentSync: import_vscode_languageserver2.TextDocumentSyncKind.Incremental,
-  completionProvider: {
-    triggerCharacters: [".", '"', "/"],
-    resolveProvider: false
-  },
-  definitionProvider: true,
-  hoverProvider: true,
-  codeActionProvider: {
-    codeActionKinds: [
-      "quickfix",
-      "refactor"
-    ]
-  },
-  documentSymbolProvider: true,
-  referencesProvider: true,
-  documentFormattingProvider: true,
-  renameProvider: {
-    prepareProvider: true
-  },
-  typeDefinitionProvider: true,
-  semanticTokensProvider: {
-    legend: {
-      tokenTypes: [
-        "namespace",
-        "type",
-        "class",
-        "enum",
-        "interface",
-        "struct",
-        "typeParameter",
-        "parameter",
-        "variable",
-        "property",
-        "enumMember",
-        "event",
-        "function",
-        "method",
-        "constructor",
-        "string",
-        "number",
-        "regexp",
-        "operator",
-        "keyword",
-        "comment",
-        "modifier",
-        "decorator"
-      ],
-      tokenModifiers: [
-        "declaration",
-        "definition",
-        "readonly",
-        "static",
-        "deprecated",
-        "abstract",
-        "async",
-        "modification",
-        "documentation",
-        "defaultLibrary"
-      ]
-    },
-    full: true
-  },
-  signatureHelpProvider: {
-    triggerCharacters: ["(", ","]
-  },
-  workspaceSymbolProvider: true,
-  implementationProvider: true
-};
-
-// src/project/index.ts
-var path4 = __toESM(require("path"));
-var fs3 = __toESM(require("fs"));
+// src/server.ts
+var crypto2 = __toESM(require("crypto"));
+var fs11 = __toESM(require("fs"));
+var os3 = __toESM(require("os"));
+var path11 = __toESM(require("path"));
 
 // node_modules/vscode-uri/lib/esm/index.mjs
 var LIB;
@@ -17434,6 +16520,316 @@ var LIB;
 })();
 var { URI, Utils } = LIB;
 
+// src/connection.ts
+var import_node = __toESM(require_node3());
+var connection = (0, import_node.createConnection)(import_node.ProposedFeatures.all, process.stdin, process.stdout);
+
+// src/documents.ts
+var import_vscode_languageserver = __toESM(require_main4());
+
+// node_modules/vscode-languageserver-textdocument/lib/esm/main.js
+var FullTextDocument = class _FullTextDocument {
+  constructor(uri, languageId, version, content) {
+    this._uri = uri;
+    this._languageId = languageId;
+    this._version = version;
+    this._content = content;
+    this._lineOffsets = void 0;
+  }
+  get uri() {
+    return this._uri;
+  }
+  get languageId() {
+    return this._languageId;
+  }
+  get version() {
+    return this._version;
+  }
+  getText(range) {
+    if (range) {
+      const start = this.offsetAt(range.start);
+      const end = this.offsetAt(range.end);
+      return this._content.substring(start, end);
+    }
+    return this._content;
+  }
+  update(changes, version) {
+    for (const change of changes) {
+      if (_FullTextDocument.isIncremental(change)) {
+        const range = getWellformedRange(change.range);
+        const startOffset = this.offsetAt(range.start);
+        const endOffset = this.offsetAt(range.end);
+        this._content = this._content.substring(0, startOffset) + change.text + this._content.substring(endOffset, this._content.length);
+        const startLine = Math.max(range.start.line, 0);
+        const endLine = Math.max(range.end.line, 0);
+        let lineOffsets = this._lineOffsets;
+        const addedLineOffsets = computeLineOffsets(change.text, false, startOffset);
+        if (endLine - startLine === addedLineOffsets.length) {
+          for (let i = 0, len = addedLineOffsets.length; i < len; i++) {
+            lineOffsets[i + startLine + 1] = addedLineOffsets[i];
+          }
+        } else {
+          if (addedLineOffsets.length < 1e4) {
+            lineOffsets.splice(startLine + 1, endLine - startLine, ...addedLineOffsets);
+          } else {
+            this._lineOffsets = lineOffsets = lineOffsets.slice(0, startLine + 1).concat(addedLineOffsets, lineOffsets.slice(endLine + 1));
+          }
+        }
+        const diff = change.text.length - (endOffset - startOffset);
+        if (diff !== 0) {
+          for (let i = startLine + 1 + addedLineOffsets.length, len = lineOffsets.length; i < len; i++) {
+            lineOffsets[i] = lineOffsets[i] + diff;
+          }
+        }
+      } else if (_FullTextDocument.isFull(change)) {
+        this._content = change.text;
+        this._lineOffsets = void 0;
+      } else {
+        throw new Error("Unknown change event received");
+      }
+    }
+    this._version = version;
+  }
+  getLineOffsets() {
+    if (this._lineOffsets === void 0) {
+      this._lineOffsets = computeLineOffsets(this._content, true);
+    }
+    return this._lineOffsets;
+  }
+  positionAt(offset) {
+    offset = Math.max(Math.min(offset, this._content.length), 0);
+    const lineOffsets = this.getLineOffsets();
+    let low = 0, high = lineOffsets.length;
+    if (high === 0) {
+      return { line: 0, character: offset };
+    }
+    while (low < high) {
+      const mid = Math.floor((low + high) / 2);
+      if (lineOffsets[mid] > offset) {
+        high = mid;
+      } else {
+        low = mid + 1;
+      }
+    }
+    const line = low - 1;
+    offset = this.ensureBeforeEOL(offset, lineOffsets[line]);
+    return { line, character: offset - lineOffsets[line] };
+  }
+  offsetAt(position) {
+    const lineOffsets = this.getLineOffsets();
+    if (position.line >= lineOffsets.length) {
+      return this._content.length;
+    } else if (position.line < 0) {
+      return 0;
+    }
+    const lineOffset = lineOffsets[position.line];
+    if (position.character <= 0) {
+      return lineOffset;
+    }
+    const nextLineOffset = position.line + 1 < lineOffsets.length ? lineOffsets[position.line + 1] : this._content.length;
+    const offset = Math.min(lineOffset + position.character, nextLineOffset);
+    return this.ensureBeforeEOL(offset, lineOffset);
+  }
+  ensureBeforeEOL(offset, lineOffset) {
+    while (offset > lineOffset && isEOL(this._content.charCodeAt(offset - 1))) {
+      offset--;
+    }
+    return offset;
+  }
+  get lineCount() {
+    return this.getLineOffsets().length;
+  }
+  static isIncremental(event) {
+    const candidate = event;
+    return candidate !== void 0 && candidate !== null && typeof candidate.text === "string" && candidate.range !== void 0 && (candidate.rangeLength === void 0 || typeof candidate.rangeLength === "number");
+  }
+  static isFull(event) {
+    const candidate = event;
+    return candidate !== void 0 && candidate !== null && typeof candidate.text === "string" && candidate.range === void 0 && candidate.rangeLength === void 0;
+  }
+};
+var TextDocument;
+(function(TextDocument2) {
+  function create(uri, languageId, version, content) {
+    return new FullTextDocument(uri, languageId, version, content);
+  }
+  TextDocument2.create = create;
+  function update(document, changes, version) {
+    if (document instanceof FullTextDocument) {
+      document.update(changes, version);
+      return document;
+    } else {
+      throw new Error("TextDocument.update: document must be created by TextDocument.create");
+    }
+  }
+  TextDocument2.update = update;
+  function applyEdits(document, edits) {
+    const text = document.getText();
+    const sortedEdits = mergeSort(edits.map(getWellformedEdit), (a, b) => {
+      const diff = a.range.start.line - b.range.start.line;
+      if (diff === 0) {
+        return a.range.start.character - b.range.start.character;
+      }
+      return diff;
+    });
+    let lastModifiedOffset = 0;
+    const spans = [];
+    for (const e of sortedEdits) {
+      const startOffset = document.offsetAt(e.range.start);
+      if (startOffset < lastModifiedOffset) {
+        throw new Error("Overlapping edit");
+      } else if (startOffset > lastModifiedOffset) {
+        spans.push(text.substring(lastModifiedOffset, startOffset));
+      }
+      if (e.newText.length) {
+        spans.push(e.newText);
+      }
+      lastModifiedOffset = document.offsetAt(e.range.end);
+    }
+    spans.push(text.substr(lastModifiedOffset));
+    return spans.join("");
+  }
+  TextDocument2.applyEdits = applyEdits;
+})(TextDocument || (TextDocument = {}));
+function mergeSort(data, compare) {
+  if (data.length <= 1) {
+    return data;
+  }
+  const p = data.length / 2 | 0;
+  const left = data.slice(0, p);
+  const right = data.slice(p);
+  mergeSort(left, compare);
+  mergeSort(right, compare);
+  let leftIdx = 0;
+  let rightIdx = 0;
+  let i = 0;
+  while (leftIdx < left.length && rightIdx < right.length) {
+    const ret = compare(left[leftIdx], right[rightIdx]);
+    if (ret <= 0) {
+      data[i++] = left[leftIdx++];
+    } else {
+      data[i++] = right[rightIdx++];
+    }
+  }
+  while (leftIdx < left.length) {
+    data[i++] = left[leftIdx++];
+  }
+  while (rightIdx < right.length) {
+    data[i++] = right[rightIdx++];
+  }
+  return data;
+}
+function computeLineOffsets(text, isAtLineStart, textOffset = 0) {
+  const result = isAtLineStart ? [textOffset] : [];
+  for (let i = 0; i < text.length; i++) {
+    const ch = text.charCodeAt(i);
+    if (isEOL(ch)) {
+      if (ch === 13 && i + 1 < text.length && text.charCodeAt(i + 1) === 10) {
+        i++;
+      }
+      result.push(textOffset + i + 1);
+    }
+  }
+  return result;
+}
+function isEOL(char) {
+  return char === 13 || char === 10;
+}
+function getWellformedRange(range) {
+  const start = range.start;
+  const end = range.end;
+  if (start.line > end.line || start.line === end.line && start.character > end.character) {
+    return { start: end, end: start };
+  }
+  return range;
+}
+function getWellformedEdit(textEdit) {
+  const range = getWellformedRange(textEdit.range);
+  if (range !== textEdit.range) {
+    return { newText: textEdit.newText, range };
+  }
+  return textEdit;
+}
+
+// src/documents.ts
+var documents = new import_vscode_languageserver.TextDocuments(TextDocument);
+
+// src/capabilities.ts
+var import_vscode_languageserver2 = __toESM(require_main4());
+var SERVER_CAPABILITIES = {
+  textDocumentSync: import_vscode_languageserver2.TextDocumentSyncKind.Incremental,
+  completionProvider: {
+    triggerCharacters: [".", '"', "/", "*"],
+    resolveProvider: false
+  },
+  definitionProvider: true,
+  hoverProvider: true,
+  codeActionProvider: {
+    codeActionKinds: [
+      "quickfix",
+      "refactor"
+    ]
+  },
+  documentSymbolProvider: true,
+  referencesProvider: true,
+  documentFormattingProvider: true,
+  renameProvider: {
+    prepareProvider: true
+  },
+  typeDefinitionProvider: true,
+  semanticTokensProvider: {
+    legend: {
+      tokenTypes: [
+        "namespace",
+        "type",
+        "class",
+        "enum",
+        "interface",
+        "struct",
+        "typeParameter",
+        "parameter",
+        "variable",
+        "property",
+        "enumMember",
+        "event",
+        "function",
+        "method",
+        "constructor",
+        "string",
+        "number",
+        "regexp",
+        "operator",
+        "keyword",
+        "comment",
+        "modifier",
+        "decorator"
+      ],
+      tokenModifiers: [
+        "declaration",
+        "definition",
+        "readonly",
+        "static",
+        "deprecated",
+        "abstract",
+        "async",
+        "modification",
+        "documentation",
+        "defaultLibrary"
+      ]
+    },
+    full: true
+  },
+  signatureHelpProvider: {
+    triggerCharacters: ["(", ","]
+  },
+  workspaceSymbolProvider: true,
+  implementationProvider: true
+};
+
+// src/project/index.ts
+var path4 = __toESM(require("path"));
+var fs3 = __toESM(require("fs"));
+
 // src/project/foundry.ts
 var fs = __toESM(require("fs"));
 var path = __toESM(require("path"));
@@ -17475,29 +16871,43 @@ function parseFoundryToml(projectRoot) {
 
 // src/project/remappings.ts
 var import_child_process = require("child_process");
-function loadRemappings(projectRoot) {
+var import_promises = require("fs/promises");
+var import_util = require("util");
+var import_path = require("path");
+var execFileAsync = (0, import_util.promisify)(import_child_process.execFile);
+function parseRemappingsFile(content) {
   const remappings = /* @__PURE__ */ new Map();
-  try {
-    const output = (0, import_child_process.execFileSync)("forge", ["remappings"], {
-      cwd: projectRoot,
-      encoding: "utf-8",
-      timeout: 5e3,
-      stdio: ["pipe", "pipe", "pipe"]
-    });
-    for (const line of output.split("\n")) {
-      const trimmed = line.trim();
-      if (!trimmed) continue;
-      const eqIdx = trimmed.indexOf("=");
-      if (eqIdx === -1) continue;
-      const prefix = trimmed.slice(0, eqIdx).trim();
-      const target = trimmed.slice(eqIdx + 1).trim();
-      if (prefix && target) {
-        remappings.set(prefix, target);
-      }
+  for (const line of content.split("\n")) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith("#")) continue;
+    const eqIdx = trimmed.indexOf("=");
+    if (eqIdx === -1) continue;
+    const prefix = trimmed.slice(0, eqIdx).trim();
+    const target = trimmed.slice(eqIdx + 1).trim();
+    if (prefix && target) {
+      remappings.set(prefix, target);
     }
-  } catch {
   }
   return remappings;
+}
+async function loadRemappings(projectRoot) {
+  try {
+    const { stdout } = await execFileAsync("forge", ["remappings"], {
+      cwd: projectRoot,
+      timeout: 5e3,
+      encoding: "utf-8"
+    });
+    return parseRemappingsFile(stdout);
+  } catch {
+  }
+  const remappingsPath = (0, import_path.join)(projectRoot, "remappings.txt");
+  try {
+    await (0, import_promises.access)(remappingsPath);
+    const content = await (0, import_promises.readFile)(remappingsPath, "utf-8");
+    return parseRemappingsFile(content);
+  } catch {
+  }
+  return /* @__PURE__ */ new Map();
 }
 
 // src/project/workspace.ts
@@ -17578,13 +16988,13 @@ var ProjectManager = class {
   projects = /* @__PURE__ */ new Map();
   watchers = /* @__PURE__ */ new Map();
   workspaceFolders = [];
-  init(workspaceFolders) {
+  async init(workspaceFolders) {
     if (!workspaceFolders) return;
     for (const folder of workspaceFolders) {
       const root = URI.parse(folder.uri).fsPath;
       this.workspaceFolders.push(root);
       const projectRoot = this.findProjectRoot(root);
-      this.loadProject(projectRoot);
+      await this.loadProject(projectRoot);
     }
   }
   findProjectRoot(startDir) {
@@ -17607,7 +17017,8 @@ var ProjectManager = class {
           }
         }
       }
-    } catch {
+    } catch (err) {
+      console.error(`[project] Error searching for project root in ${startDir}:`, err);
     }
     return startDir;
   }
@@ -17621,9 +17032,9 @@ var ProjectManager = class {
     }
     return void 0;
   }
-  loadProject(root) {
+  async loadProject(root) {
     const config = parseFoundryToml(root);
-    const remappings = loadRemappings(root);
+    const remappings = await loadRemappings(root);
     const srcDir = path4.join(root, config.src);
     const solFiles = findSolFiles(srcDir);
     for (const lib of config.libs) {
@@ -17644,11 +17055,11 @@ var ProjectManager = class {
     });
     return project;
   }
-  reloadProject(root) {
+  async reloadProject(root) {
     const existing = this.projects.get(root);
     if (!existing) return;
     existing.config = parseFoundryToml(root);
-    existing.remappings = loadRemappings(root);
+    existing.remappings = await loadRemappings(root);
     const srcDir = path4.join(root, existing.config.src);
     existing.solFiles = findSolFiles(srcDir);
     for (const lib of existing.config.libs) {
@@ -17669,11 +17080,12 @@ var ProjectManager = class {
 var projectManager = new ProjectManager();
 
 // src/compiler/index.ts
-var import_vscode_languageserver4 = __toESM(require_main4());
+var import_vscode_languageserver5 = __toESM(require_main4());
 var import_child_process2 = require("child_process");
-var import_util = require("util");
+var import_util2 = require("util");
 var fs5 = __toESM(require("fs"));
 var path6 = __toESM(require("path"));
+var os = __toESM(require("os"));
 
 // src/compiler/cache.ts
 var import_crypto = require("crypto");
@@ -17721,7 +17133,7 @@ function isFunctionDefinition(node) {
   return node.nodeType === "FunctionDefinition";
 }
 function isStateVariableDeclaration(node) {
-  return node.nodeType === "StateVariableDeclaration";
+  return node.nodeType === "StateVariableDeclaration" || node.nodeType === "VariableDeclaration" && !!node.visibility;
 }
 function isStructDefinition(node) {
   return node.nodeType === "StructDefinition";
@@ -17816,11 +17228,18 @@ function readFileContent(filePath, projectRoot) {
     return null;
   }
 }
-function offsetToLineCol(content, offset) {
+function offsetToLineCol(content, byteOffset) {
   let line = 0;
   let character = 0;
-  for (let i = 0; i < offset && i < content.length; i++) {
-    if (content[i] === "\n") {
+  let currentByte = 0;
+  for (let i = 0; i < content.length; i++) {
+    const char = content[i];
+    const charBytes = Buffer.byteLength(char, "utf-8");
+    if (currentByte + charBytes > byteOffset) {
+      break;
+    }
+    currentByte += charBytes;
+    if (char === "\n") {
       line++;
       character = 0;
     } else {
@@ -17830,8 +17249,216 @@ function offsetToLineCol(content, offset) {
   return { line, character };
 }
 
+// src/ast/traversal.ts
+function findLineForOffset(lineStarts, byteOffset) {
+  let lo = 0;
+  let hi = lineStarts.length - 1;
+  while (lo < hi) {
+    const mid = lo + hi + 1 >> 1;
+    if (lineStarts[mid] <= byteOffset) lo = mid;
+    else hi = mid - 1;
+  }
+  return lo;
+}
+function getLineContent(content, lineStarts, line) {
+  const start = lineStarts[line];
+  const end = line + 1 < lineStarts.length ? lineStarts[line + 1] : content.length;
+  return content.substring(start, end > 0 && content[end - 1] === "\n" ? end - 1 : end);
+}
+function byteOffsetToCharOffset(lineContent, byteOffset) {
+  let currentByte = 0;
+  let charOffset = 0;
+  for (let i = 0; i < lineContent.length; i++) {
+    const charBytes = Buffer.byteLength(lineContent[i], "utf-8");
+    if (currentByte + charBytes > byteOffset) break;
+    currentByte += charBytes;
+    charOffset++;
+  }
+  return charOffset;
+}
+function offsetToPosition(content, byteOffset, lineTable) {
+  if (lineTable) {
+    const lineIdx = findLineForOffset(lineTable.lineStarts, byteOffset);
+    const lineStart = lineTable.lineStarts[lineIdx];
+    const lineContent = getLineContent(content, lineTable.lineStarts, lineIdx);
+    const charOffset = byteOffsetToCharOffset(lineContent, byteOffset - lineStart);
+    return { line: lineIdx, character: charOffset };
+  }
+  let line = 0;
+  let character = 0;
+  let currentByte = 0;
+  for (let i = 0; i < content.length; i++) {
+    const char = content[i];
+    const charBytes = Buffer.byteLength(char, "utf-8");
+    if (currentByte + charBytes > byteOffset) {
+      break;
+    }
+    currentByte += charBytes;
+    if (char === "\n") {
+      line++;
+      character = 0;
+    } else {
+      character++;
+    }
+  }
+  return { line, character };
+}
+function srcToRange(src, content, lineTable) {
+  const parts = src.split(":");
+  if (parts.length < 2) return null;
+  const start = parseInt(parts[0], 10);
+  const length = parseInt(parts[1], 10);
+  if (isNaN(start) || isNaN(length)) return null;
+  return {
+    start: offsetToPosition(content, start, lineTable),
+    end: offsetToPosition(content, start + length, lineTable)
+  };
+}
+function parseSrc(src) {
+  const parts = src.split(":");
+  if (parts.length < 2) return null;
+  const start = parseInt(parts[0], 10);
+  const length = parseInt(parts[1], 10);
+  if (isNaN(start) || isNaN(length)) return null;
+  return { start, length };
+}
+function positionToOffset(content, position, lineTable) {
+  if (lineTable) {
+    const line = Math.min(position.line, lineTable.lineStarts.length - 1);
+    const lineStart = lineTable.lineStarts[line];
+    const lineContent = getLineContent(content, lineTable.lineStarts, line);
+    let charBytes = 0;
+    for (let i = 0; i < position.character && i < lineContent.length; i++) {
+      charBytes += Buffer.byteLength(lineContent[i], "utf-8");
+    }
+    return lineStart + charBytes;
+  }
+  const lines = content.split("\n");
+  let byteOffset = 0;
+  for (let i = 0; i < position.line && i < lines.length; i++) {
+    byteOffset += Buffer.byteLength(lines[i], "utf-8") + 1;
+  }
+  const targetLine = lines[position.line] || "";
+  byteOffset += Buffer.byteLength(targetLine.substring(0, position.character), "utf-8");
+  return byteOffset;
+}
+function walkAst(node, visitor) {
+  walkAstInternal(node, null, visitor);
+}
+function walkAstInternal(node, parent, visitor) {
+  const result = visitor(node, parent);
+  if (result === false) return;
+  if (node.nodes) {
+    for (const child of node.nodes) {
+      walkAstInternal(child, node, visitor);
+    }
+  }
+  if (nodeTypeHasChildren(node)) {
+    for (const child of getChildren(node)) {
+      if (child && typeof child === "object" && "nodeType" in child) {
+        walkAstInternal(child, node, visitor);
+      }
+    }
+  }
+}
+function nodeTypeHasChildren(_node) {
+  return true;
+}
+function getChildren(node) {
+  const children = [];
+  const pushChild = (val) => {
+    if (val && typeof val === "object" && "nodeType" in val) {
+      children.push(val);
+    }
+  };
+  const pushArray = (arr) => {
+    if (Array.isArray(arr)) {
+      for (const item of arr) {
+        if (item && typeof item === "object" && "nodeType" in item) {
+          children.push(item);
+        }
+      }
+    }
+  };
+  pushChild(node.body);
+  pushChild(node.parameters);
+  pushChild(node.returnParameters);
+  pushChild(node.typeName);
+  pushChild(node.keyType);
+  pushChild(node.valueType);
+  pushChild(node.baseType);
+  pushChild(node.expression);
+  pushChild(node.baseName);
+  pushChild(node.pathNode);
+  pushChild(node.subExpression);
+  pushChild(node.condition);
+  pushChild(node.trueBody);
+  pushChild(node.falseBody);
+  pushChild(node.leftHandSide);
+  pushChild(node.rightHandSide);
+  pushChild(node.leftExpression);
+  pushChild(node.rightExpression);
+  pushChild(node.baseExpression);
+  pushChild(node.indexExpression);
+  pushChild(node.initialValue);
+  pushChild(node.eventCall);
+  pushChild(node.errorCall);
+  pushChild(node.block);
+  pushChild(node.externalCall);
+  pushChild(node.loopExpression);
+  pushChild(node.trueExp);
+  pushChild(node.falseExp);
+  pushArray(node.arguments);
+  pushArray(node.members);
+  pushArray(node.baseContracts);
+  pushArray(node.overrides);
+  pushArray(node.statements);
+  pushArray(node.modifiers);
+  pushArray(node.declarations);
+  pushArray(node.initializations);
+  pushArray(node.clauses);
+  pushArray(node.assignments);
+  if (Array.isArray(node.symbolAliases)) {
+    for (const alias of node.symbolAliases) {
+      if (alias?.local && typeof alias.local === "object" && "nodeType" in alias.local) {
+        children.push(alias.local);
+      }
+      if (alias?.foreign && typeof alias.foreign === "object" && "nodeType" in alias.foreign) {
+        children.push(alias.foreign);
+      }
+    }
+  }
+  return children;
+}
+function findNodeAtPosition(ast, content, position, lineTable) {
+  const offset = positionToOffset(content, position, lineTable);
+  let best = null;
+  let bestLength = Infinity;
+  walkAst(ast, (node) => {
+    if (!node.src) return;
+    const parsed = parseSrc(node.src);
+    if (!parsed) return;
+    if (offset >= parsed.start && offset <= parsed.start + parsed.length && parsed.length < bestLength) {
+      bestLength = parsed.length;
+      best = node;
+    }
+  });
+  return best;
+}
+function findNodesByName(ast, name, nodeType) {
+  const results = [];
+  walkAst(ast, (node) => {
+    if (node.name === name && (!nodeType || node.nodeType === nodeType)) {
+      results.push(node);
+    }
+  });
+  return results;
+}
+function findImports(ast) {
+  return findNodesByName(ast, "", "ImportDirective");
+}
+
 // src/indexer.ts
-init_traversal();
 var GlobalIndex = class {
   symbols = /* @__PURE__ */ new Map();
   fileIndex = /* @__PURE__ */ new Map();
@@ -17840,6 +17467,24 @@ var GlobalIndex = class {
     this.symbols.clear();
     this.fileIndex.clear();
     this.nodeMap.clear();
+  }
+  removeFile(filePath) {
+    const uri = URI.file(filePath).toString();
+    const oldEntries = this.fileIndex.get(uri);
+    if (!oldEntries) return;
+    for (const entry of oldEntries) {
+      const symbolEntries = this.symbols.get(entry.name);
+      if (symbolEntries) {
+        const idx = symbolEntries.indexOf(entry);
+        if (idx !== -1) symbolEntries.splice(idx, 1);
+        if (symbolEntries.length === 0) this.symbols.delete(entry.name);
+      }
+      if (entry.nodeId !== void 0) this.nodeMap.delete(entry.nodeId);
+    }
+    this.fileIndex.delete(uri);
+  }
+  getIndexedFiles() {
+    return new Set(this.fileIndex.keys());
   }
   indexFile(filePath, ast) {
     try {
@@ -17972,14 +17617,542 @@ var GlobalIndex = class {
 };
 var globalIndex = new GlobalIndex();
 
+// src/features/codeAction.ts
+var import_vscode_languageserver4 = __toESM(require_main4());
+var compilerDiagnostics = {};
+function register(handler) {
+  compilerDiagnostics[handler.code] = handler;
+}
+register({
+  code: "1878",
+  blocks: [],
+  resolve(diag, document) {
+    return [createInsertAction(
+      document,
+      diag,
+      "Add SPDX-License-Identifier: MIT",
+      { line: 0, character: 0 },
+      "// SPDX-License-Identifier: MIT\n"
+    )];
+  }
+});
+register({
+  code: "4937",
+  blocks: [],
+  resolve(diag, document) {
+    const line = diag.range.start.line;
+    const lineText = document.getText({
+      start: { line, character: 0 },
+      end: { line: line + 1, character: 0 }
+    });
+    const match = lineText.match(/function\s+(\w+)/);
+    if (match) {
+      const funcName = match[1];
+      const editRange = findAfterText(document, line, `function ${funcName}`);
+      return [createInsertAction(
+        document,
+        diag,
+        "Add public visibility",
+        editRange,
+        " public"
+      )];
+    }
+    return [];
+  }
+});
+register({
+  code: "9456",
+  blocks: ["4937"],
+  // override is more specific than visibility
+  resolve(diag, document) {
+    const line = diag.range.start.line;
+    const editRange = findAfterFunctionSig(document, line);
+    return [createInsertAction(document, diag, "Add override", editRange, " override")];
+  }
+});
+register({
+  code: "5333",
+  blocks: [],
+  resolve(diag, document) {
+    const msg = diag.message.toLowerCase();
+    const versionMatch = msg.match(/(\d+\.\d+\.\d+)/);
+    const version = versionMatch ? versionMatch[1] : "0.8.0";
+    const firstLine = document.getText({ start: { line: 0, character: 0 }, end: { line: 1, character: 0 } });
+    const insertLine = firstLine.includes("SPDX") ? 1 : 0;
+    return [createInsertAction(
+      document,
+      diag,
+      `Add pragma solidity ^${version}`,
+      { line: insertLine, character: 0 },
+      `pragma solidity ^${version};
+`
+    )];
+  }
+});
+register({
+  code: "9429",
+  blocks: [],
+  resolve(diag, document) {
+    const checksummedMatch = diag.message.match(/checksummed address:\s*"(\w+)"/i);
+    if (checksummedMatch && checksummedMatch[1]) {
+      const checksummed = checksummedMatch[1];
+      return [createReplaceAction(
+        document,
+        diag,
+        "Convert to checksummed address",
+        diag.range,
+        checksummed
+      )];
+    }
+    return [];
+  }
+});
+register({
+  code: "7407",
+  blocks: [],
+  resolve(diag, document) {
+    const editRange = findBeforeVariableName(document, diag.range.start.line);
+    return [createInsertAction(document, diag, "Add memory data location", editRange, " memory")];
+  }
+});
+register({
+  code: "2519",
+  blocks: ["9456", "4937", "9582"],
+  // abstract subsumes override, visibility, virtual
+  resolve(diag, document) {
+    const line = diag.range.start.line;
+    const editRange = findBeforeContract(document, line);
+    return [createInsertAction(document, diag, "Make contract abstract", editRange, "abstract ")];
+  }
+});
+register({
+  code: "9582",
+  blocks: [],
+  resolve(diag, document) {
+    const line = diag.range.start.line;
+    const editRange = findAfterFunctionSig(document, line);
+    return [createInsertAction(document, diag, "Add virtual", editRange, " virtual")];
+  }
+});
+register({
+  code: "6422",
+  blocks: [],
+  resolve(diag, document) {
+    const line = diag.range.start.line;
+    const msg = diag.message.toLowerCase();
+    const modifier = msg.includes("pure") && !msg.includes("view") ? "pure" : "view";
+    const editRange = findAfterKeyword(document, line, "{");
+    return [createInsertAction(document, diag, `Make function ${modifier}`, editRange, ` ${modifier}`)];
+  }
+});
+function getBlockedCodes(codes) {
+  const blocked = /* @__PURE__ */ new Set();
+  for (const code of codes) {
+    const handler = compilerDiagnostics[code];
+    if (handler) {
+      for (const b of handler.blocks) {
+        blocked.add(b);
+      }
+    }
+  }
+  return blocked;
+}
+function diagnosticDeduplicate(diagnostics) {
+  const groups = /* @__PURE__ */ new Map();
+  for (const diag of diagnostics) {
+    const file = diag.source ?? "unknown";
+    const key = `${file}::${diag.range.start.line}:${diag.range.start.character}-${diag.range.end.line}:${diag.range.end.character}`;
+    const group = groups.get(key);
+    if (group) {
+      group.push(diag);
+    } else {
+      groups.set(key, [diag]);
+    }
+  }
+  const result = [];
+  for (const group of groups.values()) {
+    const codesInGroup = group.map((d) => String(d.code ?? "")).filter((c) => c !== "");
+    const blocked = getBlockedCodes(codesInGroup);
+    for (const diag of group) {
+      const code = String(diag.code ?? "");
+      if (code === "" || !blocked.has(code)) {
+        result.push(diag);
+      }
+    }
+  }
+  return result;
+}
+var ERC20_SNIPPET = `// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+
+contract MyToken is ERC20 {
+    constructor(uint256 initialSupply) ERC20("MyToken", "MTK") {
+        _mint(msg.sender, initialSupply);
+    }
+}`;
+var ERC721_SNIPPET = `// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+
+contract MyNFT is ERC721 {
+    uint256 private _nextTokenId;
+
+    constructor() ERC721("MyNFT", "MNFT") {}
+
+    function mint(address to) public returns (uint256) {
+        uint256 tokenId = _nextTokenId++;
+        _mint(to, tokenId);
+        return tokenId;
+    }
+}`;
+var ERC1155_SNIPPET = `// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
+
+contract MyMultiToken is ERC1155 {
+    constructor() ERC1155("") {}
+
+    function mint(address to, uint256 id, uint256 amount) public {
+        _mint(to, id, amount, "");
+    }
+}`;
+var OWNABLE_SNIPPET = `// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+import "@openzeppelin/contracts/access/Ownable.sol";
+
+contract MyContract is Ownable {
+    constructor() Ownable(msg.sender) {}
+}`;
+function provideCodeActions(ast, document, range, diagnostics, _compileResult) {
+  const actions = [];
+  const content = document.getText();
+  const trimmed = content.replace(/\/\/.*$/gm, "").replace(/\/\*[\s\S]*?\*\//g, "").trim();
+  if (trimmed === "" || trimmed === "pragma solidity ^0.8.0;") {
+    actions.push(createSnippetAction(document, "Create ERC-20 Token", "erc20-snippet", ERC20_SNIPPET));
+    actions.push(createSnippetAction(document, "Create ERC-721 NFT", "erc721-snippet", ERC721_SNIPPET));
+    actions.push(createSnippetAction(document, "Create ERC-1155 Multi-Token", "erc1155-snippet", ERC1155_SNIPPET));
+    actions.push(createSnippetAction(document, "Create Ownable Contract", "ownable-snippet", OWNABLE_SNIPPET));
+  }
+  for (const diag of diagnostics) {
+    const fixes = diagnosticToCodeActions(diag, document, diagnostics);
+    actions.push(...fixes);
+  }
+  return actions;
+}
+function diagnosticToCodeActions(diag, document, allDiagnostics) {
+  const code = String(diag.code ?? "");
+  const handler = compilerDiagnostics[code];
+  if (handler) {
+    return handler.resolve(diag, document, allDiagnostics);
+  }
+  return regexFallback(diag, document, allDiagnostics);
+}
+function regexFallback(diag, document, allDiagnostics) {
+  const msg = diag.message.toLowerCase();
+  const line = diag.range.start.line;
+  if (msg.includes("spdx license") || msg.includes("license identifier")) {
+    return [createInsertAction(
+      document,
+      diag,
+      "Add SPDX-License-Identifier: MIT",
+      { line: 0, character: 0 },
+      "// SPDX-License-Identifier: MIT\n"
+    )];
+  }
+  if (msg.includes("visibility") || msg.includes("no visibility specified")) {
+    const lineText = document.getText({
+      start: { line, character: 0 },
+      end: { line: line + 1, character: 0 }
+    });
+    const match = lineText.match(/function\s+(\w+)/);
+    if (match) {
+      const funcName = match[1];
+      const editRange = findAfterText(document, line, `function ${funcName}`);
+      return [createInsertAction(
+        document,
+        diag,
+        "Add public visibility",
+        editRange,
+        " public"
+      )];
+    }
+  }
+  if (msg.includes("mutability") || msg.includes("state mutability")) {
+    if (msg.includes("view") || msg.includes("can be restricted")) {
+      const editRange = findAfterKeyword(document, line, "{");
+      return [createInsertAction(
+        document,
+        diag,
+        "Make function view",
+        editRange,
+        " view"
+      )];
+    }
+  }
+  if (msg.includes("override") && !msg.includes("multiple")) {
+    const editRange = findAfterFunctionSig(document, line);
+    return [createInsertAction(document, diag, "Add override", editRange, " override")];
+  }
+  if (msg.includes("virtual")) {
+    const editRange = findAfterFunctionSig(document, line);
+    return [createInsertAction(document, diag, "Add virtual", editRange, " virtual")];
+  }
+  if (msg.includes("abstract") || msg.includes("unimplemented")) {
+    const editRange = findBeforeContract(document, line);
+    return [createInsertAction(document, diag, "Make contract abstract", editRange, "abstract ")];
+  }
+  if (msg.includes("data location") || msg.includes("storage location")) {
+    const editRange = findBeforeVariableName(document, line);
+    return [createInsertAction(document, diag, "Add memory data location", editRange, " memory")];
+  }
+  if (msg.includes("pragma") && msg.includes("solidity") || msg.includes("source file requires different compiler version")) {
+    const versionMatch = msg.match(/(\d+\.\d+\.\d+)/);
+    const version = versionMatch ? versionMatch[1] : "0.8.0";
+    const firstLine = document.getText({ start: { line: 0, character: 0 }, end: { line: 1, character: 0 } });
+    const insertLine = firstLine.includes("SPDX") ? 1 : 0;
+    return [createInsertAction(
+      document,
+      diag,
+      `Add pragma solidity ^${version}`,
+      { line: insertLine, character: 0 },
+      `pragma solidity ^${version};
+`
+    )];
+  }
+  if (msg.includes("multiple") && msg.includes("override")) {
+    const editRange = findAfterFunctionSig(document, line);
+    const baseMatch = msg.match(/override\s*(.*?)(?:\.|$)/i);
+    const bases = baseMatch ? baseMatch[1] : "";
+    return [createInsertAction(
+      document,
+      diag,
+      "Add override(...)",
+      editRange,
+      ` override(${bases})`
+    )];
+  }
+  if (msg.includes("missing implementation") || msg.includes("should be marked as abstract")) {
+    const action = createImplementInterfaceAction(diag, document, allDiagnostics);
+    return action ? [action] : [];
+  }
+  if (msg.includes("contract code size") || msg.includes("code too large") || msg.includes("contract deployer code size")) {
+    return [createViaIrAction(diag, document)];
+  }
+  return [];
+}
+function createSnippetAction(document, title, code, snippet) {
+  const diag = {
+    range: import_vscode_languageserver4.Range.create(0, 0, 0, 0),
+    message: title,
+    severity: import_vscode_languageserver4.DiagnosticSeverity.Information,
+    code,
+    source: "foundry-lsp"
+  };
+  return {
+    title,
+    kind: import_vscode_languageserver4.CodeActionKind.QuickFix,
+    diagnostics: [diag],
+    edit: {
+      changes: {
+        [document.uri]: [import_vscode_languageserver4.TextEdit.replace(fullRange(document), snippet)]
+      }
+    }
+  };
+}
+function createInsertAction(document, diag, title, position, text) {
+  return {
+    title,
+    kind: import_vscode_languageserver4.CodeActionKind.QuickFix,
+    diagnostics: [diag],
+    edit: {
+      changes: {
+        [document.uri]: [import_vscode_languageserver4.TextEdit.insert(position, text)]
+      }
+    }
+  };
+}
+function createReplaceAction(document, diag, title, range, newText) {
+  return {
+    title,
+    kind: import_vscode_languageserver4.CodeActionKind.QuickFix,
+    diagnostics: [diag],
+    edit: {
+      changes: {
+        [document.uri]: [import_vscode_languageserver4.TextEdit.replace(range, newText)]
+      }
+    }
+  };
+}
+function createViaIrAction(diag, document) {
+  const viaIrComment = "[profile.default]\nvia_ir = true\n";
+  const title = "Enable via-ir in foundry.toml to reduce contract size";
+  return {
+    title,
+    kind: import_vscode_languageserver4.CodeActionKind.QuickFix,
+    diagnostics: [diag],
+    edit: {
+      changes: {
+        [document.uri]: [import_vscode_languageserver4.TextEdit.insert({ line: 0, character: 0 }, viaIrComment)]
+      }
+    }
+  };
+}
+function findAfterText(document, line, searchText) {
+  const lineText = document.getText({
+    start: { line, character: 0 },
+    end: { line: line + 1, character: 0 }
+  });
+  const idx = lineText.indexOf(searchText);
+  if (idx >= 0) {
+    return { line, character: idx + searchText.length };
+  }
+  return { line, character: lineText.trimEnd().length };
+}
+function findAfterKeyword(document, line, keyword) {
+  return findAfterText(document, line, keyword);
+}
+function findAfterFunctionSig(document, line) {
+  const lineText = document.getText({
+    start: { line, character: 0 },
+    end: { line: line + 1, character: 0 }
+  });
+  const match = lineText.match(/function\s+\w+\s*\([^)]*\)/);
+  if (match) {
+    return { line, character: match.index + match[0].length };
+  }
+  return { line, character: lineText.trimEnd().length };
+}
+function findBeforeContract(document, line) {
+  const lineText = document.getText({
+    start: { line, character: 0 },
+    end: { line: line + 1, character: 0 }
+  });
+  const match = lineText.match(/(contract|interface|library)\s/);
+  if (match) {
+    return { line, character: match.index };
+  }
+  return { line, character: 0 };
+}
+function findBeforeVariableName(document, line) {
+  const lineText = document.getText({
+    start: { line, character: 0 },
+    end: { line: line + 1, character: 0 }
+  });
+  const match = lineText.match(/(\w+)\s*;/);
+  if (match) {
+    return { line, character: match.index };
+  }
+  return { line, character: lineText.trimEnd().length };
+}
+function fullRange(document) {
+  const lastLine = document.lineCount - 1;
+  const text = document.getText();
+  const lastLineStart = text.lastIndexOf("\n", text.length - 2) + 1;
+  const lastLineLength = text.length - lastLineStart;
+  return import_vscode_languageserver4.Range.create(0, 0, lastLine, lastLineLength);
+}
+function createImplementInterfaceAction(diag, document, allDiagnostics) {
+  const contractLine = diag.range.start.line;
+  const contractLineText = document.getText({
+    start: { line: contractLine, character: 0 },
+    end: { line: contractLine + 1, character: 0 }
+  });
+  const contractMatch = contractLineText.match(/contract\s+(\w+)/);
+  if (!contractMatch) return null;
+  const missingFuncs = [];
+  for (const d of allDiagnostics) {
+    if (d.message.toLowerCase().includes("missing implementation") && d !== diag) {
+      const funcLine = d.range.start.line;
+      const funcLineText = document.getText({
+        start: { line: funcLine, character: 0 },
+        end: { line: funcLine + 1, character: 0 }
+      }).trim();
+      const funcMatch = funcLineText.match(/(function\s+\w+\s*\([^)]*\)[^{;]*)/);
+      if (funcMatch) {
+        let sig = funcMatch[1].trim();
+        sig = sig.replace(/;$/, "").trim();
+        missingFuncs.push(sig);
+      }
+    }
+  }
+  if (missingFuncs.length === 0) return null;
+  let stubs = `
+    // --- Interface implementations ---
+`;
+  for (const sig of missingFuncs) {
+    const nameMatch = sig.match(/function\s+(\w+)/);
+    const funcName = nameMatch ? nameMatch[1] : "unknown";
+    const returnsMatch = sig.match(/returns\s*\(([^)]+)\)/);
+    let body = "";
+    if (returnsMatch) {
+      const returnTypes = returnsMatch[1].split(",").map((t) => t.trim());
+      if (returnTypes.length === 1) {
+        const rt = returnTypes[0];
+        if (rt === "uint256" || rt === "uint" || rt.includes("uint")) {
+          body = "        return 0;";
+        } else if (rt === "bool") {
+          body = "        return false;";
+        } else if (rt === "address") {
+          body = "        return address(0);";
+        } else if (rt === "string memory") {
+          body = '        return "";';
+        } else if (rt === "bytes memory") {
+          body = '        return "";';
+        } else {
+          body = `        revert("${funcName}: not implemented");`;
+        }
+      } else {
+        body = `        revert("${funcName}: not implemented");`;
+      }
+    } else {
+      body = `        revert("${funcName}: not implemented");`;
+    }
+    stubs += `    ${sig} override {
+${body}
+    }
+
+`;
+  }
+  const lastLine = document.lineCount - 1;
+  let closingBraceLine = lastLine;
+  for (let i = lastLine; i >= contractLine; i--) {
+    const lineText = document.getText({
+      start: { line: i, character: 0 },
+      end: { line: i + 1, character: 0 }
+    });
+    if (lineText.trim() === "}") {
+      closingBraceLine = i;
+      break;
+    }
+  }
+  const insertPos = { line: closingBraceLine, character: 0 };
+  return {
+    title: `Implement interface functions (${missingFuncs.length} functions)`,
+    kind: import_vscode_languageserver4.CodeActionKind.QuickFix,
+    diagnostics: [diag],
+    edit: {
+      changes: {
+        [document.uri]: [import_vscode_languageserver4.TextEdit.insert(insertPos, stubs)]
+      }
+    }
+  };
+}
+
 // src/compiler/index.ts
-init_traversal();
-var execFileAsync = (0, import_util.promisify)(import_child_process2.execFile);
+var execFileAsync2 = (0, import_util2.promisify)(import_child_process2.execFile);
 var CompilerManager = class {
   cache = new CompileCache();
   debounceTimers = /* @__PURE__ */ new Map();
   dependencyGraph = /* @__PURE__ */ new Map();
   inverseDeps = /* @__PURE__ */ new Map();
+  /** Per-URI counter that increments on each compile request. Used by
+   *  compileWithDebounce to detect and discard stale results. */
+  validationCounters = /* @__PURE__ */ new Map();
   async compile(uri, content) {
     try {
       return await this._compile(uri, content);
@@ -17993,16 +18166,18 @@ var CompilerManager = class {
     if (cached) {
       return cached;
     }
-    const project = projectManager.getProject(uri);
+    let project = projectManager.getProject(uri);
+    let tempDir = null;
     if (!project) {
-      return null;
+      const result2 = await this.compileOutOfProject(uri, content);
+      return result2;
     }
     const filePath = URI.parse(uri).fsPath;
     let ast = null;
     let diagnostics = [];
     let sourceFileMap = /* @__PURE__ */ new Map();
     try {
-      const preRead = readAstFromDisk(project, filePath);
+      const preRead = await readAstFromDisk(project, filePath);
       ast = preRead?.ast ?? null;
       sourceFileMap = preRead?.sourceFileMap ?? /* @__PURE__ */ new Map();
     } catch (error) {
@@ -18010,7 +18185,7 @@ var CompilerManager = class {
     }
     let forgeSucceeded = false;
     try {
-      const { stdout, stderr } = await execFileAsync("forge", ["build", "--ast"], {
+      const { stdout, stderr } = await execFileAsync2("forge", ["build", "--ast"], {
         cwd: project.root,
         timeout: 3e4,
         encoding: "utf-8",
@@ -18025,7 +18200,7 @@ var CompilerManager = class {
     }
     if (forgeSucceeded) {
       try {
-        const freshRead = readAstFromDisk(project, filePath);
+        const freshRead = await readAstFromDisk(project, filePath);
         if (freshRead?.ast) ast = freshRead.ast;
         if (freshRead?.sourceFileMap && freshRead.sourceFileMap.size > 0) {
           sourceFileMap = freshRead.sourceFileMap;
@@ -18034,12 +18209,12 @@ var CompilerManager = class {
         console.error(`[compiler] readAstFromDisk (fresh) error:`, error);
       }
       try {
-        indexCompiledFiles(project, sourceFileMap);
+        await indexCompiledFiles(project, sourceFileMap);
       } catch (error) {
         console.error(`[compiler] indexCompiledFiles error:`, error);
       }
       try {
-        const jsonDiagnostics = readForgeJsonDiagnostics(project, filePath);
+        const jsonDiagnostics = await readForgeJsonDiagnostics(project, filePath);
         if (jsonDiagnostics.length > 0) {
           const seen = new Set(jsonDiagnostics.map(
             (d) => `${d.range.start.line}:${d.range.start.character}-${d.range.end.line}:${d.range.end.character}`
@@ -18053,6 +18228,7 @@ var CompilerManager = class {
         console.error(`[compiler] readForgeJsonDiagnostics error:`, error);
       }
     }
+    diagnostics = diagnosticDeduplicate(diagnostics);
     const result = {
       uri,
       diagnostics,
@@ -18066,14 +18242,87 @@ var CompilerManager = class {
     }
     return result;
   }
+  async compileOutOfProject(uri, content) {
+    const filePath = URI.parse(uri).fsPath;
+    const basename6 = path6.basename(filePath);
+    let tempDir = null;
+    try {
+      tempDir = fs5.mkdtempSync(path6.join(os.tmpdir(), "foundry-lsp-"));
+      const srcDir = path6.join(tempDir, "src");
+      fs5.mkdirSync(srcDir, { recursive: true });
+      fs5.writeFileSync(
+        path6.join(tempDir, "foundry.toml"),
+        '[profile.default]\nsrc = "src"\nout = "out"\nlibs = ["lib"]\n'
+      );
+      fs5.writeFileSync(path6.join(srcDir, basename6), content);
+      let diagnostics = [];
+      let ast = null;
+      let sourceFileMap = /* @__PURE__ */ new Map();
+      let forgeSucceeded = false;
+      try {
+        const { stdout, stderr } = await execFileAsync2("forge", ["build", "--ast"], {
+          cwd: tempDir,
+          timeout: 3e4,
+          encoding: "utf-8",
+          maxBuffer: 50 * 1024 * 1024
+        });
+        diagnostics = parseForgeOutput(stdout, stderr);
+        forgeSucceeded = true;
+      } catch (error) {
+        if (error.stderr || error.stdout) {
+          diagnostics = parseForgeOutput(error.stdout || "", error.stderr || "");
+        }
+      }
+      if (forgeSucceeded && tempDir) {
+        try {
+          const tempProject = {
+            root: tempDir,
+            config: { src: "src", out: "out", libs: ["lib"], solcVersion: null },
+            remappings: /* @__PURE__ */ new Map(),
+            solFiles: /* @__PURE__ */ new Set()
+          };
+          const astRead = await readAstFromDisk(tempProject, filePath);
+          if (astRead.ast) ast = astRead.ast;
+          if (astRead.sourceFileMap.size > 0) sourceFileMap = astRead.sourceFileMap;
+        } catch (error) {
+          console.error(`[compiler] compileOutOfProject readAstFromDisk error:`, error);
+        }
+      }
+      const result = {
+        uri,
+        diagnostics,
+        ast,
+        timestamp: Date.now(),
+        sourceFileMap
+      };
+      this.cache.set(uri, content, result);
+      return result;
+    } catch {
+      return null;
+    } finally {
+      if (tempDir) {
+        try {
+          fs5.rmSync(tempDir, { recursive: true, force: true });
+        } catch (err) {
+          console.error(`[compiler] Failed to clean temp dir ${tempDir}:`, err);
+        }
+      }
+    }
+  }
   async compileWithDebounce(uri, content, callback) {
     const existingTimer = this.debounceTimers.get(uri);
     if (existingTimer) {
       clearTimeout(existingTimer);
     }
+    const validationId = (this.validationCounters.get(uri) ?? 0) + 1;
+    this.validationCounters.set(uri, validationId);
     const timer = setTimeout(async () => {
       this.debounceTimers.delete(uri);
       const result = await this.compile(uri, content);
+      if (this.validationCounters.get(uri) !== validationId) {
+        console.log(`[compiler] Discarding stale results for ${uri} (validationId ${validationId} \u2260 ${this.validationCounters.get(uri)})`);
+        return;
+      }
       callback(result?.diagnostics ?? []);
       const dependents = this.inverseDeps.get(uri);
       if (dependents) {
@@ -18085,6 +18334,9 @@ var CompilerManager = class {
             const depDoc = documents.get(depUri);
             if (!depDoc) continue;
             const recompiled = await this.compile(depUri, depDoc.getText());
+            if (this.validationCounters.get(uri) !== validationId) {
+              continue;
+            }
             callback(recompiled?.diagnostics ?? []);
           }
         }
@@ -18152,29 +18404,30 @@ var CompilerManager = class {
       clearTimeout(timer);
     }
     this.debounceTimers.clear();
+    this.validationCounters.clear();
     this.cache.clear();
   }
 };
-function readAstFromDisk(project, filePath) {
+async function readAstFromDisk(project, filePath) {
   const sourceFileMap = /* @__PURE__ */ new Map();
   let ast = null;
   try {
     const outDir = path6.join(project.root, project.config.out);
     if (!fs5.existsSync(outDir)) return { ast: null, sourceFileMap };
-    const entries = fs5.readdirSync(outDir, { withFileTypes: true });
+    const entries = await fs5.promises.readdir(outDir, { withFileTypes: true });
     for (const entry of entries) {
       if (!entry.isDirectory()) continue;
       const artifactDir = path6.join(outDir, entry.name);
-      const jsonFiles = fs5.readdirSync(artifactDir).filter((f) => f.endsWith(".json"));
+      const jsonFiles = (await fs5.promises.readdir(artifactDir)).filter((f) => f.endsWith(".json"));
       if (jsonFiles.length === 0) continue;
       try {
-        const artifact = JSON.parse(fs5.readFileSync(path6.join(artifactDir, jsonFiles[0]), "utf-8"));
+        const artifact = JSON.parse(await fs5.promises.readFile(path6.join(artifactDir, jsonFiles[0]), "utf-8"));
         if (artifact.ast?.src) {
           const srcParts = artifact.ast.src.split(":");
           if (srcParts.length >= 3) {
             const fileIndex = parseInt(srcParts[2], 10);
             if (!isNaN(fileIndex) && !sourceFileMap.has(fileIndex)) {
-              const sourcePath = findSourceFile(project, entry.name);
+              const sourcePath = await findSourceFile(project, entry.name);
               if (sourcePath) {
                 sourceFileMap.set(fileIndex, sourcePath);
               }
@@ -18190,9 +18443,9 @@ function readAstFromDisk(project, filePath) {
     const sourceOutDirRel = path6.join(outDir, relPath);
     const resolvedOutDir = fs5.existsSync(sourceOutDirRel) ? sourceOutDirRel : sourceOutDir;
     if (fs5.existsSync(resolvedOutDir)) {
-      const artifacts = fs5.readdirSync(resolvedOutDir).filter((f) => f.endsWith(".json"));
+      const artifacts = (await fs5.promises.readdir(resolvedOutDir)).filter((f) => f.endsWith(".json"));
       if (artifacts.length > 0) {
-        const artifact = JSON.parse(fs5.readFileSync(path6.join(sourceOutDir, artifacts[0]), "utf-8"));
+        const artifact = JSON.parse(await fs5.promises.readFile(path6.join(resolvedOutDir, artifacts[0]), "utf-8"));
         ast = artifact.ast || null;
       }
     }
@@ -18200,7 +18453,7 @@ function readAstFromDisk(project, filePath) {
   }
   return { ast, sourceFileMap };
 }
-function findSourceFile(project, artifactName) {
+async function findSourceFile(project, artifactName) {
   const searchDirs = [
     path6.join(project.root, project.config.src),
     ...project.config.libs.map((lib) => path6.join(project.root, lib))
@@ -18211,9 +18464,33 @@ function findSourceFile(project, artifactName) {
       return filePath;
     }
   }
+  for (const lib of project.config.libs) {
+    const libDir = path6.join(project.root, lib);
+    const found2 = await findFileRecursive(libDir, artifactName);
+    if (found2) return found2;
+  }
+  const srcDir = path6.join(project.root, project.config.src);
+  const found = await findFileRecursive(srcDir, artifactName);
+  if (found) return found;
   return null;
 }
-function readForgeJsonDiagnostics(project, filePath) {
+async function findFileRecursive(dir, fileName) {
+  try {
+    const entries = await fs5.promises.readdir(dir, { withFileTypes: true });
+    for (const entry of entries) {
+      if (entry.name === fileName && entry.isFile()) {
+        return path6.join(dir, fileName);
+      }
+      if (entry.isDirectory() && !entry.name.startsWith(".") && entry.name !== "node_modules") {
+        const found = await findFileRecursive(path6.join(dir, entry.name), fileName);
+        if (found) return found;
+      }
+    }
+  } catch {
+  }
+  return null;
+}
+async function readForgeJsonDiagnostics(project, filePath) {
   try {
     const outDir = path6.join(project.root, project.config.out);
     if (!fs5.existsSync(outDir)) return [];
@@ -18223,11 +18500,11 @@ function readForgeJsonDiagnostics(project, filePath) {
     const candidateDirs = [path6.join(outDir, relPath), path6.join(outDir, basename6)];
     for (const artifactDir of candidateDirs) {
       if (!fs5.existsSync(artifactDir)) continue;
-      const jsonFiles = fs5.readdirSync(artifactDir).filter((f) => f.endsWith(".json"));
+      const jsonFiles = (await fs5.promises.readdir(artifactDir)).filter((f) => f.endsWith(".json"));
       if (jsonFiles.length === 0) continue;
       try {
         const artifact = JSON.parse(
-          fs5.readFileSync(path6.join(artifactDir, jsonFiles[0]), "utf-8")
+          await fs5.promises.readFile(path6.join(artifactDir, jsonFiles[0]), "utf-8")
         );
         if (artifact.errors && Array.isArray(artifact.errors)) {
           const diags = parseDiagnostics(
@@ -18244,23 +18521,48 @@ function readForgeJsonDiagnostics(project, filePath) {
   }
   return [];
 }
-function indexCompiledFiles(project, sourceFileMap) {
+async function indexCompiledFiles(project, sourceFileMap) {
   try {
     const outDir = path6.join(project.root, project.config.out);
     if (!fs5.existsSync(outDir)) return;
-    globalIndex.clear();
-    const entries = fs5.readdirSync(outDir, { withFileTypes: true });
+    const newFilePaths = /* @__PURE__ */ new Set();
+    const entries = await fs5.promises.readdir(outDir, { withFileTypes: true });
     for (const entry of entries) {
       if (!entry.isDirectory()) continue;
       const artifactDir = path6.join(outDir, entry.name);
-      const jsonFiles = fs5.readdirSync(artifactDir).filter((f) => f.endsWith(".json"));
+      const jsonFiles = (await fs5.promises.readdir(artifactDir)).filter((f) => f.endsWith(".json"));
       if (jsonFiles.length === 0) continue;
       try {
         const artifact = JSON.parse(
-          fs5.readFileSync(path6.join(artifactDir, jsonFiles[0]), "utf-8")
+          await fs5.promises.readFile(path6.join(artifactDir, jsonFiles[0]), "utf-8")
         );
         if (artifact.ast) {
-          const filePath = findSourceFile(project, entry.name);
+          const filePath = await findSourceFile(project, entry.name);
+          if (filePath) {
+            newFilePaths.add(filePath);
+          }
+        }
+      } catch {
+      }
+    }
+    const oldFiles = globalIndex.getIndexedFiles();
+    for (const oldUri of oldFiles) {
+      const oldFilePath = URI.parse(oldUri).fsPath;
+      if (!newFilePaths.has(oldFilePath)) {
+        globalIndex.removeFile(oldFilePath);
+      }
+    }
+    for (const entry of entries) {
+      if (!entry.isDirectory()) continue;
+      const artifactDir = path6.join(outDir, entry.name);
+      const jsonFiles = (await fs5.promises.readdir(artifactDir)).filter((f) => f.endsWith(".json"));
+      if (jsonFiles.length === 0) continue;
+      try {
+        const artifact = JSON.parse(
+          await fs5.promises.readFile(path6.join(artifactDir, jsonFiles[0]), "utf-8")
+        );
+        if (artifact.ast) {
+          const filePath = await findSourceFile(project, entry.name);
           if (filePath) {
             globalIndex.indexFile(filePath, artifact.ast);
           }
@@ -18278,9 +18580,9 @@ function parseForgeOutput(stdout, stderr) {
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
     const errMatch = line.match(/^Error\s*\((\w+)\)\s*:\s*(.+)/i);
-    const warnMatch = line.match(/^warning\[(\w+)\]\s*:\s*(.+)/i);
+    const warnMatch = line.match(/^warning\[([\w-]+)\]\s*:\s*(.+)/i);
     if (errMatch || warnMatch) {
-      const severity = errMatch ? import_vscode_languageserver4.DiagnosticSeverity.Error : import_vscode_languageserver4.DiagnosticSeverity.Warning;
+      const severity = errMatch ? import_vscode_languageserver5.DiagnosticSeverity.Error : import_vscode_languageserver5.DiagnosticSeverity.Warning;
       const code = (errMatch || warnMatch)[1];
       const message = (errMatch || warnMatch)[2];
       for (let j = i; j < Math.min(i + 5, lines.length); j++) {
@@ -18318,8 +18620,136 @@ function parseForgeOutput(stdout, stderr) {
 var compilerManager = new CompilerManager();
 
 // src/features/hover.ts
-var import_vscode_languageserver5 = __toESM(require_main4());
-init_traversal();
+var import_vscode_languageserver6 = __toESM(require_main4());
+
+// src/utils.ts
+var fs6 = __toESM(require("fs"));
+function readFileContent2(filePath) {
+  try {
+    return fs6.readFileSync(filePath, "utf-8");
+  } catch {
+    return null;
+  }
+}
+async function readFileContentAsync(filePath) {
+  try {
+    return await fs6.promises.readFile(filePath, "utf-8");
+  } catch {
+    return null;
+  }
+}
+function findNodeById(ast, id) {
+  let found = null;
+  walkAst(ast, (node) => {
+    if (found) return false;
+    if (node.id === id) {
+      found = node;
+      return false;
+    }
+    return true;
+  });
+  return found;
+}
+function extractNatSpec(node) {
+  const doc = node.documentation;
+  if (!doc?.text) return "";
+  const lines = doc.text.split("\n").map((l) => l.trim()).filter(Boolean);
+  const parts = [];
+  for (const line of lines) {
+    if (line.startsWith("@notice")) {
+      parts.push(line.replace("@notice", "").trim());
+    } else if (line.startsWith("@dev")) {
+      parts.push(line.replace("@dev", "").trim());
+    } else if (line.startsWith("@param")) {
+      parts.push(line);
+    } else if (line.startsWith("@return")) {
+      parts.push(line);
+    } else if (line.startsWith("@title")) {
+      parts.push(line.replace("@title", "").trim());
+    } else if (line.startsWith("@author")) {
+      parts.push(line.replace("@author", "").trim());
+    } else {
+      parts.push(line);
+    }
+  }
+  return parts.join("\n");
+}
+function resolveNatSpec(node) {
+  const rawDocs = extractNatSpec(node);
+  if (!rawDocs) return "";
+  if (!rawDocs.includes("@inheritdoc")) return rawDocs;
+  const functionName = node.name;
+  if (!functionName) return rawDocs;
+  const inheritRegex = /@inheritdoc\s+(\w+)/g;
+  let result = rawDocs;
+  let match;
+  while ((match = inheritRegex.exec(rawDocs)) !== null) {
+    const contractName = match[1];
+    const resolved = resolveInheritedDocs(contractName, functionName);
+    if (resolved) {
+      result = result.replace(match[0], resolved);
+    }
+  }
+  return result;
+}
+function resolveInheritedDocs(contractName, memberName) {
+  const entries = globalIndex.findByName(contractName);
+  for (const entry of entries) {
+    if (!isContractDefinition(entry.node) && entry.kind !== "contract" && entry.kind !== "interface" && entry.kind !== "library") {
+      continue;
+    }
+    const member = findMemberByName(entry.node, memberName);
+    if (member) {
+      return extractNatSpec(member);
+    }
+  }
+  return null;
+}
+function findMemberByName(contractNode, memberName) {
+  if (!contractNode.nodes) return null;
+  for (const child of contractNode.nodes) {
+    if (child.name !== memberName) continue;
+    if (isFunctionDefinition(child) || isStateVariableDeclaration(child) || isEventDefinition(child) || isErrorDefinition(child) || isModifierDefinition(child)) {
+      return child;
+    }
+  }
+  return null;
+}
+function extractTypeName(node) {
+  if (!node) return "unknown";
+  if (node.nodeType === "ElementaryTypeName") return node.name;
+  if (node.nodeType === "UserDefinedTypeName") return node.name ?? node.pathNode?.name ?? "unknown";
+  if (node.nodeType === "Mapping") {
+    const key = extractTypeName(node.keyType);
+    const value = extractTypeName(node.valueType);
+    return `mapping(${key} => ${value})`;
+  }
+  if (node.nodeType === "ArrayTypeName") {
+    const base = extractTypeName(node.baseType);
+    return `${base}[]`;
+  }
+  const typeDesc = node.typeDescriptions;
+  return typeDesc?.typeString ?? "unknown";
+}
+function findImportForSymbol(ast, symbolName) {
+  let result = null;
+  walkAst(ast, (node) => {
+    if (result) return false;
+    if (isImportDirective(node) && node.symbolAliases) {
+      for (const alias of node.symbolAliases) {
+        const foreign = alias.foreign;
+        if (foreign?.name === symbolName) {
+          result = node.file || null;
+          return false;
+        }
+      }
+    }
+    return true;
+  });
+  return result;
+}
+
+// src/features/hover.ts
 function provideHover(ast, document, position, _compileResult) {
   const content = document.getText();
   const node = findNodeAtPosition(ast, content, position);
@@ -18430,7 +18860,7 @@ function hoverIdentifier(node, ast, content, range) {
   if (importInfo) {
     return {
       contents: {
-        kind: import_vscode_languageserver5.MarkupKind.Markdown,
+        kind: import_vscode_languageserver6.MarkupKind.Markdown,
         value: `\`${name}\` from \`${importInfo}\``
       },
       range: range ?? void 0
@@ -18440,42 +18870,42 @@ function hoverIdentifier(node, ast, content, range) {
 }
 function hoverFunction(node, content, range) {
   const sig = buildFunctionSignature(node, content);
-  const docs = extractNatSpec(node);
+  const docs = resolveNatSpec(node);
   const lines = ["```solidity", sig, "```"];
   if (docs) lines.push("", docs);
   return {
-    contents: { kind: import_vscode_languageserver5.MarkupKind.Markdown, value: lines.join("\n") },
+    contents: { kind: import_vscode_languageserver6.MarkupKind.Markdown, value: lines.join("\n") },
     range: range ?? void 0
   };
 }
 function hoverStateVariable(node, content, range) {
-  const typeName = extractTypeName(node.typeName, content);
+  const typeName = extractTypeName(node.typeName);
   const mutability = node.constant ? "constant" : node.immutable ? "immutable" : "";
   const vis = node.visibility;
   const decl = `${mutability ? mutability + " " : ""}${vis} ${typeName} ${node.name}`;
-  const docs = extractNatSpec(node);
+  const docs = resolveNatSpec(node);
   const lines = ["```solidity", decl.trim(), "```"];
   if (docs) lines.push("", docs);
   return {
-    contents: { kind: import_vscode_languageserver5.MarkupKind.Markdown, value: lines.join("\n") },
+    contents: { kind: import_vscode_languageserver6.MarkupKind.Markdown, value: lines.join("\n") },
     range: range ?? void 0
   };
 }
 function hoverContract(node, range) {
   const kind = node.contractKind;
-  const docs = extractNatSpec(node);
+  const docs = resolveNatSpec(node);
   const lines = [`**${kind}** \`${node.name}\``];
   if (docs) lines.push("", docs);
   return {
-    contents: { kind: import_vscode_languageserver5.MarkupKind.Markdown, value: lines.join("\n") },
+    contents: { kind: import_vscode_languageserver6.MarkupKind.Markdown, value: lines.join("\n") },
     range: range ?? void 0
   };
 }
 function hoverParameter(node, range) {
-  const typeName = extractTypeName(node.typeName, "");
+  const typeName = extractTypeName(node.typeName);
   const lines = ["```solidity", `${typeName} ${node.name}`, "```"];
   return {
-    contents: { kind: import_vscode_languageserver5.MarkupKind.Markdown, value: lines.join("\n") },
+    contents: { kind: import_vscode_languageserver6.MarkupKind.Markdown, value: lines.join("\n") },
     range: range ?? void 0
   };
 }
@@ -18488,7 +18918,7 @@ function hoverImport(node, range) {
   }).join(", ")} }` : "";
   const lines = ["```solidity", `import "${file}"${alias};`, "```"];
   return {
-    contents: { kind: import_vscode_languageserver5.MarkupKind.Markdown, value: lines.join("\n") },
+    contents: { kind: import_vscode_languageserver6.MarkupKind.Markdown, value: lines.join("\n") },
     range: range ?? void 0
   };
 }
@@ -18517,7 +18947,7 @@ function resolveImportSymbol(importNode, content, position, ast) {
       const symRange = srcToRange(foreign.src, content);
       return {
         contents: {
-          kind: import_vscode_languageserver5.MarkupKind.Markdown,
+          kind: import_vscode_languageserver6.MarkupKind.Markdown,
           value: `\`${name}\` from \`${file}\``
         },
         range: symRange ?? void 0
@@ -18532,7 +18962,7 @@ function hoverTypeDefinition(node, content, range) {
   const lines = ["```solidity", `${kind} ${node.name} {`];
   for (const m of members) {
     if (node.nodeType === "StructDefinition") {
-      const typeName = extractTypeName(m.typeName, content);
+      const typeName = extractTypeName(m.typeName);
       lines.push(`  ${typeName} ${m.name};`);
     } else {
       lines.push(`  ${m.name},`);
@@ -18540,43 +18970,43 @@ function hoverTypeDefinition(node, content, range) {
   }
   lines.push("}", "```");
   return {
-    contents: { kind: import_vscode_languageserver5.MarkupKind.Markdown, value: lines.join("\n") },
+    contents: { kind: import_vscode_languageserver6.MarkupKind.Markdown, value: lines.join("\n") },
     range: range ?? void 0
   };
 }
 function hoverEvent(node, content, range) {
   const params = node.parameters;
   const paramList = params?.parameters?.map((p) => {
-    const typeName = extractTypeName(p.typeName, content);
+    const typeName = extractTypeName(p.typeName);
     return `${typeName} ${p.name}`;
   }).join(", ") ?? "";
   const lines = ["```solidity", `event ${node.name}(${paramList});`, "```"];
   return {
-    contents: { kind: import_vscode_languageserver5.MarkupKind.Markdown, value: lines.join("\n") },
+    contents: { kind: import_vscode_languageserver6.MarkupKind.Markdown, value: lines.join("\n") },
     range: range ?? void 0
   };
 }
 function hoverError(node, content, range) {
   const params = node.parameters;
   const paramList = params?.parameters?.map((p) => {
-    const typeName = extractTypeName(p.typeName, content);
+    const typeName = extractTypeName(p.typeName);
     return `${typeName} ${p.name}`;
   }).join(", ") ?? "";
   const lines = ["```solidity", `error ${node.name}(${paramList});`, "```"];
   return {
-    contents: { kind: import_vscode_languageserver5.MarkupKind.Markdown, value: lines.join("\n") },
+    contents: { kind: import_vscode_languageserver6.MarkupKind.Markdown, value: lines.join("\n") },
     range: range ?? void 0
   };
 }
 function hoverModifier(node, content, range) {
   const params = node.parameters;
   const paramList = params?.parameters?.map((p) => {
-    const typeName = extractTypeName(p.typeName, content);
+    const typeName = extractTypeName(p.typeName);
     return `${typeName} ${p.name}`;
   }).join(", ") ?? "";
   const lines = ["```solidity", `modifier ${node.name}(${paramList})`, "```"];
   return {
-    contents: { kind: import_vscode_languageserver5.MarkupKind.Markdown, value: lines.join("\n") },
+    contents: { kind: import_vscode_languageserver6.MarkupKind.Markdown, value: lines.join("\n") },
     range: range ?? void 0
   };
 }
@@ -18584,7 +19014,7 @@ function hoverElementaryType(node, range) {
   const desc = getSolidityTypeDescription(node.name);
   const lines = ["```solidity", node.name, "```", "", desc];
   return {
-    contents: { kind: import_vscode_languageserver5.MarkupKind.Markdown, value: lines.join("\n") },
+    contents: { kind: import_vscode_languageserver6.MarkupKind.Markdown, value: lines.join("\n") },
     range: range ?? void 0
   };
 }
@@ -18600,34 +19030,34 @@ function hoverUserDefinedType(node, ast, range) {
     }
   }
   return {
-    contents: { kind: import_vscode_languageserver5.MarkupKind.Markdown, value: `\`${name}\`` },
+    contents: { kind: import_vscode_languageserver6.MarkupKind.Markdown, value: `\`${name}\`` },
     range: range ?? void 0
   };
 }
 function hoverMapping(node, content, range) {
-  const keyType = extractTypeName(node.keyType, content);
-  const valueType = extractTypeName(node.valueType, content);
+  const keyType = extractTypeName(node.keyType);
+  const valueType = extractTypeName(node.valueType);
   const lines = ["```solidity", `mapping(${keyType} => ${valueType})`, "```"];
   return {
-    contents: { kind: import_vscode_languageserver5.MarkupKind.Markdown, value: lines.join("\n") },
+    contents: { kind: import_vscode_languageserver6.MarkupKind.Markdown, value: lines.join("\n") },
     range: range ?? void 0
   };
 }
 function hoverArray(node, content, range) {
-  const baseType = extractTypeName(node.baseType, content);
+  const baseType = extractTypeName(node.baseType);
   const lines = ["```solidity", `${baseType}[]`, "```"];
   return {
-    contents: { kind: import_vscode_languageserver5.MarkupKind.Markdown, value: lines.join("\n") },
+    contents: { kind: import_vscode_languageserver6.MarkupKind.Markdown, value: lines.join("\n") },
     range: range ?? void 0
   };
 }
 function buildFunctionSignature(node, content) {
   const params = node.parameters?.parameters?.map((p) => {
-    const typeName = extractTypeName(p.typeName, content);
+    const typeName = extractTypeName(p.typeName);
     return `${typeName}${p.name ? " " + p.name : ""}`;
   }).join(", ") ?? "";
   const returns = node.returnParameters?.parameters?.map((p) => {
-    const typeName = extractTypeName(p.typeName, content);
+    const typeName = extractTypeName(p.typeName);
     return `${typeName}${p.name ? " " + p.name : ""}`;
   }).join(", ") ?? "";
   const kind = node.kind || "function";
@@ -18652,69 +19082,6 @@ function buildFunctionSignature(node, content) {
   if (node.virtual) parts.push("virtual");
   const returnStr = returns ? ` returns (${returns})` : "";
   return `${parts.join(" ")} function ${node.name}(${params})${returnStr}`;
-}
-function extractTypeName(node, content) {
-  if (!node) return "unknown";
-  if (isElementaryTypeName(node)) {
-    return node.name;
-  }
-  if (isUserDefinedTypeName(node)) {
-    return node.name;
-  }
-  if (isMapping(node)) {
-    const key = extractTypeName(node.keyType, content);
-    const value = extractTypeName(node.valueType, content);
-    return `mapping(${key} => ${value})`;
-  }
-  if (isArrayTypeName(node)) {
-    const base = extractTypeName(node.baseType, content);
-    return `${base}[]`;
-  }
-  const typeDesc = node.typeDescriptions;
-  if (typeDesc?.typeString) {
-    return typeDesc.typeString;
-  }
-  return node.name ?? "unknown";
-}
-function extractNatSpec(node) {
-  const doc = node.documentation;
-  if (!doc?.text) return "";
-  const lines = doc.text.split("\n").map((l) => l.trim()).filter(Boolean);
-  const parts = [];
-  for (const line of lines) {
-    if (line.startsWith("@notice")) {
-      parts.push(line.replace("@notice", "").trim());
-    } else if (line.startsWith("@dev")) {
-      parts.push(line.replace("@dev", "").trim());
-    } else if (line.startsWith("@param")) {
-      parts.push(line);
-    } else if (line.startsWith("@return")) {
-      parts.push(line);
-    } else if (line.startsWith("@title")) {
-      parts.push(line.replace("@title", "").trim());
-    } else if (line.startsWith("@author")) {
-      parts.push(line.replace("@author", "").trim());
-    } else {
-      parts.push(line);
-    }
-  }
-  return parts.join("\n");
-}
-function findNodeById(ast, id) {
-  let found = null;
-  const walk = (node) => {
-    if (node.id === id) {
-      found = node;
-      return;
-    }
-    if (node.nodes) {
-      for (const child of node.nodes) {
-        walk(child);
-      }
-    }
-  };
-  walk(ast);
-  return found;
 }
 function findDefinitionByName(ast, name) {
   let found = null;
@@ -18762,26 +19129,6 @@ function getSolidityTypeDescription(name) {
   };
   return descriptions[name] ?? `${name} type`;
 }
-function findImportForSymbol(ast, symbolName) {
-  let result = null;
-  const walk = (node) => {
-    if (result) return;
-    if (isImportDirective(node) && node.symbolAliases) {
-      for (const alias of node.symbolAliases) {
-        const foreign = alias.foreign;
-        if (foreign?.name === symbolName) {
-          result = node.file || null;
-          return;
-        }
-      }
-    }
-    if (node.nodes) {
-      for (const child of node.nodes) walk(child);
-    }
-  };
-  walk(ast);
-  return result;
-}
 function resolveTypeName(typeNameNode, ast, content, range) {
   const name = typeNameNode.name;
   if (!name) return null;
@@ -18796,23 +19143,22 @@ function resolveTypeName(typeNameNode, ast, content, range) {
   if (importPath) {
     return {
       contents: {
-        kind: import_vscode_languageserver5.MarkupKind.Markdown,
+        kind: import_vscode_languageserver6.MarkupKind.Markdown,
         value: `\`${name}\` from \`${importPath}\``
       },
       range: range ?? void 0
     };
   }
   return {
-    contents: { kind: import_vscode_languageserver5.MarkupKind.Markdown, value: `\`${name}\`` },
+    contents: { kind: import_vscode_languageserver6.MarkupKind.Markdown, value: `\`${name}\`` },
     range: range ?? void 0
   };
 }
 
 // src/features/completion.ts
-var import_vscode_languageserver6 = __toESM(require_main4());
-var fs6 = __toESM(require("fs"));
+var import_vscode_languageserver7 = __toESM(require_main4());
+var fs7 = __toESM(require("fs"));
 var path7 = __toESM(require("path"));
-init_traversal();
 var SOLIDITY_KEYWORDS = [
   ["pragma", "pragma solidity ^0.8.0;"],
   ["contract", "contract ${1:Name} {\n	$0\n}"],
@@ -18916,104 +19262,31 @@ var ELEMENTARY_TYPES = [
   ["bool", "Boolean type"],
   ["string", "Dynamic byte array string"],
   ["bytes", "Dynamic byte array"],
-  ["int", "Signed integer (alias for int256)"],
   ["uint", "Unsigned integer (alias for uint256)"],
-  ["int8", "Signed integer (8 bits)"],
-  ["int16", "Signed integer (16 bits)"],
-  ["int24", "Signed integer (24 bits)"],
-  ["int32", "Signed integer (32 bits)"],
-  ["int40", "Signed integer (40 bits)"],
-  ["int48", "Signed integer (48 bits)"],
-  ["int56", "Signed integer (56 bits)"],
-  ["int64", "Signed integer (64 bits)"],
-  ["int72", "Signed integer (72 bits)"],
-  ["int80", "Signed integer (80 bits)"],
-  ["int88", "Signed integer (88 bits)"],
-  ["int96", "Signed integer (96 bits)"],
-  ["int104", "Signed integer (104 bits)"],
-  ["int112", "Signed integer (112 bits)"],
-  ["int120", "Signed integer (120 bits)"],
-  ["int128", "Signed integer (128 bits)"],
-  ["int136", "Signed integer (136 bits)"],
-  ["int144", "Signed integer (144 bits)"],
-  ["int152", "Signed integer (152 bits)"],
-  ["int160", "Signed integer (160 bits)"],
-  ["int168", "Signed integer (168 bits)"],
-  ["int176", "Signed integer (176 bits)"],
-  ["int184", "Signed integer (184 bits)"],
-  ["int192", "Signed integer (192 bits)"],
-  ["int200", "Signed integer (200 bits)"],
-  ["int208", "Signed integer (208 bits)"],
-  ["int216", "Signed integer (216 bits)"],
-  ["int224", "Signed integer (224 bits)"],
-  ["int232", "Signed integer (232 bits)"],
-  ["int240", "Signed integer (240 bits)"],
-  ["int248", "Signed integer (248 bits)"],
-  ["int256", "Signed integer (256 bits)"],
-  ["uint8", "Unsigned integer (8 bits)"],
-  ["uint16", "Unsigned integer (16 bits)"],
-  ["uint24", "Unsigned integer (24 bits)"],
-  ["uint32", "Unsigned integer (32 bits)"],
-  ["uint40", "Unsigned integer (40 bits)"],
-  ["uint48", "Unsigned integer (48 bits)"],
-  ["uint56", "Unsigned integer (56 bits)"],
-  ["uint64", "Unsigned integer (64 bits)"],
-  ["uint72", "Unsigned integer (72 bits)"],
-  ["uint80", "Unsigned integer (80 bits)"],
-  ["uint88", "Unsigned integer (88 bits)"],
-  ["uint96", "Unsigned integer (96 bits)"],
-  ["uint104", "Unsigned integer (104 bits)"],
-  ["uint112", "Unsigned integer (112 bits)"],
-  ["uint120", "Unsigned integer (120 bits)"],
-  ["uint128", "Unsigned integer (128 bits)"],
-  ["uint136", "Unsigned integer (136 bits)"],
-  ["uint144", "Unsigned integer (144 bits)"],
-  ["uint152", "Unsigned integer (152 bits)"],
-  ["uint160", "Unsigned integer (160 bits)"],
-  ["uint168", "Unsigned integer (168 bits)"],
-  ["uint176", "Unsigned integer (176 bits)"],
-  ["uint184", "Unsigned integer (184 bits)"],
-  ["uint192", "Unsigned integer (192 bits)"],
-  ["uint200", "Unsigned integer (200 bits)"],
-  ["uint208", "Unsigned integer (208 bits)"],
-  ["uint216", "Unsigned integer (216 bits)"],
-  ["uint224", "Unsigned integer (224 bits)"],
-  ["uint232", "Unsigned integer (232 bits)"],
-  ["uint240", "Unsigned integer (240 bits)"],
-  ["uint248", "Unsigned integer (248 bits)"],
   ["uint256", "Unsigned integer (256 bits)"],
-  ["bytes1", "Fixed-size byte array (1 byte)"],
-  ["bytes2", "Fixed-size byte array (2 bytes)"],
-  ["bytes3", "Fixed-size byte array (3 bytes)"],
+  ["uint128", "Unsigned integer (128 bits)"],
+  ["uint64", "Unsigned integer (64 bits)"],
+  ["uint32", "Unsigned integer (32 bits)"],
+  ["uint16", "Unsigned integer (16 bits)"],
+  ["uint8", "Unsigned integer (8 bits)"],
+  ["int", "Signed integer (alias for int256)"],
+  ["int256", "Signed integer (256 bits)"],
+  ["int128", "Signed integer (128 bits)"],
+  ["int64", "Signed integer (64 bits)"],
+  ["int32", "Signed integer (32 bits)"],
+  ["int16", "Signed integer (16 bits)"],
+  ["int8", "Signed integer (8 bits)"],
   ["bytes4", "Fixed-size byte array (4 bytes)"],
-  ["bytes5", "Fixed-size byte array (5 bytes)"],
-  ["bytes6", "Fixed-size byte array (6 bytes)"],
-  ["bytes7", "Fixed-size byte array (7 bytes)"],
   ["bytes8", "Fixed-size byte array (8 bytes)"],
-  ["bytes9", "Fixed-size byte array (9 bytes)"],
-  ["bytes10", "Fixed-size byte array (10 bytes)"],
-  ["bytes11", "Fixed-size byte array (11 bytes)"],
-  ["bytes12", "Fixed-size byte array (12 bytes)"],
-  ["bytes13", "Fixed-size byte array (13 bytes)"],
-  ["bytes14", "Fixed-size byte array (14 bytes)"],
-  ["bytes15", "Fixed-size byte array (15 bytes)"],
   ["bytes16", "Fixed-size byte array (16 bytes)"],
-  ["bytes17", "Fixed-size byte array (17 bytes)"],
-  ["bytes18", "Fixed-size byte array (18 bytes)"],
-  ["bytes19", "Fixed-size byte array (19 bytes)"],
   ["bytes20", "Fixed-size byte array (20 bytes)"],
-  ["bytes21", "Fixed-size byte array (21 bytes)"],
-  ["bytes22", "Fixed-size byte array (22 bytes)"],
-  ["bytes23", "Fixed-size byte array (23 bytes)"],
-  ["bytes24", "Fixed-size byte array (24 bytes)"],
-  ["bytes25", "Fixed-size byte array (25 bytes)"],
-  ["bytes26", "Fixed-size byte array (26 bytes)"],
-  ["bytes27", "Fixed-size byte array (27 bytes)"],
-  ["bytes28", "Fixed-size byte array (28 bytes)"],
-  ["bytes29", "Fixed-size byte array (29 bytes)"],
-  ["bytes30", "Fixed-size byte array (30 bytes)"],
-  ["bytes31", "Fixed-size byte array (31 bytes)"],
-  ["bytes32", "Fixed-size byte array (32 bytes)"]
+  ["bytes32", "Fixed-size byte array (32 bytes)"],
+  ["uint96", "Unsigned integer (96 bits)"],
+  ["uint112", "Unsigned integer (112 bits)"],
+  ["uint160", "Unsigned integer (160 bits)"],
+  ["int96", "Signed integer (96 bits)"],
+  ["int112", "Signed integer (112 bits)"],
+  ["int160", "Signed integer (160 bits)"]
 ];
 var GLOBAL_OBJECT_MEMBERS = {
   msg: [
@@ -19058,7 +19331,23 @@ var ADDRESS_MEMBERS = [
   ["transfer", "transfer(${1:uint256 amount})", "bool", "Send wei to the address"],
   ["send", "send(${1:uint256 amount})", "bool", "Send wei to the address (returns false on failure)"]
 ];
-function provideCompletion(ast, document, position, _compileResult, project) {
+var dirCache = /* @__PURE__ */ new Map();
+var DIR_CACHE_TTL = 2e3;
+async function readdirCached(dir) {
+  const now = Date.now();
+  const cached = dirCache.get(dir);
+  if (cached && now - cached.timestamp < DIR_CACHE_TTL) {
+    return cached.entries;
+  }
+  try {
+    const entries = await fs7.promises.readdir(dir, { withFileTypes: true });
+    dirCache.set(dir, { entries, timestamp: now });
+    return entries;
+  } catch {
+    return [];
+  }
+}
+async function provideCompletion(ast, document, position, _compileResult, project) {
   const content = document.getText();
   const fullLine = document.getText({
     start: { line: position.line, character: 0 },
@@ -19079,7 +19368,7 @@ function provideCompletion(ast, document, position, _compileResult, project) {
   }
   const importMatch = fullLine.match(/import\s+"([^"]*)$/);
   if (importMatch) {
-    return provideImportCompletion(importMatch[1], position, project);
+    return await provideImportCompletion(importMatch[1], position, project);
   }
   if (/\bemit\s+\w*$/.test(lineText)) {
     return provideEmitCompletion(ast, content);
@@ -19102,18 +19391,18 @@ function provideCompletion(ast, document, position, _compileResult, project) {
     if (prefix && !name.toLowerCase().startsWith(prefix.toLowerCase())) continue;
     items.push({
       label: name,
-      kind: import_vscode_languageserver6.CompletionItemKind.Function,
+      kind: import_vscode_languageserver7.CompletionItemKind.Function,
       insertText: snippet,
-      insertTextFormat: import_vscode_languageserver6.InsertTextFormat.Snippet,
+      insertTextFormat: import_vscode_languageserver7.InsertTextFormat.Snippet,
       detail: desc,
-      documentation: { kind: import_vscode_languageserver6.MarkupKind.Markdown, value: desc }
+      documentation: { kind: import_vscode_languageserver7.MarkupKind.Markdown, value: desc }
     });
   }
   for (const [name, insertText, type, desc] of GLOBAL_VARIABLES) {
     if (prefix && !name.toLowerCase().startsWith(prefix.toLowerCase())) continue;
     items.push({
       label: name,
-      kind: import_vscode_languageserver6.CompletionItemKind.Variable,
+      kind: import_vscode_languageserver7.CompletionItemKind.Variable,
       insertText,
       detail: `${type} \u2014 ${desc}`
     });
@@ -19121,14 +19410,14 @@ function provideCompletion(ast, document, position, _compileResult, project) {
   for (const [unit, desc] of ETHER_UNITS) {
     items.push({
       label: unit,
-      kind: import_vscode_languageserver6.CompletionItemKind.Unit,
+      kind: import_vscode_languageserver7.CompletionItemKind.Unit,
       detail: desc
     });
   }
   for (const [unit, desc] of TIME_UNITS) {
     items.push({
       label: unit,
-      kind: import_vscode_languageserver6.CompletionItemKind.Unit,
+      kind: import_vscode_languageserver7.CompletionItemKind.Unit,
       detail: desc
     });
   }
@@ -19136,17 +19425,34 @@ function provideCompletion(ast, document, position, _compileResult, project) {
     if (prefix && !typeName.toLowerCase().startsWith(prefix.toLowerCase())) continue;
     items.push({
       label: typeName,
-      kind: import_vscode_languageserver6.CompletionItemKind.TypeParameter,
+      kind: import_vscode_languageserver7.CompletionItemKind.TypeParameter,
       detail: desc
     });
   }
   for (const [keyword, snippet] of SOLIDITY_KEYWORDS) {
     items.push({
       label: keyword,
-      kind: import_vscode_languageserver6.CompletionItemKind.Keyword,
+      kind: import_vscode_languageserver7.CompletionItemKind.Keyword,
       insertText: snippet,
-      insertTextFormat: import_vscode_languageserver6.InsertTextFormat.Snippet,
+      insertTextFormat: import_vscode_languageserver7.InsertTextFormat.Snippet,
       detail: "Solidity keyword"
+    });
+  }
+  const offset = positionToOffset(content, position);
+  const scopedVars = findVariableDeclarationsInScope(ast, offset, content);
+  const scopedNames = /* @__PURE__ */ new Set();
+  for (const v of scopedVars) {
+    if (scopedNames.has(v.name)) continue;
+    scopedNames.add(v.name);
+    if (prefix && !v.name.toLowerCase().startsWith(prefix.toLowerCase())) continue;
+    items.push({
+      label: v.name,
+      kind: import_vscode_languageserver7.CompletionItemKind.Variable,
+      detail: `${v.typeName} ${v.name}`,
+      documentation: {
+        kind: import_vscode_languageserver7.MarkupKind.Markdown,
+        value: v.blockOffset === 0 ? `*(parameter)* ${v.typeName} ${v.name}` : `*(local variable)* ${v.typeName} ${v.name}`
+      }
     });
   }
   const idItems = collectIdentifiers(ast, content, prefix);
@@ -19159,12 +19465,12 @@ function provideCompletion(ast, document, position, _compileResult, project) {
     const bStarts = bLabel.startsWith(pfx) ? 0 : 1;
     if (aStarts !== bStarts) return aStarts - bStarts;
     const kindPriority = {
-      [import_vscode_languageserver6.CompletionItemKind.Variable]: 1,
-      [import_vscode_languageserver6.CompletionItemKind.Function]: 2,
-      [import_vscode_languageserver6.CompletionItemKind.Keyword]: 3,
-      [import_vscode_languageserver6.CompletionItemKind.TypeParameter]: 4,
-      [import_vscode_languageserver6.CompletionItemKind.Module]: 5,
-      [import_vscode_languageserver6.CompletionItemKind.Unit]: 6
+      [import_vscode_languageserver7.CompletionItemKind.Variable]: 1,
+      [import_vscode_languageserver7.CompletionItemKind.Function]: 2,
+      [import_vscode_languageserver7.CompletionItemKind.Keyword]: 3,
+      [import_vscode_languageserver7.CompletionItemKind.TypeParameter]: 4,
+      [import_vscode_languageserver7.CompletionItemKind.Module]: 5,
+      [import_vscode_languageserver7.CompletionItemKind.Unit]: 6
     };
     const aPriority = kindPriority[a.kind ?? 0] ?? 10;
     const bPriority = kindPriority[b.kind ?? 0] ?? 10;
@@ -19189,15 +19495,15 @@ function collectEvents(node, items, seen) {
   if (isEventDefinition(node) && node.name && !seen.has(node.name)) {
     seen.add(node.name);
     const params = node.parameters?.parameters?.map((p) => {
-      const typeName = extractTypeName2(p.typeName);
+      const typeName = extractTypeName(p.typeName);
       return `${typeName} ${p.name}`;
     }).join(", ") ?? "";
     items.push({
       label: node.name,
-      kind: import_vscode_languageserver6.CompletionItemKind.Event,
+      kind: import_vscode_languageserver7.CompletionItemKind.Event,
       detail: `event ${node.name}(${params})`,
       insertText: `${node.name}(${node.parameters?.parameters?.map((_, i) => `$${i + 1}`).join(", ") ?? ""})`,
-      insertTextFormat: import_vscode_languageserver6.InsertTextFormat.Snippet
+      insertTextFormat: import_vscode_languageserver7.InsertTextFormat.Snippet
     });
   }
   if (node.nodes) {
@@ -19210,15 +19516,15 @@ function collectErrors(node, items, seen) {
   if (isErrorDefinition(node) && node.name && !seen.has(node.name)) {
     seen.add(node.name);
     const params = node.parameters?.parameters?.map((p) => {
-      const typeName = extractTypeName2(p.typeName);
+      const typeName = extractTypeName(p.typeName);
       return `${typeName} ${p.name}`;
     }).join(", ") ?? "";
     items.push({
       label: node.name,
-      kind: import_vscode_languageserver6.CompletionItemKind.Enum,
+      kind: import_vscode_languageserver7.CompletionItemKind.Enum,
       detail: `error ${node.name}(${params})`,
       insertText: `${node.name}(${node.parameters?.parameters?.map((_, i) => `$${i + 1}`).join(", ") ?? ""})`,
-      insertTextFormat: import_vscode_languageserver6.InsertTextFormat.Snippet
+      insertTextFormat: import_vscode_languageserver7.InsertTextFormat.Snippet
     });
   }
   if (node.nodes) {
@@ -19232,90 +19538,49 @@ function provideDotCompletion(expression, ast, content, position, project) {
   const rootName = parts[0];
   if (rootName === "this") {
     const enclosingContract = findEnclosingContract(ast, position, content);
-    if (enclosingContract) {
-      const nodes = enclosingContract.nodes ?? [];
-      const items = [];
-      for (const member of nodes) {
-        const vis = member.visibility;
-        if (vis === "private") continue;
-        if (isFunctionDefinition(member)) {
-          const fn = member;
-          const params = fn.parameters?.parameters?.map((p) => `${extractTypeName2(p.typeName)} ${p.name}`).join(", ") ?? "";
-          items.push({
-            label: fn.name,
-            kind: import_vscode_languageserver6.CompletionItemKind.Function,
-            detail: `${fn.visibility} function ${fn.name}(${params})`
-          });
-        } else if (isStateVariableDeclaration(member)) {
-          const sv = member;
-          items.push({
-            label: sv.name,
-            kind: import_vscode_languageserver6.CompletionItemKind.Property,
-            detail: `${sv.visibility} ${extractTypeName2(sv.typeName)} ${sv.name}`
-          });
-        } else if (isEventDefinition(member)) {
-          items.push({ label: member.name, kind: import_vscode_languageserver6.CompletionItemKind.Event });
-        } else if (isErrorDefinition(member)) {
-          items.push({ label: member.name, kind: import_vscode_languageserver6.CompletionItemKind.Enum });
-        }
-      }
-      return items;
+    if (enclosingContract && isContractDefinition(enclosingContract)) {
+      return collectContractMembers(enclosingContract, ast, {
+        includeOwn: true,
+        includeOwnPrivate: true
+      });
     }
   }
   if (rootName === "super") {
     const enclosingContract = findEnclosingContract(ast, position, content);
-    if (enclosingContract) {
-      const baseContracts = enclosingContract.baseContracts ?? [];
+    if (enclosingContract && isContractDefinition(enclosingContract)) {
       const items = [];
       const seen = /* @__PURE__ */ new Set();
+      const visited = /* @__PURE__ */ new Set();
+      const baseContracts = enclosingContract.baseContracts ?? [];
       for (const base of baseContracts) {
         const baseName = base.baseName?.name;
         if (!baseName) continue;
         const baseType = findTypeByName(ast, baseName);
-        if (!baseType || !isContractDefinition(baseType)) continue;
-        const nodes = baseType.nodes ?? [];
-        for (const member of nodes) {
-          const vis = member.visibility;
-          if (vis === "private") continue;
-          if (member.name && !seen.has(member.name)) {
-            seen.add(member.name);
-            if (isFunctionDefinition(member)) {
-              const fn = member;
-              const params = fn.parameters?.parameters?.map((p) => `${extractTypeName2(p.typeName)} ${p.name}`).join(", ") ?? "";
-              items.push({
-                label: fn.name,
-                kind: import_vscode_languageserver6.CompletionItemKind.Function,
-                detail: `${fn.visibility} function ${fn.name}(${params})`
-              });
-            } else if (isStateVariableDeclaration(member)) {
-              const sv = member;
-              items.push({
-                label: sv.name,
-                kind: import_vscode_languageserver6.CompletionItemKind.Property,
-                detail: `${sv.visibility} ${extractTypeName2(sv.typeName)} ${sv.name}`
-              });
-            }
-          }
+        if (baseType && isContractDefinition(baseType)) {
+          collectContractMembersInto(baseType, ast, items, seen, visited, {
+            includeOwn: true,
+            includeOwnPrivate: false
+          });
         }
       }
       return items;
     }
   }
-  if (parts.length === 2 && GLOBAL_OBJECT_MEMBERS[rootName]) {
+  if (parts.length >= 1 && parts.length <= 2 && GLOBAL_OBJECT_MEMBERS[rootName]) {
     const members = GLOBAL_OBJECT_MEMBERS[rootName];
     return members.map(([name, insertTextOrType, desc]) => {
       if (rootName === "abi") {
         return {
           label: name,
-          kind: import_vscode_languageserver6.CompletionItemKind.Function,
+          kind: import_vscode_languageserver7.CompletionItemKind.Function,
           insertText: insertTextOrType,
-          insertTextFormat: import_vscode_languageserver6.InsertTextFormat.Snippet,
+          insertTextFormat: import_vscode_languageserver7.InsertTextFormat.Snippet,
           detail: desc
         };
       }
       return {
         label: name,
-        kind: import_vscode_languageserver6.CompletionItemKind.Property,
+        kind: import_vscode_languageserver7.CompletionItemKind.Property,
         detail: `${insertTextOrType} \u2014 ${desc}`
       };
     });
@@ -19327,9 +19592,9 @@ function provideDotCompletion(expression, ast, content, position, project) {
   if (currentType === "address" || currentType === "address payable") {
     return ADDRESS_MEMBERS.map(([name, insertText, type, desc]) => ({
       label: name,
-      kind: import_vscode_languageserver6.CompletionItemKind.Function,
+      kind: import_vscode_languageserver7.CompletionItemKind.Function,
       insertText,
-      insertTextFormat: import_vscode_languageserver6.InsertTextFormat.Snippet,
+      insertTextFormat: import_vscode_languageserver7.InsertTextFormat.Snippet,
       detail: `${type} \u2014 ${desc}`
     }));
   }
@@ -19338,16 +19603,16 @@ function provideDotCompletion(expression, ast, content, position, project) {
 }
 function resolveTypeFromName(ast, name, content) {
   let found = null;
-  walkAst2(ast, (node) => {
+  walkAst(ast, (node) => {
     if (found) return false;
     if (isStateVariableDeclaration(node) && node.name === name) {
-      found = extractTypeName2(node.typeName);
+      found = extractTypeName(node.typeName);
       return false;
     }
     if (isFunctionDefinition(node) && node.name === name) {
       const retParams = node.returnParameters?.parameters;
       if (retParams && retParams.length > 0) {
-        found = extractTypeName2(retParams[0].typeName);
+        found = extractTypeName(retParams[0].typeName);
       }
       return false;
     }
@@ -19359,25 +19624,13 @@ function resolveTypeFromMember(ast, typeName, memberName, content) {
   const typeDef = findTypeByName(ast, typeName);
   if (!typeDef) return null;
   if (isContractDefinition(typeDef)) {
-    const nodes = typeDef.nodes ?? [];
-    for (const member of nodes) {
-      if (isFunctionDefinition(member) && member.name === memberName) {
-        const retParams = member.returnParameters?.parameters;
-        if (retParams && retParams.length > 0) {
-          return extractTypeName2(retParams[0].typeName);
-        }
-        return null;
-      }
-      if (isStateVariableDeclaration(member) && member.name === memberName) {
-        return extractTypeName2(member.typeName);
-      }
-    }
+    return resolveContractMemberType(typeDef, ast, memberName);
   }
   if (isStructDefinition(typeDef)) {
     const members = typeDef.members ?? [];
     for (const member of members) {
       if (member.name === memberName) {
-        return extractTypeName2(member.typeName);
+        return extractTypeName(member.typeName);
       }
     }
   }
@@ -19387,64 +19640,18 @@ function getMembersOfType(typeName, ast, content) {
   const items = [];
   const typeDef = findTypeByName(ast, typeName);
   if (typeDef && isContractDefinition(typeDef)) {
-    const nodes = typeDef.nodes ?? [];
-    for (const member of nodes) {
-      if (isFunctionDefinition(member)) {
-        const fn = member;
-        const params = fn.parameters?.parameters?.map((p) => {
-          const tn = extractTypeName2(p.typeName);
-          return `${tn} ${p.name}`;
-        }).join(", ") ?? "";
-        const docs = extractNatSpec2(fn);
-        items.push({
-          label: fn.name,
-          kind: import_vscode_languageserver6.CompletionItemKind.Function,
-          detail: `${fn.visibility} function ${fn.name}(${params})`,
-          documentation: docs ? { kind: import_vscode_languageserver6.MarkupKind.Markdown, value: docs } : void 0
-        });
-      } else if (isStateVariableDeclaration(member)) {
-        const sv = member;
-        items.push({
-          label: sv.name,
-          kind: import_vscode_languageserver6.CompletionItemKind.Property,
-          detail: `${sv.visibility} ${extractTypeName2(sv.typeName)} ${sv.name}`
-        });
-      } else if (isStructDefinition(member)) {
-        items.push({
-          label: member.name,
-          kind: import_vscode_languageserver6.CompletionItemKind.Struct
-        });
-      } else if (isEnumDefinition(member)) {
-        items.push({
-          label: member.name,
-          kind: import_vscode_languageserver6.CompletionItemKind.Enum
-        });
-      } else if (isEventDefinition(member)) {
-        items.push({
-          label: member.name,
-          kind: import_vscode_languageserver6.CompletionItemKind.Event
-        });
-      } else if (isErrorDefinition(member)) {
-        items.push({
-          label: member.name,
-          kind: import_vscode_languageserver6.CompletionItemKind.Enum
-        });
-      } else if (isModifierDefinition(member)) {
-        items.push({
-          label: member.name,
-          kind: import_vscode_languageserver6.CompletionItemKind.Function,
-          detail: "modifier"
-        });
-      }
-    }
+    return collectContractMembers(typeDef, ast, {
+      includeOwn: true,
+      includeOwnPrivate: true
+    });
   }
   if (typeDef && isStructDefinition(typeDef)) {
     const members = typeDef.members ?? [];
     for (const member of members) {
       items.push({
         label: member.name,
-        kind: import_vscode_languageserver6.CompletionItemKind.Field,
-        detail: extractTypeName2(member.typeName)
+        kind: import_vscode_languageserver7.CompletionItemKind.Field,
+        detail: extractTypeName(member.typeName)
       });
     }
   }
@@ -19453,16 +19660,16 @@ function getMembersOfType(typeName, ast, content) {
     for (const val of values) {
       items.push({
         label: val.name,
-        kind: import_vscode_languageserver6.CompletionItemKind.EnumMember,
+        kind: import_vscode_languageserver7.CompletionItemKind.EnumMember,
         detail: `enum value`
       });
     }
   }
   if (typeName.endsWith("[]") || typeName.includes("mapping")) {
     items.push(
-      { label: "push", kind: import_vscode_languageserver6.CompletionItemKind.Function, detail: "Push element to array" },
-      { label: "pop", kind: import_vscode_languageserver6.CompletionItemKind.Function, detail: "Remove last element" },
-      { label: "length", kind: import_vscode_languageserver6.CompletionItemKind.Property, detail: "uint \u2014 Array length" }
+      { label: "push", kind: import_vscode_languageserver7.CompletionItemKind.Function, detail: "Push element to array" },
+      { label: "pop", kind: import_vscode_languageserver7.CompletionItemKind.Function, detail: "Remove last element" },
+      { label: "length", kind: import_vscode_languageserver7.CompletionItemKind.Property, detail: "uint \u2014 Array length" }
     );
   }
   return items;
@@ -19470,12 +19677,12 @@ function getMembersOfType(typeName, ast, content) {
 function provideUsingLibraryCompletion(ast, content, prefix) {
   const items = [];
   const seen = /* @__PURE__ */ new Set();
-  walkAst2(ast, (node) => {
+  walkAst(ast, (node) => {
     if (node.nodeType === "LibraryDefinition" && node.name && !seen.has(node.name)) {
       seen.add(node.name);
       items.push({
         label: node.name,
-        kind: import_vscode_languageserver6.CompletionItemKind.Module,
+        kind: import_vscode_languageserver7.CompletionItemKind.Module,
         detail: "library"
       });
     }
@@ -19502,14 +19709,14 @@ function provideUsingLibraryCompletion(ast, content, prefix) {
     if (!seen.has(lib) && (!prefix || lib.toLowerCase().startsWith(prefix.toLowerCase()))) {
       items.push({
         label: lib,
-        kind: import_vscode_languageserver6.CompletionItemKind.Module,
+        kind: import_vscode_languageserver7.CompletionItemKind.Module,
         detail: "OpenZeppelin library"
       });
     }
   }
   return items;
 }
-function provideImportCompletion(partial, position, project) {
+async function provideImportCompletion(partial, position, project) {
   if (!project) return [];
   const items = [];
   const dir = partial.includes("/") ? path7.dirname(partial) : "";
@@ -19520,17 +19727,17 @@ function provideImportCompletion(partial, position, project) {
   ];
   for (const searchDir of searchDirs) {
     const targetDir = dir ? path7.join(searchDir, dir) : searchDir;
-    if (!fs6.existsSync(targetDir)) continue;
-    const entries = fs6.readdirSync(targetDir, { withFileTypes: true });
+    const entries = await readdirCached(targetDir);
+    if (entries.length === 0) continue;
     for (const entry of entries) {
       if (!entry.name.endsWith(".sol")) continue;
       if (prefix && !entry.name.startsWith(prefix)) continue;
       const filePath = dir ? `${dir}/${entry.name}` : entry.name;
       items.push({
         label: entry.name,
-        kind: import_vscode_languageserver6.CompletionItemKind.File,
+        kind: import_vscode_languageserver7.CompletionItemKind.File,
         detail: filePath,
-        textEdit: import_vscode_languageserver6.TextEdit.replace(
+        textEdit: import_vscode_languageserver7.TextEdit.replace(
           {
             start: { line: position.line, character: position.character - partial.length },
             end: position
@@ -19546,9 +19753,9 @@ function provideImportCompletion(partial, position, project) {
       const dirPath = dir ? `${dir}/${entry.name}` : entry.name;
       items.push({
         label: entry.name + "/",
-        kind: import_vscode_languageserver6.CompletionItemKind.Folder,
+        kind: import_vscode_languageserver7.CompletionItemKind.Folder,
         detail: dirPath,
-        textEdit: import_vscode_languageserver6.TextEdit.replace(
+        textEdit: import_vscode_languageserver7.TextEdit.replace(
           {
             start: { line: position.line, character: position.character - partial.length },
             end: position
@@ -19563,18 +19770,18 @@ function provideImportCompletion(partial, position, project) {
 function collectIdentifiers(ast, content, prefix) {
   const items = [];
   const seen = /* @__PURE__ */ new Set();
-  walkAst2(ast, (node) => {
+  walkAst(ast, (node) => {
     if (node.name && node.name.startsWith(prefix) && !seen.has(node.name)) {
       seen.add(node.name);
-      let kind = import_vscode_languageserver6.CompletionItemKind.Variable;
-      if (isContractDefinition(node)) kind = import_vscode_languageserver6.CompletionItemKind.Class;
-      else if (isFunctionDefinition(node)) kind = import_vscode_languageserver6.CompletionItemKind.Function;
-      else if (isStateVariableDeclaration(node)) kind = import_vscode_languageserver6.CompletionItemKind.Property;
-      else if (isStructDefinition(node)) kind = import_vscode_languageserver6.CompletionItemKind.Struct;
-      else if (isEnumDefinition(node)) kind = import_vscode_languageserver6.CompletionItemKind.Enum;
-      else if (isEventDefinition(node)) kind = import_vscode_languageserver6.CompletionItemKind.Event;
-      else if (isErrorDefinition(node)) kind = import_vscode_languageserver6.CompletionItemKind.Enum;
-      else if (isModifierDefinition(node)) kind = import_vscode_languageserver6.CompletionItemKind.Function;
+      let kind = import_vscode_languageserver7.CompletionItemKind.Variable;
+      if (isContractDefinition(node)) kind = import_vscode_languageserver7.CompletionItemKind.Class;
+      else if (isFunctionDefinition(node)) kind = import_vscode_languageserver7.CompletionItemKind.Function;
+      else if (isStateVariableDeclaration(node)) kind = import_vscode_languageserver7.CompletionItemKind.Property;
+      else if (isStructDefinition(node)) kind = import_vscode_languageserver7.CompletionItemKind.Struct;
+      else if (isEnumDefinition(node)) kind = import_vscode_languageserver7.CompletionItemKind.Enum;
+      else if (isEventDefinition(node)) kind = import_vscode_languageserver7.CompletionItemKind.Event;
+      else if (isErrorDefinition(node)) kind = import_vscode_languageserver7.CompletionItemKind.Enum;
+      else if (isModifierDefinition(node)) kind = import_vscode_languageserver7.CompletionItemKind.Function;
       items.push({
         label: node.name,
         kind,
@@ -19587,7 +19794,7 @@ function collectIdentifiers(ast, content, prefix) {
 }
 function findTypeByName(ast, name) {
   let found = null;
-  walkAst2(ast, (node) => {
+  walkAst(ast, (node) => {
     if (found) return false;
     if (node.name === name && (isContractDefinition(node) || isStructDefinition(node) || isEnumDefinition(node))) {
       found = node;
@@ -19597,53 +19804,124 @@ function findTypeByName(ast, name) {
   });
   return found;
 }
-function extractTypeName2(node) {
-  if (!node) return "unknown";
-  if (node.name) return node.name;
-  if (node.nodeType === "ElementaryTypeName") return node.name;
-  if (node.nodeType === "UserDefinedTypeName") return node.name;
-  if (node.nodeType === "Mapping") {
-    const key = extractTypeName2(node.keyType);
-    const value = extractTypeName2(node.valueType);
-    return `mapping(${key} => ${value})`;
-  }
-  if (node.nodeType === "ArrayTypeName") {
-    const base = extractTypeName2(node.baseType);
-    return `${base}[]`;
-  }
-  const typeDesc = node.typeDescriptions;
-  return typeDesc?.typeString ?? "unknown";
+function collectContractMembers(contract, ast, opts = {}) {
+  const items = [];
+  const seen = /* @__PURE__ */ new Set();
+  const visited = /* @__PURE__ */ new Set();
+  collectContractMembersInto(contract, ast, items, seen, visited, {
+    includeOwn: opts.includeOwn !== false,
+    includeOwnPrivate: opts.includeOwnPrivate === true
+  });
+  return items;
 }
-function extractNatSpec2(node) {
-  const doc = node.documentation;
-  if (!doc?.text) return "";
-  const lines = doc.text.split("\n").map((l) => l.trim()).filter(Boolean);
-  const parts = [];
-  for (const line of lines) {
-    if (line.startsWith("@notice")) {
-      parts.push(line.replace("@notice", "").trim());
-    } else if (line.startsWith("@dev")) {
-      parts.push(line.replace("@dev", "").trim());
-    } else if (line.startsWith("@param")) {
-      parts.push(line);
-    } else if (line.startsWith("@return")) {
-      parts.push(line);
+function collectContractMembersInto(contract, ast, items, seen, visited, opts) {
+  if (visited.has(contract.id)) return;
+  visited.add(contract.id);
+  if (opts.includeOwn) {
+    const nodes = contract.nodes ?? [];
+    for (const member of nodes) {
+      if (member.name && seen.has(member.name)) continue;
+      const vis = member.visibility;
+      if (vis === "private") {
+        if (!opts.includeOwnPrivate) continue;
+      }
+      const item = contractMemberToCompletionItem(member);
+      if (item) {
+        if (member.name) seen.add(member.name);
+        items.push(item);
+      }
     }
   }
-  return parts.join("\n");
-}
-function walkAst2(node, callback) {
-  if (!callback(node)) return;
-  if (node.nodes) {
-    for (const child of node.nodes) {
-      walkAst2(child, callback);
+  const baseContracts = contract.baseContracts ?? [];
+  for (const base of baseContracts) {
+    const baseName = base.baseName?.name;
+    if (!baseName) continue;
+    const baseType = findTypeByName(ast, baseName);
+    if (baseType && isContractDefinition(baseType)) {
+      collectContractMembersInto(baseType, ast, items, seen, visited, {
+        includeOwn: true,
+        includeOwnPrivate: false
+      });
     }
   }
+}
+function contractMemberToCompletionItem(member) {
+  if (isFunctionDefinition(member)) {
+    const fn = member;
+    const params = fn.parameters?.parameters?.map((p) => {
+      const tn = extractTypeName(p.typeName);
+      return `${tn} ${p.name}`;
+    }).join(", ") ?? "";
+    const docs = extractNatSpec(fn);
+    return {
+      label: fn.name,
+      kind: import_vscode_languageserver7.CompletionItemKind.Function,
+      detail: `${fn.visibility} function ${fn.name}(${params})`,
+      documentation: docs ? { kind: import_vscode_languageserver7.MarkupKind.Markdown, value: docs } : void 0
+    };
+  }
+  if (isStateVariableDeclaration(member)) {
+    const sv = member;
+    return {
+      label: sv.name,
+      kind: import_vscode_languageserver7.CompletionItemKind.Property,
+      detail: `${sv.visibility} ${extractTypeName(sv.typeName)} ${sv.name}`
+    };
+  }
+  if (isStructDefinition(member)) {
+    return { label: member.name, kind: import_vscode_languageserver7.CompletionItemKind.Struct };
+  }
+  if (isEnumDefinition(member)) {
+    return { label: member.name, kind: import_vscode_languageserver7.CompletionItemKind.Enum };
+  }
+  if (isEventDefinition(member)) {
+    return { label: member.name, kind: import_vscode_languageserver7.CompletionItemKind.Event };
+  }
+  if (isErrorDefinition(member)) {
+    return { label: member.name, kind: import_vscode_languageserver7.CompletionItemKind.Enum };
+  }
+  if (isModifierDefinition(member)) {
+    return { label: member.name, kind: import_vscode_languageserver7.CompletionItemKind.Function, detail: "modifier" };
+  }
+  return void 0;
+}
+function resolveContractMemberType(contract, ast, memberName) {
+  const visited = /* @__PURE__ */ new Set();
+  return resolveContractMemberTypeImpl(contract, ast, memberName, visited);
+}
+function resolveContractMemberTypeImpl(contract, ast, memberName, visited) {
+  if (visited.has(contract.id)) return null;
+  visited.add(contract.id);
+  const nodes = contract.nodes ?? [];
+  for (const member of nodes) {
+    if (member.name !== memberName) continue;
+    if (isFunctionDefinition(member)) {
+      const retParams = member.returnParameters?.parameters;
+      if (retParams && retParams.length > 0) {
+        return extractTypeName(retParams[0].typeName);
+      }
+      return null;
+    }
+    if (isStateVariableDeclaration(member)) {
+      return extractTypeName(member.typeName);
+    }
+  }
+  const baseContracts = contract.baseContracts ?? [];
+  for (const base of baseContracts) {
+    const baseName = base.baseName?.name;
+    if (!baseName) continue;
+    const baseType = findTypeByName(ast, baseName);
+    if (baseType && isContractDefinition(baseType)) {
+      const result = resolveContractMemberTypeImpl(baseType, ast, memberName, visited);
+      if (result) return result;
+    }
+  }
+  return null;
 }
 function findEnclosingContract(ast, position, content) {
   let found = null;
-  const offset = positionToOffset2(content, position);
-  walkAst2(ast, (node) => {
+  const offset = positionToOffset(content, position);
+  walkAst(ast, (node) => {
     if (found) return false;
     if (isContractDefinition(node) && node.src) {
       const parsed = parseSrc(node.src);
@@ -19660,6 +19938,7 @@ function provideNatSpecCompletion(ast, position, content) {
   const items = [];
   const enclosingContract = findEnclosingContract(ast, position, content);
   const enclosingFunction = findEnclosingFunction(ast, position, content);
+  const enclosingEvent = findEnclosingEvent(ast, position, content);
   if (enclosingFunction) {
     const fn = enclosingFunction;
     const params = fn.parameters?.parameters ?? [];
@@ -19682,11 +19961,51 @@ function provideNatSpecCompletion(ast, position, content) {
 `;
     }
     items.push({
-      label: "/** NatSpec block */",
-      kind: import_vscode_languageserver6.CompletionItemKind.Snippet,
+      label: "/** NatSpec block for function */",
+      kind: import_vscode_languageserver7.CompletionItemKind.Snippet,
       insertText: autoBlock.trimEnd(),
-      insertTextFormat: import_vscode_languageserver6.InsertTextFormat.Snippet,
-      detail: `Auto-generate NatSpec for ${fn.name ?? "function"} with ${params.length} params`
+      insertTextFormat: import_vscode_languageserver7.InsertTextFormat.Snippet,
+      detail: `Auto-generate NatSpec for ${fn.name ?? "function"} with ${params.length} params, ${returnParams.length} returns`
+    });
+  }
+  if (enclosingContract && !enclosingFunction) {
+    const contractName = enclosingContract.name ?? "Contract";
+    const contractKind = enclosingContract.contractKind ?? "contract";
+    let contractBlock = "";
+    contractBlock += `@title ${contractName}
+`;
+    contractBlock += "@author ${1:Author name}\n";
+    contractBlock += `@notice \${2:Explain to an end user what this ${contractKind} does}
+`;
+    contractBlock += "@dev ${3:Explain to a developer any extra details}\n";
+    items.push({
+      label: "/** NatSpec block for contract */",
+      kind: import_vscode_languageserver7.CompletionItemKind.Snippet,
+      insertText: contractBlock.trimEnd(),
+      insertTextFormat: import_vscode_languageserver7.InsertTextFormat.Snippet,
+      detail: `Auto-generate NatSpec for ${contractKind} ${contractName}`
+    });
+  }
+  if (enclosingEvent) {
+    const eventName = enclosingEvent.name ?? "Event";
+    const eventParams = enclosingEvent.parameters?.parameters ?? [];
+    let eventBlock = "";
+    eventBlock += `@notice \${1:Emit when ...}
+`;
+    eventBlock += "@dev ${2:Developer details}\n";
+    for (let i = 0; i < eventParams.length; i++) {
+      const p = eventParams[i];
+      const paramName = p.name ?? `param${i}`;
+      const snippetIndex = i + 3;
+      eventBlock += `@param ${paramName} \${${snippetIndex}:${paramName} description}
+`;
+    }
+    items.push({
+      label: "/** NatSpec block for event */",
+      kind: import_vscode_languageserver7.CompletionItemKind.Snippet,
+      insertText: eventBlock.trimEnd(),
+      insertTextFormat: import_vscode_languageserver7.InsertTextFormat.Snippet,
+      detail: `Auto-generate NatSpec for event ${eventName} with ${eventParams.length} params`
     });
   }
   const tags = [
@@ -19696,18 +20015,22 @@ function provideNatSpecCompletion(ast, position, content) {
     ["@author", "@author ${1:The name of the author}", "Author name"],
     ["@title", "@title ${1:A title that should describe this}", "Title"]
   ];
+  if (enclosingFunction || enclosingEvent) {
+    tags.push(
+      ["@param", "@param ${1:name} ${2:Describe the parameter}", "Parameter documentation"]
+    );
+  }
   if (enclosingFunction) {
     tags.push(
-      ["@param", "@param ${1:name} ${2:Describe the parameter}", "Parameter documentation"],
       ["@return", "@return ${1:Describe the return value}", "Return value documentation"]
     );
   }
   for (const [label, snippet, desc] of tags) {
     items.push({
       label,
-      kind: import_vscode_languageserver6.CompletionItemKind.Property,
+      kind: import_vscode_languageserver7.CompletionItemKind.Property,
       insertText: snippet,
-      insertTextFormat: import_vscode_languageserver6.InsertTextFormat.Snippet,
+      insertTextFormat: import_vscode_languageserver7.InsertTextFormat.Snippet,
       detail: desc
     });
   }
@@ -19715,8 +20038,8 @@ function provideNatSpecCompletion(ast, position, content) {
 }
 function findEnclosingFunction(ast, position, content) {
   let found = null;
-  const offset = positionToOffset2(content, position);
-  walkAst2(ast, (node) => {
+  const offset = positionToOffset(content, position);
+  walkAst(ast, (node) => {
     if (found) return false;
     if (isFunctionDefinition(node) && node.src) {
       const parsed = parseSrc(node.src);
@@ -19729,21 +20052,206 @@ function findEnclosingFunction(ast, position, content) {
   });
   return found;
 }
-function positionToOffset2(content, position) {
-  let offset = 0;
-  const lines = content.split("\n");
-  for (let i = 0; i < position.line && i < lines.length; i++) {
-    offset += lines[i].length + 1;
+function findVariableDeclarationsInScope(ast, offset, content) {
+  const enclosingFunction = findEnclosingFunctionByOffset(ast, offset);
+  if (!enclosingFunction) return [];
+  const fn = enclosingFunction;
+  const results = [];
+  const params = fn.parameters?.parameters ?? [];
+  for (const param of params) {
+    if (param.name) {
+      results.push({
+        name: param.name,
+        typeName: extractTypeName(param.typeName),
+        declOffset: 0,
+        // params are always in scope
+        blockOffset: 0
+      });
+    }
   }
-  return offset + position.character;
+  const body = fn.body;
+  if (body) {
+    collectDeclarationsInScope(body, offset, results);
+  }
+  const enclosingContract = findEnclosingContractByOffset(ast, offset);
+  if (enclosingContract) {
+    const contract = enclosingContract;
+    const nodes = contract.nodes ?? [];
+    for (const member of nodes) {
+      if (isStateVariableDeclaration(member) && member.name) {
+        results.push({
+          name: member.name,
+          typeName: extractTypeName(member.typeName),
+          declOffset: 0,
+          // state variables are always in scope within the contract
+          blockOffset: 0
+        });
+      }
+    }
+  }
+  return results;
+}
+function findEnclosingFunctionByOffset(ast, offset) {
+  let found = null;
+  walkAst(ast, (node) => {
+    if (found) return false;
+    if (isFunctionDefinition(node) && node.src) {
+      const parsed = parseSrc(node.src);
+      if (parsed && offset >= parsed.start && offset <= parsed.start + parsed.length) {
+        found = node;
+        return false;
+      }
+    }
+    return true;
+  });
+  return found;
+}
+function findEnclosingContractByOffset(ast, offset) {
+  let found = null;
+  walkAst(ast, (node) => {
+    if (found) return false;
+    if (isContractDefinition(node) && node.src) {
+      const parsed = parseSrc(node.src);
+      if (parsed && offset >= parsed.start && offset <= parsed.start + parsed.length) {
+        found = node;
+        return false;
+      }
+    }
+    return true;
+  });
+  return found;
+}
+function collectDeclarationsInScope(node, targetOffset, results) {
+  if (node.nodeType !== "Block") return;
+  const blockParsed = parseSrc(node.src);
+  if (!blockParsed) return;
+  const blockStart = blockParsed.start;
+  const blockEnd = blockStart + blockParsed.length;
+  if (targetOffset < blockStart || targetOffset > blockEnd) return;
+  const statements = node.statements ?? [];
+  for (const stmt of statements) {
+    if (!stmt.src) continue;
+    const stmtParsed = parseSrc(stmt.src);
+    if (!stmtParsed) continue;
+    if (stmtParsed.start >= targetOffset) continue;
+    if (stmt.nodeType === "VariableDeclarationStatement") {
+      const declarations = stmt.declarations ?? [];
+      for (const decl of declarations) {
+        if (decl.name && decl.src) {
+          const declParsed = parseSrc(decl.src);
+          if (declParsed && declParsed.start < targetOffset) {
+            results.push({
+              name: decl.name,
+              typeName: extractTypeName(decl.typeName),
+              declOffset: declParsed.start,
+              blockOffset: blockStart
+            });
+          }
+        }
+      }
+    }
+    if (stmt.nodeType === "ForStatement") {
+      const initializations = stmt.initializations ?? [];
+      for (const init of initializations) {
+        if (init.nodeType === "VariableDeclarationStatement") {
+          const declarations = init.declarations ?? [];
+          for (const decl of declarations) {
+            if (decl.name && decl.src) {
+              const declParsed = parseSrc(decl.src);
+              if (declParsed && declParsed.start < targetOffset) {
+                results.push({
+                  name: decl.name,
+                  typeName: extractTypeName(decl.typeName),
+                  declOffset: declParsed.start,
+                  blockOffset: blockStart
+                });
+              }
+            }
+          }
+        }
+      }
+      const body = stmt.body;
+      if (body) {
+        collectDeclarationsInScope(body, targetOffset, results);
+      }
+    }
+    collectNestedBlockDeclarations(stmt, targetOffset, results);
+  }
+}
+function collectNestedBlockDeclarations(node, targetOffset, results) {
+  if (node.nodeType === "IfStatement") {
+    const trueBody = node.trueBody;
+    const falseBody = node.falseBody;
+    if (trueBody) collectDeclarationsInScope(trueBody, targetOffset, results);
+    if (falseBody) collectDeclarationsInScope(falseBody, targetOffset, results);
+  }
+  if (node.nodeType === "WhileStatement") {
+    const body = node.body;
+    if (body) collectDeclarationsInScope(body, targetOffset, results);
+  }
+  if (node.nodeType === "DoWhileStatement") {
+    const body = node.body;
+    if (body) collectDeclarationsInScope(body, targetOffset, results);
+  }
+  if (node.nodeType === "UncheckedStatement") {
+    const body = node.body;
+    if (body) collectDeclarationsInScope(body, targetOffset, results);
+  }
+  if (node.nodeType === "Block") {
+    collectDeclarationsInScope(node, targetOffset, results);
+  }
+  if (node.nodeType === "TryStatement") {
+    const body = node.body;
+    if (body) collectDeclarationsInScope(body, targetOffset, results);
+    const clauses = node.clauses ?? [];
+    for (const clause of clauses) {
+      if (clause.nodeType === "TryCatchClause") {
+        const parameters = clause.parameters;
+        if (parameters && Array.isArray(parameters)) {
+          for (const param of parameters) {
+            if (param.name && param.src) {
+              const paramParsed = parseSrc(param.src);
+              if (paramParsed && paramParsed.start < targetOffset) {
+                results.push({
+                  name: param.name,
+                  typeName: extractTypeName(param.typeName),
+                  declOffset: paramParsed.start,
+                  blockOffset: 0
+                });
+              }
+            }
+          }
+        }
+        const clauseBody = clause.block;
+        if (clauseBody) {
+          collectDeclarationsInScope(clauseBody, targetOffset, results);
+        }
+      }
+    }
+  }
+}
+function findEnclosingEvent(ast, position, content) {
+  let found = null;
+  const offset = positionToOffset(content, position);
+  walkAst(ast, (node) => {
+    if (found) return false;
+    if (isEventDefinition(node) && node.src) {
+      const parsed = parseSrc(node.src);
+      if (parsed && offset >= parsed.start && offset <= parsed.start + parsed.length) {
+        found = node;
+        return false;
+      }
+    }
+    return true;
+  });
+  return found;
 }
 
 // src/features/definition.ts
-var import_vscode_languageserver7 = __toESM(require_main4());
-var fs7 = __toESM(require("fs"));
+var import_vscode_languageserver8 = __toESM(require_main4());
+var fs8 = __toESM(require("fs"));
 var path8 = __toESM(require("path"));
-init_traversal();
-function provideDefinition(ast, document, position, compileResult, project) {
+async function provideDefinition(ast, document, position, compileResult, project) {
   const content = document.getText();
   const node = findNodeAtPosition(ast, content, position);
   if (!node) return null;
@@ -19757,7 +20265,7 @@ function provideDefinition(ast, document, position, compileResult, project) {
     return resolveIdentifier(node, ast, content, project, sourceFileMap);
   }
   if (isMemberAccess(node)) {
-    return resolveMemberAccess(node, ast, content, project, sourceFileMap);
+    return await resolveMemberAccess(node, ast, content, project, sourceFileMap);
   }
   return null;
 }
@@ -19766,61 +20274,74 @@ function resolveImport(node, project) {
   const importPath = node.file;
   const resolved = applyRemappings(importPath, project);
   if (path8.isAbsolute(resolved)) {
-    if (fs7.existsSync(resolved)) {
-      return import_vscode_languageserver7.Location.create(
+    if (fs8.existsSync(resolved)) {
+      return import_vscode_languageserver8.Location.create(
         URI.file(resolved).toString(),
-        import_vscode_languageserver7.Range.create(0, 0, 0, 0)
+        import_vscode_languageserver8.Range.create(0, 0, 0, 0)
       );
     }
   }
   const projectPath = path8.join(project.root, resolved);
-  if (fs7.existsSync(projectPath)) {
-    return import_vscode_languageserver7.Location.create(
+  if (fs8.existsSync(projectPath)) {
+    return import_vscode_languageserver8.Location.create(
       URI.file(projectPath).toString(),
-      import_vscode_languageserver7.Range.create(0, 0, 0, 0)
+      import_vscode_languageserver8.Range.create(0, 0, 0, 0)
     );
   }
   for (const lib of project.config.libs) {
     const libPath = path8.join(project.root, lib, resolved);
-    if (fs7.existsSync(libPath)) {
-      return import_vscode_languageserver7.Location.create(
+    if (fs8.existsSync(libPath)) {
+      return import_vscode_languageserver8.Location.create(
         URI.file(libPath).toString(),
-        import_vscode_languageserver7.Range.create(0, 0, 0, 0)
+        import_vscode_languageserver8.Range.create(0, 0, 0, 0)
       );
     }
   }
   const srcPath = path8.join(project.root, project.config.src, resolved);
-  if (fs7.existsSync(srcPath)) {
-    return import_vscode_languageserver7.Location.create(
+  if (fs8.existsSync(srcPath)) {
+    return import_vscode_languageserver8.Location.create(
       URI.file(srcPath).toString(),
-      import_vscode_languageserver7.Range.create(0, 0, 0, 0)
+      import_vscode_languageserver8.Range.create(0, 0, 0, 0)
     );
   }
   return null;
 }
 function resolveIdentifier(node, ast, content, project, sourceFileMap) {
   if (node.referencedDeclaration !== void 0) {
-    const def = findNodeById2(ast, node.referencedDeclaration);
+    const def = findNodeById(ast, node.referencedDeclaration);
     if (def?.src) {
       const range = srcToRange(def.src, content);
       if (range) {
         const uri = documentUri(def, sourceFileMap);
-        return import_vscode_languageserver7.Location.create(uri, range);
+        return import_vscode_languageserver8.Location.create(uri, range);
       }
     }
   }
   const localDef = findDefinitionByNameLocation(ast, node.name, content, sourceFileMap);
   if (localDef) return localDef;
   if (project && node.name) {
-    const importPath = findImportForSymbol2(ast, node.name);
+    const importPath = findImportForSymbol(ast, node.name);
     if (importPath) {
       return resolveImportPath(importPath, project);
     }
   }
   return null;
 }
-function resolveMemberAccess(node, ast, content, project, sourceFileMap) {
+async function resolveMemberAccess(node, ast, content, project, sourceFileMap) {
   const memberName = node.memberName;
+  const refId = node.referencedDeclaration;
+  if (typeof refId === "number" && refId !== -1) {
+    const def = findNodeById(ast, refId);
+    if (def?.src) {
+      const range = srcToRange(def.src, content);
+      if (range) {
+        const uri = documentUri(def, sourceFileMap);
+        if (uri) return import_vscode_languageserver8.Location.create(uri, range);
+      }
+    }
+  }
+  const scopedResult = resolveScopedMemberAccess(node, ast, content, sourceFileMap);
+  if (scopedResult) return scopedResult;
   const results = [];
   const walk = (n) => {
     if (n.name === memberName && (isFunctionDefinition(n) || isStateVariableDeclaration(n) || isStructDefinition(n) || isEnumDefinition(n) || isEventDefinition(n) || isErrorDefinition(n) || isModifierDefinition(n))) {
@@ -19828,7 +20349,7 @@ function resolveMemberAccess(node, ast, content, project, sourceFileMap) {
         const range = srcToRange(n.src, content);
         if (range) {
           results.push(
-            import_vscode_languageserver7.Location.create(documentUri(n, sourceFileMap), range)
+            import_vscode_languageserver8.Location.create(documentUri(n, sourceFileMap), range)
           );
         }
       }
@@ -19840,7 +20361,58 @@ function resolveMemberAccess(node, ast, content, project, sourceFileMap) {
     }
   };
   walk(ast);
-  return results.length > 0 ? results[0] : null;
+  if (results.length > 0) return results[0];
+  if (project) {
+    const entries = globalIndex.findByName(memberName);
+    for (const entry of entries) {
+      if (entry.node.src) {
+        const entryContent = readFileContent2(entry.filePath);
+        if (entryContent) {
+          const range = srcToRange(entry.node.src, entryContent);
+          if (range) {
+            return import_vscode_languageserver8.Location.create(entry.uri, range);
+          }
+        }
+      }
+    }
+  }
+  return null;
+}
+function resolveScopedMemberAccess(node, ast, content, sourceFileMap) {
+  const expression = node.expression;
+  if (!expression) return null;
+  if (!isIdentifier(expression) || !expression.name) return null;
+  const containerName = expression.name;
+  const memberName = node.memberName;
+  const containerEntries = globalIndex.findByNameAndKind(containerName, "contract").concat(globalIndex.findByNameAndKind(containerName, "interface")).concat(globalIndex.findByNameAndKind(containerName, "library"));
+  if (containerEntries.length === 0) return null;
+  for (const entry of containerEntries) {
+    const contractNode = entry.node;
+    if (!contractNode.nodes) continue;
+    const memberContent = readFileContent2(entry.filePath) ?? content;
+    const found = findMemberInAst(contractNode.nodes, memberName);
+    if (found?.src) {
+      const memberRange = srcToRange(found.src, memberContent);
+      if (memberRange) {
+        return import_vscode_languageserver8.Location.create(entry.uri, memberRange);
+      }
+    }
+  }
+  return null;
+}
+function findMemberInAst(nodes, memberName) {
+  for (const child of nodes) {
+    if (child.name === memberName) {
+      if (isStructDefinition(child) || isEnumDefinition(child) || isEventDefinition(child) || isErrorDefinition(child) || isFunctionDefinition(child) || isStateVariableDeclaration(child) || isModifierDefinition(child)) {
+        return child;
+      }
+    }
+    if (child.nodes) {
+      const found = findMemberInAst(child.nodes, memberName);
+      if (found) return found;
+    }
+  }
+  return null;
 }
 function applyRemappings(importPath, project) {
   const sorted = Array.from(project.remappings.entries()).sort(
@@ -19865,12 +20437,12 @@ function resolveImportSymbolDef(importNode, content, position, ast, sourceFileMa
     if (offset >= parsed.start && offset <= parsed.start + parsed.length) {
       const refId = foreign.referencedDeclaration;
       if (refId !== void 0) {
-        const def = findNodeById2(ast, refId);
+        const def = findNodeById(ast, refId);
         if (def?.src) {
           const range = srcToRange(def.src, content);
           if (range) {
             const uri = documentUri(def, sourceFileMap);
-            return import_vscode_languageserver7.Location.create(uri, range);
+            return import_vscode_languageserver8.Location.create(uri, range);
           }
         }
       }
@@ -19879,60 +20451,23 @@ function resolveImportSymbolDef(importNode, content, position, ast, sourceFileMa
   }
   return null;
 }
-function findImportForSymbol2(ast, symbolName) {
-  let result = null;
-  const walk = (node) => {
-    if (result) return;
-    if (isImportDirective(node) && node.symbolAliases) {
-      for (const alias of node.symbolAliases) {
-        const foreign = alias.foreign;
-        if (foreign?.name === symbolName) {
-          result = node.file || null;
-          return;
-        }
-      }
-    }
-    if (node.nodes) {
-      for (const child of node.nodes) walk(child);
-    }
-  };
-  walk(ast);
-  return result;
-}
 function resolveImportPath(importPath, project) {
   const resolved = applyRemappings(importPath, project);
   const projectPath = path8.join(project.root, resolved);
-  if (fs7.existsSync(projectPath)) {
-    return import_vscode_languageserver7.Location.create(URI.file(projectPath).toString(), import_vscode_languageserver7.Range.create(0, 0, 0, 0));
+  if (fs8.existsSync(projectPath)) {
+    return import_vscode_languageserver8.Location.create(URI.file(projectPath).toString(), import_vscode_languageserver8.Range.create(0, 0, 0, 0));
   }
   for (const lib of project.config.libs) {
     const libPath = path8.join(project.root, lib, resolved);
-    if (fs7.existsSync(libPath)) {
-      return import_vscode_languageserver7.Location.create(URI.file(libPath).toString(), import_vscode_languageserver7.Range.create(0, 0, 0, 0));
+    if (fs8.existsSync(libPath)) {
+      return import_vscode_languageserver8.Location.create(URI.file(libPath).toString(), import_vscode_languageserver8.Range.create(0, 0, 0, 0));
     }
   }
   const srcPath = path8.join(project.root, project.config.src, resolved);
-  if (fs7.existsSync(srcPath)) {
-    return import_vscode_languageserver7.Location.create(URI.file(srcPath).toString(), import_vscode_languageserver7.Range.create(0, 0, 0, 0));
+  if (fs8.existsSync(srcPath)) {
+    return import_vscode_languageserver8.Location.create(URI.file(srcPath).toString(), import_vscode_languageserver8.Range.create(0, 0, 0, 0));
   }
   return null;
-}
-function findNodeById2(ast, id) {
-  let found = null;
-  const walk = (node) => {
-    if (found) return;
-    if (node.id === id) {
-      found = node;
-      return;
-    }
-    if (node.nodes) {
-      for (const child of node.nodes) {
-        walk(child);
-      }
-    }
-  };
-  walk(ast);
-  return found;
 }
 function findDefinitionByNameLocation(ast, name, content, sourceFileMap) {
   let found = null;
@@ -19954,7 +20489,7 @@ function findDefinitionByNameLocation(ast, name, content, sourceFileMap) {
     const range = srcToRange(foundNode.src, content);
     if (range) {
       const uri = documentUri(foundNode, sourceFileMap);
-      return import_vscode_languageserver7.Location.create(uri, range);
+      return import_vscode_languageserver8.Location.create(uri, range);
     }
   }
   return null;
@@ -19972,336 +20507,8 @@ function documentUri(node, sourceFileMap) {
   return "";
 }
 
-// src/features/codeAction.ts
-var import_vscode_languageserver8 = __toESM(require_main4());
-var ERC20_SNIPPET = `// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
-
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-
-contract MyToken is ERC20 {
-    constructor(uint256 initialSupply) ERC20("MyToken", "MTK") {
-        _mint(msg.sender, initialSupply);
-    }
-}`;
-var ERC721_SNIPPET = `// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
-
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-
-contract MyNFT is ERC721 {
-    uint256 private _nextTokenId;
-
-    constructor() ERC721("MyNFT", "MNFT") {}
-
-    function mint(address to) public returns (uint256) {
-        uint256 tokenId = _nextTokenId++;
-        _mint(to, tokenId);
-        return tokenId;
-    }
-}`;
-var ERC1155_SNIPPET = `// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
-
-import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
-
-contract MyMultiToken is ERC1155 {
-    constructor() ERC1155("") {}
-
-    function mint(address to, uint256 id, uint256 amount) public {
-        _mint(to, id, amount, "");
-    }
-}`;
-var OWNABLE_SNIPPET = `// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
-
-import "@openzeppelin/contracts/access/Ownable.sol";
-
-contract MyContract is Ownable {
-    constructor() Ownable(msg.sender) {}
-}`;
-function provideCodeActions(ast, document, range, diagnostics, _compileResult) {
-  const actions = [];
-  const content = document.getText();
-  const trimmed = content.replace(/\/\/.*$/gm, "").replace(/\/\*[\s\S]*?\*\//g, "").trim();
-  if (trimmed === "" || trimmed === "pragma solidity ^0.8.0;") {
-    actions.push(createSnippetAction(document, "Create ERC-20 Token", "erc20-snippet", ERC20_SNIPPET));
-    actions.push(createSnippetAction(document, "Create ERC-721 NFT", "erc721-snippet", ERC721_SNIPPET));
-    actions.push(createSnippetAction(document, "Create ERC-1155 Multi-Token", "erc1155-snippet", ERC1155_SNIPPET));
-    actions.push(createSnippetAction(document, "Create Ownable Contract", "ownable-snippet", OWNABLE_SNIPPET));
-  }
-  for (const diag of diagnostics) {
-    const fix = diagnosticToCodeAction(diag, document, diagnostics);
-    if (fix) actions.push(fix);
-  }
-  return actions;
-}
-function diagnosticToCodeAction(diag, document, allDiagnostics) {
-  const msg = diag.message.toLowerCase();
-  const line = diag.range.start.line;
-  const lineText = document.getText({
-    start: { line, character: 0 },
-    end: { line: line + 1, character: 0 }
-  });
-  if (msg.includes("spdx license") || msg.includes("license identifier")) {
-    return createInsertAction(
-      document,
-      diag,
-      "Add SPDX-License-Identifier: MIT",
-      { line: 0, character: 0 },
-      "// SPDX-License-Identifier: MIT\n"
-    );
-  }
-  if (msg.includes("visibility") || msg.includes("no visibility specified")) {
-    const match = lineText.match(/function\s+(\w+)/);
-    if (match) {
-      const funcName = match[1];
-      const editRange = findAfterText(document, line, `function ${funcName}`);
-      return createInsertAction(
-        document,
-        diag,
-        "Add public visibility",
-        editRange,
-        " public"
-      );
-    }
-  }
-  if (msg.includes("mutability") || msg.includes("state mutability")) {
-    if (msg.includes("view") || msg.includes("can be restricted")) {
-      const editRange = findAfterKeyword(document, line, "{");
-      return createInsertAction(
-        document,
-        diag,
-        "Make function view",
-        editRange,
-        " view"
-      );
-    }
-  }
-  if (msg.includes("override") && !msg.includes("multiple")) {
-    const editRange = findAfterFunctionSig(document, line);
-    return createInsertAction(document, diag, "Add override", editRange, " override");
-  }
-  if (msg.includes("virtual")) {
-    const editRange = findAfterFunctionSig(document, line);
-    return createInsertAction(document, diag, "Add virtual", editRange, " virtual");
-  }
-  if (msg.includes("abstract") || msg.includes("unimplemented")) {
-    const editRange = findBeforeContract(document, line);
-    return createInsertAction(document, diag, "Make contract abstract", editRange, "abstract ");
-  }
-  if (msg.includes("data location") || msg.includes("storage location")) {
-    const editRange = findBeforeVariableName(document, line);
-    return createInsertAction(document, diag, "Add memory data location", editRange, " memory");
-  }
-  if (msg.includes("pragma") && msg.includes("solidity") || msg.includes("source file requires different compiler version")) {
-    const versionMatch = msg.match(/(\d+\.\d+\.\d+)/);
-    const version = versionMatch ? versionMatch[1] : "0.8.0";
-    const firstLine = document.getText({ start: { line: 0, character: 0 }, end: { line: 1, character: 0 } });
-    const insertLine = firstLine.includes("SPDX") ? 1 : 0;
-    return createInsertAction(
-      document,
-      diag,
-      `Add pragma solidity ^${version}`,
-      { line: insertLine, character: 0 },
-      `pragma solidity ^${version};
-`
-    );
-  }
-  if (msg.includes("multiple") && msg.includes("override")) {
-    const editRange = findAfterFunctionSig(document, line);
-    const baseMatch = msg.match(/override\s*(.*?)(?:\.|$)/i);
-    const bases = baseMatch ? baseMatch[1] : "";
-    return createInsertAction(
-      document,
-      diag,
-      "Add override(...)",
-      editRange,
-      ` override(${bases})`
-    );
-  }
-  if (msg.includes("missing implementation") || msg.includes("should be marked as abstract")) {
-    return createImplementInterfaceAction(diag, document, allDiagnostics);
-  }
-  return null;
-}
-function createSnippetAction(document, title, code, snippet) {
-  const diag = {
-    range: import_vscode_languageserver8.Range.create(0, 0, 0, 0),
-    message: title,
-    severity: import_vscode_languageserver8.DiagnosticSeverity.Information,
-    code,
-    source: "foundry-lsp"
-  };
-  return {
-    title,
-    kind: import_vscode_languageserver8.CodeActionKind.QuickFix,
-    diagnostics: [diag],
-    edit: {
-      changes: {
-        [document.uri]: [import_vscode_languageserver8.TextEdit.replace(fullRange(document), snippet)]
-      }
-    }
-  };
-}
-function createInsertAction(document, diag, title, position, text) {
-  return {
-    title,
-    kind: import_vscode_languageserver8.CodeActionKind.QuickFix,
-    diagnostics: [diag],
-    edit: {
-      changes: {
-        [document.uri]: [import_vscode_languageserver8.TextEdit.insert(position, text)]
-      }
-    }
-  };
-}
-function findAfterText(document, line, searchText) {
-  const lineText = document.getText({
-    start: { line, character: 0 },
-    end: { line: line + 1, character: 0 }
-  });
-  const idx = lineText.indexOf(searchText);
-  if (idx >= 0) {
-    return { line, character: idx + searchText.length };
-  }
-  return { line, character: lineText.trimEnd().length };
-}
-function findAfterKeyword(document, line, keyword) {
-  return findAfterText(document, line, keyword);
-}
-function findAfterFunctionSig(document, line) {
-  const lineText = document.getText({
-    start: { line, character: 0 },
-    end: { line: line + 1, character: 0 }
-  });
-  const match = lineText.match(/function\s+\w+\s*\([^)]*\)/);
-  if (match) {
-    return { line, character: match.index + match[0].length };
-  }
-  return { line, character: lineText.trimEnd().length };
-}
-function findBeforeContract(document, line) {
-  const lineText = document.getText({
-    start: { line, character: 0 },
-    end: { line: line + 1, character: 0 }
-  });
-  const match = lineText.match(/(contract|interface|library)\s/);
-  if (match) {
-    return { line, character: match.index };
-  }
-  return { line, character: 0 };
-}
-function findBeforeVariableName(document, line) {
-  const lineText = document.getText({
-    start: { line, character: 0 },
-    end: { line: line + 1, character: 0 }
-  });
-  const match = lineText.match(/(\w+)\s*;/);
-  if (match) {
-    return { line, character: match.index };
-  }
-  return { line, character: lineText.trimEnd().length };
-}
-function fullRange(document) {
-  const lastLine = document.lineCount - 1;
-  const text = document.getText();
-  const lastLineStart = text.lastIndexOf("\n", text.length - 2) + 1;
-  const lastLineLength = text.length - lastLineStart;
-  return import_vscode_languageserver8.Range.create(0, 0, lastLine, lastLineLength);
-}
-function createImplementInterfaceAction(diag, document, allDiagnostics) {
-  const contractLine = diag.range.start.line;
-  const contractLineText = document.getText({
-    start: { line: contractLine, character: 0 },
-    end: { line: contractLine + 1, character: 0 }
-  });
-  const contractMatch = contractLineText.match(/contract\s+(\w+)/);
-  if (!contractMatch) return null;
-  const contractName = contractMatch[1];
-  const missingFuncs = [];
-  for (const d of allDiagnostics) {
-    if (d.message.toLowerCase().includes("missing implementation") && d !== diag) {
-      const funcLine = d.range.start.line;
-      const funcLineText = document.getText({
-        start: { line: funcLine, character: 0 },
-        end: { line: funcLine + 1, character: 0 }
-      }).trim();
-      const funcMatch = funcLineText.match(/(function\s+\w+\s*\([^)]*\)[^{;]*)/);
-      if (funcMatch) {
-        let sig = funcMatch[1].trim();
-        sig = sig.replace(/;$/, "").trim();
-        missingFuncs.push(sig);
-      }
-    }
-  }
-  if (missingFuncs.length === 0) return null;
-  let stubs = `
-    // --- Interface implementations ---
-`;
-  for (const sig of missingFuncs) {
-    const nameMatch = sig.match(/function\s+(\w+)/);
-    const funcName = nameMatch ? nameMatch[1] : "unknown";
-    const isView = sig.includes("view") || sig.includes("pure");
-    const returnsMatch = sig.match(/returns\s*\(([^)]+)\)/);
-    let body = "";
-    if (returnsMatch) {
-      const returnTypes = returnsMatch[1].split(",").map((t) => t.trim());
-      if (returnTypes.length === 1) {
-        const rt = returnTypes[0];
-        if (rt === "uint256" || rt === "uint" || rt.includes("uint")) {
-          body = "        return 0;";
-        } else if (rt === "bool") {
-          body = "        return false;";
-        } else if (rt === "address") {
-          body = "        return address(0);";
-        } else if (rt === "string memory") {
-          body = '        return "";';
-        } else if (rt === "bytes memory") {
-          body = '        return "";';
-        } else {
-          body = `        revert("${funcName}: not implemented");`;
-        }
-      } else {
-        body = `        revert("${funcName}: not implemented");`;
-      }
-    } else {
-      body = `        revert("${funcName}: not implemented");`;
-    }
-    stubs += `    ${sig} override {
-${body}
-    }
-
-`;
-  }
-  const lastLine = document.lineCount - 1;
-  let closingBraceLine = lastLine;
-  for (let i = lastLine; i >= contractLine; i--) {
-    const lineText = document.getText({
-      start: { line: i, character: 0 },
-      end: { line: i + 1, character: 0 }
-    });
-    if (lineText.trim() === "}") {
-      closingBraceLine = i;
-      break;
-    }
-  }
-  const insertPos = { line: closingBraceLine, character: 0 };
-  return {
-    title: `Implement interface functions (${missingFuncs.length} functions)`,
-    kind: import_vscode_languageserver8.CodeActionKind.QuickFix,
-    diagnostics: [diag],
-    edit: {
-      changes: {
-        [document.uri]: [import_vscode_languageserver8.TextEdit.insert(insertPos, stubs)]
-      }
-    }
-  };
-}
-
 // src/features/documentSymbol.ts
 var import_vscode_languageserver9 = __toESM(require_main4());
-init_traversal();
 var EMPTY_RANGE = import_vscode_languageserver9.Range.create(0, 0, 0, 0);
 function safeRange(src, content) {
   if (!src) return EMPTY_RANGE;
@@ -20386,14 +20593,44 @@ function nodeToSymbol(node, content) {
   return null;
 }
 function createFunctionSymbol(node, content) {
-  if (!node.name) return null;
+  const kind = node.kind;
+  const name = kind === "constructor" ? "constructor" : node.name;
+  if (!name) return null;
   const range = safeRange(node.src, content);
-  const kind = getFunctionSymbolKind(node);
+  const symbolKind = getFunctionSymbolKind(node);
+  const children = [];
+  const params = node.parameters;
+  if (params?.parameters) {
+    for (const param of params.parameters) {
+      if (param.name) {
+        children.push({
+          name: param.name,
+          kind: import_vscode_languageserver9.SymbolKind.Variable,
+          range: safeRange(param.src, content),
+          selectionRange: safeRange(param.src, content)
+        });
+      }
+    }
+  }
+  const returnParams = node.returnParameters;
+  if (returnParams?.parameters) {
+    for (const param of returnParams.parameters) {
+      if (param.name) {
+        children.push({
+          name: param.name,
+          kind: import_vscode_languageserver9.SymbolKind.Variable,
+          range: safeRange(param.src, content),
+          selectionRange: safeRange(param.src, content)
+        });
+      }
+    }
+  }
   return {
-    name: node.name,
-    kind,
+    name,
+    kind: symbolKind,
     range,
-    selectionRange: range
+    selectionRange: range,
+    children: children.length > 0 ? children : void 0
   };
 }
 function getFunctionSymbolKind(node) {
@@ -20483,10 +20720,9 @@ function createModifierSymbol(node, content) {
 
 // src/features/references.ts
 var import_vscode_languageserver10 = __toESM(require_main4());
-init_traversal();
-var fs8 = __toESM(require("fs"));
+var fs9 = __toESM(require("fs"));
 var path9 = __toESM(require("path"));
-function provideReferences(ast, document, position, compileResult, includeDeclaration) {
+async function provideReferences(ast, document, position, compileResult, includeDeclaration) {
   const content = document.getText();
   const node = findNodeAtPosition(ast, content, position);
   if (!node) return [];
@@ -20497,6 +20733,9 @@ function provideReferences(ast, document, position, compileResult, includeDeclar
   const results = [];
   const uri = document.uri;
   const cursorRange = node.src && srcToRange(node.src, content) || null;
+  if (includeDeclaration && cursorRange && !isIdentifier(node)) {
+    results.push(import_vscode_languageserver10.Location.create(uri, cursorRange));
+  }
   collectReferencesInAst(ast, content, uri, defId, results);
   const fileEntries = /* @__PURE__ */ new Map();
   const indexedEntries = globalIndex.findByName(name);
@@ -20511,9 +20750,9 @@ function provideReferences(ast, document, position, compileResult, includeDeclar
   }
   for (const [entryUri, entries] of fileEntries) {
     const filePath = entries[0].filePath;
-    const entryAst = readAstForFile(filePath);
+    const entryAst = await readAstForFile(filePath);
     if (!entryAst) continue;
-    const fileContent = readFileContent2(filePath);
+    const fileContent = await readFileContentAsync(filePath);
     if (!fileContent) continue;
     collectReferencesInAst(entryAst, fileContent, entryUri, defId, results);
   }
@@ -20562,14 +20801,7 @@ function collectReferencesInAst(ast, content, uri, targetId, results) {
     return true;
   });
 }
-function readFileContent2(filePath) {
-  try {
-    return fs8.readFileSync(filePath, "utf-8");
-  } catch {
-    return null;
-  }
-}
-function readAstForFile(filePath) {
+async function readAstForFile(filePath) {
   try {
     const outDir = path9.join(
       path9.dirname(filePath),
@@ -20577,11 +20809,13 @@ function readAstForFile(filePath) {
       "out",
       path9.basename(filePath)
     );
-    if (!fs8.existsSync(outDir)) {
-      const projectRoot = findProjectRoot(filePath);
+    const exists = await fs9.promises.access(outDir).then(() => true, () => false);
+    if (!exists) {
+      const projectRoot = await findProjectRoot(filePath);
       if (!projectRoot) return null;
       const altOutDir = path9.join(projectRoot, "out", path9.basename(filePath));
-      if (!fs8.existsSync(altOutDir)) return null;
+      const altExists = await fs9.promises.access(altOutDir).then(() => true, () => false);
+      if (!altExists) return null;
       return readAstFromOutDir(altOutDir);
     }
     return readAstFromOutDir(outDir);
@@ -20589,20 +20823,20 @@ function readAstForFile(filePath) {
     return null;
   }
 }
-function readAstFromOutDir(outDir) {
+async function readAstFromOutDir(outDir) {
   try {
-    const files = fs8.readdirSync(outDir).filter((f) => f.endsWith(".json"));
+    const files = (await fs9.promises.readdir(outDir)).filter((f) => f.endsWith(".json"));
     if (files.length === 0) return null;
-    const artifact = JSON.parse(fs8.readFileSync(path9.join(outDir, files[0]), "utf-8"));
+    const artifact = JSON.parse(await fs9.promises.readFile(path9.join(outDir, files[0]), "utf-8"));
     return artifact.ast || null;
   } catch {
     return null;
   }
 }
-function findProjectRoot(filePath) {
+async function findProjectRoot(filePath) {
   let dir = path9.dirname(filePath);
   while (dir) {
-    if (fs8.existsSync(path9.join(dir, "foundry.toml"))) {
+    if (await fs9.promises.access(path9.join(dir, "foundry.toml")).then(() => true, () => false)) {
       return dir;
     }
     const parent = path9.dirname(dir);
@@ -20615,6 +20849,24 @@ function findProjectRoot(filePath) {
 // src/features/formatting.ts
 var import_vscode_languageserver11 = __toESM(require_main4());
 var import_child_process3 = require("child_process");
+function fallbackFormat(content) {
+  const lines = content.split("\n");
+  const formatted = [];
+  for (let i = 0; i < lines.length; i++) {
+    let line = lines[i];
+    line = line.replace(/\s+$/, "");
+    const braceMatch = line.match(/^(\s*)\{\s*$/);
+    if (braceMatch && formatted.length > 0) {
+      const prevLine = formatted[formatted.length - 1];
+      if (!prevLine.endsWith("{") && !prevLine.endsWith(";")) {
+        formatted[formatted.length - 1] = prevLine + " {";
+        continue;
+      }
+    }
+    formatted.push(line);
+  }
+  return formatted.join("\n");
+}
 async function provideFormatting(document, connection2) {
   const content = document.getText();
   const uri = document.uri;
@@ -20658,8 +20910,23 @@ async function provideFormatting(document, connection2) {
       }
     });
     child.on("error", () => {
-      connection2.window.showErrorMessage("Formatting failed: forge not found or unavailable");
-      resolve2([]);
+      const formatted = fallbackFormat(content);
+      if (formatted !== content) {
+        const lastLine = document.lineCount - 1;
+        const lastLineStart = content.lastIndexOf("\n", content.length - 2) + 1;
+        const lastLineLength = content.length - lastLineStart;
+        resolve2([
+          import_vscode_languageserver11.TextEdit.replace(
+            {
+              start: { line: 0, character: 0 },
+              end: { line: lastLine, character: lastLineLength }
+            },
+            formatted
+          )
+        ]);
+      } else {
+        resolve2([]);
+      }
     });
     child.stdin.write(content);
     child.stdin.end();
@@ -20668,27 +20935,27 @@ async function provideFormatting(document, connection2) {
 
 // src/features/rename.ts
 var import_vscode_languageserver12 = __toESM(require_main4());
-init_traversal();
-var fs9 = __toESM(require("fs"));
-function provideRename(ast, document, position, newName, compileResult) {
+async function provideRename(ast, document, position, newName, compileResult) {
   const content = document.getText();
   const node = findNodeAtPosition(ast, content, position);
   if (!node) return null;
   const defId = resolveDefinitionId2(node, ast);
   if (defId === void 0) return null;
-  const defNode = findNodeById3(ast, defId);
+  const defNode = findNodeById(ast, defId);
   if (!defNode?.name) return null;
   const oldName = defNode.name;
   if (oldName === newName) return null;
   const edits = /* @__PURE__ */ new Map();
+  const affectedUris = [];
   const currentEdits = collectRenamesInAst(ast, content, defId, oldName, newName);
   if (currentEdits.length > 0) {
     edits.set(document.uri, currentEdits);
+    affectedUris.push(document.uri);
   }
   const indexedEntries = globalIndex.findByName(oldName);
   for (const entry of indexedEntries) {
     if (entry.uri === document.uri) continue;
-    const fileContent = readFileContent3(entry.filePath);
+    const fileContent = await readFileContentAsync(entry.filePath);
     if (!fileContent) continue;
     const fileEdits = collectRenamesInAst(entry.node, fileContent, defId, oldName, newName);
     if (fileEdits.length > 0) {
@@ -20698,9 +20965,16 @@ function provideRename(ast, document, position, newName, compileResult) {
       } else {
         edits.set(entry.uri, fileEdits);
       }
+      if (!affectedUris.includes(entry.uri)) {
+        affectedUris.push(entry.uri);
+      }
     }
   }
-  return edits.size > 0 ? { changes: Object.fromEntries(edits) } : null;
+  if (edits.size === 0) return null;
+  return {
+    edits: { changes: Object.fromEntries(edits) },
+    affectedUris
+  };
 }
 function collectRenamesInAst(ast, content, targetId, oldName, newName) {
   const edits = [];
@@ -20708,11 +20982,13 @@ function collectRenamesInAst(ast, content, targetId, oldName, newName) {
     if (node.id === targetId && node.name === oldName && node.src) {
       const parsed = parseSrc(node.src);
       if (parsed) {
-        const startOffset = parsed.start;
-        const nameOffset = content.indexOf(oldName, startOffset);
-        if (nameOffset >= 0) {
-          const namePos = offsetToPosition(content, nameOffset);
-          const nameEndPos = offsetToPosition(content, nameOffset + oldName.length);
+        const startPos = offsetToPosition(content, parsed.start);
+        const lines = content.split("\n");
+        const lineText = lines[startPos.line] || "";
+        const nameIdx = lineText.indexOf(oldName, startPos.character);
+        if (nameIdx >= 0) {
+          const namePos = { line: startPos.line, character: nameIdx };
+          const nameEndPos = { line: startPos.line, character: nameIdx + oldName.length };
           edits.push(import_vscode_languageserver12.TextEdit.replace({ start: namePos, end: nameEndPos }, newName));
         }
       }
@@ -20723,10 +20999,13 @@ function collectRenamesInAst(ast, content, targetId, oldName, newName) {
     if (isIdentifier(node) && node.referencedDeclaration === targetId && node.src) {
       const parsed = parseSrc(node.src);
       if (parsed) {
-        const nameOffset = content.indexOf(node.name, parsed.start);
-        if (nameOffset >= 0) {
-          const namePos = offsetToPosition(content, nameOffset);
-          const nameEndPos = offsetToPosition(content, nameOffset + node.name.length);
+        const startPos = offsetToPosition(content, parsed.start);
+        const lines = content.split("\n");
+        const lineText = lines[startPos.line] || "";
+        const nameIdx = lineText.indexOf(node.name, startPos.character);
+        if (nameIdx >= 0) {
+          const namePos = { line: startPos.line, character: nameIdx };
+          const nameEndPos = { line: startPos.line, character: nameIdx + node.name.length };
           edits.push(import_vscode_languageserver12.TextEdit.replace({ start: namePos, end: nameEndPos }, newName));
         }
       }
@@ -20749,18 +21028,6 @@ function resolveDefinitionId2(node, ast) {
     if (def?.id !== void 0) return def.id;
   }
   return void 0;
-}
-function findNodeById3(ast, id) {
-  let found = null;
-  walkAst(ast, (node) => {
-    if (found) return false;
-    if (node.id === id) {
-      found = node;
-      return false;
-    }
-    return true;
-  });
-  return found;
 }
 function findNodeByName(ast, name) {
   let found = null;
@@ -20786,23 +21053,14 @@ function findModifierDefinition(ast, name) {
   });
   return found;
 }
-function readFileContent3(filePath) {
-  try {
-    return fs9.readFileSync(filePath, "utf-8");
-  } catch {
-    return null;
-  }
-}
 
 // src/features/typeDefinition.ts
-var fs10 = __toESM(require("fs"));
 var import_vscode_languageserver13 = __toESM(require_main4());
-init_traversal();
-function provideTypeDefinition(ast, document, position, compileResult) {
+async function provideTypeDefinition(ast, document, position, compileResult) {
   const content = document.getText();
   const node = findNodeAtPosition(ast, content, position);
   if (!node) return null;
-  const typeName = extractTypeName3(node);
+  const typeName = extractTypeName2(node);
   if (!typeName) return null;
   const localDef = findTypeDefinition(ast, typeName);
   if (localDef?.src) {
@@ -20816,7 +21074,7 @@ function provideTypeDefinition(ast, document, position, compileResult) {
   if (indexed.length > 0) {
     const entry = indexed[0];
     if (entry.node.src) {
-      const entryContent = readFileContent4(entry.filePath);
+      const entryContent = await readFileContentAsync(entry.filePath);
       if (entryContent) {
         const range = srcToRange(entry.node.src, entryContent);
         if (range) {
@@ -20827,7 +21085,7 @@ function provideTypeDefinition(ast, document, position, compileResult) {
   }
   return null;
 }
-function extractTypeName3(node) {
+function extractTypeName2(node) {
   if (isUserDefinedTypeName(node)) {
     return node.name ?? null;
   }
@@ -20895,17 +21153,9 @@ function resolveUri(node, compileResult) {
   }
   return "";
 }
-function readFileContent4(filePath) {
-  try {
-    return fs10.readFileSync(filePath, "utf-8");
-  } catch {
-    return null;
-  }
-}
 
 // src/features/semanticTokens.ts
 var import_vscode_languageserver14 = __toESM(require_main4());
-init_traversal();
 var T = {
   namespace: 0,
   type: 1,
@@ -20952,6 +21202,7 @@ function provideSemanticTokens(ast, content) {
     }
     return true;
   });
+  emitCommentTokens(content, builder);
   return builder.build();
 }
 function nodeToSemanticToken(node, content) {
@@ -21048,11 +21299,99 @@ function nodeToSemanticToken(node, content) {
   if (node.nodeType === "UserDefinedValueTypeDefinition") {
     return { line: pos.line, character: pos.character, length: name?.length ?? 0, type: T.type, modifiers: M.definition };
   }
+  if (node.nodeType === "Literal") {
+    const value = node.value;
+    const kind = node.kind;
+    if (kind === "string" || typeof value === "string" && value.startsWith('"')) {
+      return { line: pos.line, character: pos.character, length: parsed.length, type: T.string, modifiers: 0 };
+    }
+    if (kind === "number" || typeof value === "string" && /^\d/.test(value)) {
+      return { line: pos.line, character: pos.character, length: parsed.length, type: T.number, modifiers: 0 };
+    }
+    if (kind === "hex" || typeof value === "string" && /^0x/i.test(value)) {
+      return { line: pos.line, character: pos.character, length: parsed.length, type: T.number, modifiers: 0 };
+    }
+    if (kind === "bool" || value === "true" || value === "false") {
+      return { line: pos.line, character: pos.character, length: parsed.length, type: T.keyword, modifiers: 0 };
+    }
+  }
   return null;
+}
+function emitCommentTokens(content, builder) {
+  const lines = content.split("\n");
+  let inBlockComment = false;
+  for (let lineIdx = 0; lineIdx < lines.length; lineIdx++) {
+    const line = lines[lineIdx];
+    let i = 0;
+    while (i < line.length) {
+      if (inBlockComment) {
+        const endIdx = line.indexOf("*/", i);
+        if (endIdx >= 0) {
+          const commentLength = endIdx + 2 - i;
+          builder.push(lineIdx, i, commentLength, T.comment, 0);
+          inBlockComment = false;
+          i = endIdx + 2;
+        } else {
+          builder.push(lineIdx, i, line.length - i, T.comment, 0);
+          i = line.length;
+        }
+        continue;
+      }
+      const ch = line[i];
+      if (ch === "/" && i + 1 < line.length && line[i + 1] === "/") {
+        builder.push(lineIdx, i, line.length - i, T.comment, 0);
+        break;
+      }
+      if (ch === "/" && i + 1 < line.length && line[i + 1] === "*") {
+        const endIdx = line.indexOf("*/", i + 2);
+        if (endIdx >= 0) {
+          const commentLength = endIdx + 2 - i;
+          builder.push(lineIdx, i, commentLength, T.comment, 0);
+          i = endIdx + 2;
+        } else {
+          builder.push(lineIdx, i, line.length - i, T.comment, 0);
+          inBlockComment = true;
+          i = line.length;
+        }
+        continue;
+      }
+      i++;
+    }
+  }
 }
 
 // src/features/signatureHelp.ts
-init_traversal();
+var BUILTINS = {
+  require: {
+    label: "function require(bool condition, string memory reason)",
+    documentation: "Reverts the transaction with the given error message if the condition is false.",
+    parameters: [
+      { label: [19, 43], documentation: "The condition to check" },
+      { label: [45, 73], documentation: "Error message if condition is false" }
+    ]
+  },
+  assert: {
+    label: "function assert(bool condition)",
+    documentation: "Reverts the transaction with Panic error if the condition is false. Used for internal errors.",
+    parameters: [
+      { label: [14, 38], documentation: "The condition to check" }
+    ]
+  },
+  revert: {
+    label: "function revert(string memory reason)",
+    documentation: "Reverts the transaction with the given error message.",
+    parameters: [
+      { label: [17, 45], documentation: "Error message" }
+    ]
+  },
+  blockhash: {
+    label: "function blockhash(uint256 blockNumber) returns (bytes32)",
+    documentation: "Get the hash of the given block number.",
+    parameters: [
+      { label: [20, 41], documentation: "Block number" }
+    ]
+  }
+};
 function provideSignatureHelp(ast, document, position, compileResult) {
   const content = document.getText();
   const callNode = findFunctionCallAtPosition(ast, content, position);
@@ -21060,42 +21399,50 @@ function provideSignatureHelp(ast, document, position, compileResult) {
   const expr = callNode.expression;
   if (!expr?.name) return null;
   const funcName = expr.name;
-  const funcDef = findFunctionDefinition(funcName, ast, content, compileResult);
-  if (!funcDef) return null;
-  const sig = buildSignature(funcDef, content);
-  if (!sig) return null;
+  const builtin = BUILTINS[funcName];
+  if (builtin) {
+    const activeParam2 = countCommasBeforePosition(content, position, callNode);
+    return {
+      signatures: [builtin],
+      activeSignature: 0,
+      activeParameter: Math.min(activeParam2, (builtin.parameters?.length ?? 1) - 1)
+    };
+  }
+  const funcDefs = findAllFunctionDefinitions(funcName, ast, content, compileResult);
+  if (funcDefs.length === 0) return null;
+  const signatures = [];
+  for (const funcDef of funcDefs) {
+    const sig = buildSignature(funcDef, content);
+    if (sig) signatures.push(sig);
+  }
+  if (signatures.length === 0) return null;
   const activeParam = countCommasBeforePosition(content, position, callNode);
+  const bestIndex = findBestOverload(signatures, activeParam + 1);
   return {
-    signatures: [sig],
-    activeSignature: 0,
-    activeParameter: Math.min(activeParam, (sig.parameters?.length ?? 1) - 1)
+    signatures,
+    activeSignature: bestIndex,
+    activeParameter: Math.min(activeParam, (signatures[bestIndex].parameters?.length ?? 1) - 1)
   };
 }
 function findFunctionCallAtPosition(ast, content, position) {
   let found = null;
   let bestRange = Infinity;
+  const cursorOffset = positionToOffset(content, position);
   walkAst(ast, (node) => {
     if (isFunctionCall(node) && node.src) {
       const parsed = parseSrc(node.src);
       if (parsed) {
-        const pos = offsetToPosition(content, parsed.start);
-        const nodeLine = pos.line;
-        const cursorLine = position.line;
-        if (cursorLine >= nodeLine) {
-          const nodeContent = content.substring(parsed.start, parsed.start + parsed.length);
-          const openParen = nodeContent.indexOf("(");
-          const closeParen = nodeContent.lastIndexOf(")");
-          if (openParen >= 0 && closeParen >= 0) {
-            const absOpen = parsed.start + openParen;
-            const absClose = parsed.start + closeParen;
-            const cursorOffset = offsetToPosition(content, positionToOffset(content, position)).line === nodeLine ? position.character + position.line * 1e3 : 0;
-            const nodeStart = pos.line * 1e3 + pos.character;
-            if (cursorOffset >= nodeStart && cursorOffset <= absClose * 1) {
-              const rangeSize = parsed.length;
-              if (rangeSize < bestRange) {
-                bestRange = rangeSize;
-                found = node;
-              }
+        const nodeContent = content.substring(parsed.start, parsed.start + parsed.length);
+        const openParen = nodeContent.indexOf("(");
+        const closeParen = nodeContent.lastIndexOf(")");
+        if (openParen >= 0 && closeParen >= 0) {
+          const absOpen = parsed.start + openParen;
+          const absClose = parsed.start + closeParen;
+          if (cursorOffset >= absOpen && cursorOffset <= absClose) {
+            const rangeSize = parsed.length;
+            if (rangeSize < bestRange) {
+              bestRange = rangeSize;
+              found = node;
             }
           }
         }
@@ -21105,34 +21452,66 @@ function findFunctionCallAtPosition(ast, content, position) {
   });
   return found;
 }
-function findFunctionDefinition(name, ast, content, compileResult) {
-  let found = null;
+function findAllFunctionDefinitions(name, ast, content, compileResult) {
+  const results = [];
   walkAst(ast, (node) => {
-    if (found) return false;
     if (isFunctionDefinition(node) && node.name === name) {
-      found = node;
-      return false;
+      results.push(node);
     }
     return true;
   });
-  if (found) return found;
-  const entries = globalIndex.findByNameAndKind(name, "function");
-  if (entries.length > 0) {
-    return entries[0].node;
+  const funcEntries = globalIndex.findByNameAndKind(name, "function");
+  for (const entry of funcEntries) {
+    if (!results.includes(entry.node)) {
+      results.push(entry.node);
+    }
   }
   const modEntries = globalIndex.findByNameAndKind(name, "modifier");
-  if (modEntries.length > 0) return modEntries[0].node;
+  for (const entry of modEntries) {
+    if (!results.includes(entry.node)) {
+      results.push(entry.node);
+    }
+  }
   const evtEntries = globalIndex.findByNameAndKind(name, "event");
-  if (evtEntries.length > 0) return evtEntries[0].node;
+  for (const entry of evtEntries) {
+    if (!results.includes(entry.node)) {
+      results.push(entry.node);
+    }
+  }
   const errEntries = globalIndex.findByNameAndKind(name, "error");
-  if (errEntries.length > 0) return errEntries[0].node;
-  return null;
+  for (const entry of errEntries) {
+    if (!results.includes(entry.node)) {
+      results.push(entry.node);
+    }
+  }
+  return results;
+}
+function findBestOverload(signatures, argCount) {
+  if (signatures.length === 0) return 0;
+  if (signatures.length === 1) return 0;
+  for (let i = 0; i < signatures.length; i++) {
+    const paramCount = signatures[i].parameters?.length ?? 0;
+    if (paramCount === argCount) {
+      return i;
+    }
+  }
+  let bestIndex = 0;
+  let bestDiff = Infinity;
+  for (let i = 0; i < signatures.length; i++) {
+    const paramCount = signatures[i].parameters?.length ?? 0;
+    const diff = Math.abs(paramCount - argCount);
+    if (diff < bestDiff || diff === bestDiff && paramCount > (signatures[bestIndex].parameters?.length ?? 0)) {
+      bestDiff = diff;
+      bestIndex = i;
+    }
+  }
+  return bestIndex;
 }
 function buildSignature(node, content) {
   const name = node.name ?? "";
   const params = extractParameters(node, content);
   const returns = extractReturns(node, content);
-  const docs = extractNatSpec3(node);
+  const docs = extractNatSpec(node);
   const paramStr = params.map((p) => `${p.type} ${p.name}`).join(", ");
   const returnStr = returns.length > 0 ? ` returns (${returns.map((r) => `${r.type} ${r.name}`).join(", ")})` : "";
   let kind = "function";
@@ -21158,25 +21537,7 @@ function buildSignature(node, content) {
       documentation: p.type
     };
   });
-  let documentation;
-  if (docs) {
-    const lines = [];
-    const natSpecLines = docs.split("\n").filter(Boolean);
-    for (const line of natSpecLines) {
-      if (line.startsWith("@notice")) {
-        lines.push(line.replace("@notice", "").trim());
-      } else if (line.startsWith("@dev")) {
-        lines.push("", line.replace("@dev", "**Dev:** ").trim());
-      } else if (line.startsWith("@param")) {
-        lines.push(line);
-      } else if (line.startsWith("@return")) {
-        lines.push(line);
-      } else {
-        lines.push(line);
-      }
-    }
-    documentation = lines.join("\n");
-  }
+  const documentation = docs || void 0;
   return {
     label,
     documentation,
@@ -21203,20 +21564,15 @@ function extractReturns(node, content) {
   }
   return returns;
 }
-function extractNatSpec3(node) {
-  const doc = node.documentation;
-  if (!doc?.text) return "";
-  return doc.text.split("\n").map((l) => l.trim()).filter(Boolean).join("\n");
-}
 function countCommasBeforePosition(content, position, callNode) {
   if (!callNode.src) return 0;
   const parsed = parseSrc(callNode.src);
   if (!parsed) return 0;
   const openParen = content.indexOf("(", parsed.start);
   if (openParen < 0) return 0;
-  const cursorOffset = position.line * 1e3 + position.character;
+  const cursorOffset = positionToOffset(content, position);
   let count = 0;
-  for (let i = openParen + 1; i < content.length; i++) {
+  for (let i = openParen + 1; i < content.length && i < cursorOffset; i++) {
     const ch = content[i];
     if (ch === "(") break;
     if (ch === ")") break;
@@ -21227,7 +21583,6 @@ function countCommasBeforePosition(content, position, callNode) {
 
 // src/features/workspaceSymbol.ts
 var import_vscode_languageserver15 = __toESM(require_main4());
-init_traversal();
 var KIND_MAP = {
   contract: import_vscode_languageserver15.SymbolKind.Class,
   interface: import_vscode_languageserver15.SymbolKind.Interface,
@@ -21242,13 +21597,13 @@ var KIND_MAP = {
   typedef: import_vscode_languageserver15.SymbolKind.TypeParameter,
   constant: import_vscode_languageserver15.SymbolKind.Constant
 };
-function provideWorkspaceSymbols(query) {
+async function provideWorkspaceSymbols(query) {
   if (!query) return [];
   const entries = globalIndex.searchFuzzy(query);
   const results = [];
   for (const entry of entries) {
     if (!entry.node.src) continue;
-    const content = readFileContent5(entry.filePath);
+    const content = await readFileContentAsync(entry.filePath);
     if (!content) continue;
     const range = srcToRange(entry.node.src, content);
     if (!range) continue;
@@ -21277,19 +21632,10 @@ function findContainerName(node) {
   }
   return void 0;
 }
-function readFileContent5(filePath) {
-  try {
-    const fs12 = require("fs");
-    return fs12.readFileSync(filePath, "utf-8");
-  } catch {
-    return null;
-  }
-}
 
 // src/features/implementation.ts
 var import_vscode_languageserver16 = __toESM(require_main4());
-init_traversal();
-function provideImplementation(ast, document, position, compileResult) {
+async function provideImplementation(ast, document, position, compileResult) {
   const content = document.getText();
   const node = findNodeAtPosition(ast, content, position);
   if (!node) return null;
@@ -21305,7 +21651,7 @@ function provideImplementation(ast, document, position, compileResult) {
       const baseNames = bases.map((b) => b.name ?? b);
       if (baseNames.includes(contractName)) {
         if (entry.node.src) {
-          const entryContent = readFileContent6(entry.filePath);
+          const entryContent = await readFileContentAsync(entry.filePath);
           if (entryContent) {
             const range = srcToRange(entry.node.src, entryContent);
             if (range) {
@@ -21318,7 +21664,7 @@ function provideImplementation(ast, document, position, compileResult) {
       for (const base of baseNameNodes) {
         if (base?.name === contractName) {
           if (entry.node.src && !results.some((r) => r.uri === entry.uri)) {
-            const entryContent = readFileContent6(entry.filePath);
+            const entryContent = await readFileContentAsync(entry.filePath);
             if (entryContent) {
               const range = srcToRange(entry.node.src, entryContent);
               if (range) {
@@ -21340,7 +21686,7 @@ function provideImplementation(ast, document, position, compileResult) {
       if (!isFunctionDefinition(entry.node)) continue;
       const hasOverride = entry.node.overrides?.length > 0;
       if (hasOverride && entry.node.src) {
-        const entryContent = readFileContent6(entry.filePath);
+        const entryContent = await readFileContentAsync(entry.filePath);
         if (entryContent) {
           const range = srcToRange(entry.node.src, entryContent);
           if (range) {
@@ -21352,18 +21698,13 @@ function provideImplementation(ast, document, position, compileResult) {
   }
   return results.length > 0 ? results : null;
 }
-function readFileContent6(filePath) {
-  try {
-    return require("fs").readFileSync(filePath, "utf-8");
-  } catch {
-    return null;
-  }
-}
 
 // src/linter/solhint.ts
 var import_vscode_languageserver17 = __toESM(require_main4());
 var import_child_process4 = require("child_process");
-var fs11 = __toESM(require("fs"));
+var crypto = __toESM(require("crypto"));
+var fs10 = __toESM(require("fs"));
+var os2 = __toESM(require("os"));
 var path10 = __toESM(require("path"));
 var SolhintLinter = class {
   debounceTimers = /* @__PURE__ */ new Map();
@@ -21378,9 +21719,11 @@ var SolhintLinter = class {
   }
   runSolhint(uri, filePath, content, callback) {
     const projectRoot = path10.dirname(filePath);
-    const tmpFile = filePath + ".solhint-tmp";
+    const tmpDir = os2.tmpdir();
+    const randomSuffix = crypto.randomBytes(8).toString("hex");
+    const tmpFile = path10.join(tmpDir, `solhint-${randomSuffix}.sol`);
     try {
-      fs11.writeFileSync(tmpFile, content, "utf-8");
+      fs10.writeFileSync(tmpFile, content, "utf-8");
     } catch {
       callback([]);
       return;
@@ -21401,12 +21744,13 @@ var SolhintLinter = class {
     });
     proc.on("close", () => {
       try {
-        fs11.unlinkSync(tmpFile);
-      } catch {
+        fs10.unlinkSync(tmpFile);
+      } catch (err) {
+        console.error(`[solhint] Failed to remove temp file ${tmpFile}:`, err);
       }
       try {
         const results = JSON.parse(stdout);
-        const diagnostics = results.filter((w) => w.filePath === tmpFile || w.filePath === path10.basename(tmpFile)).map((w) => this.convertWarning(w, content));
+        const diagnostics = results.filter((w) => w.filePath === tmpFile || w.filePath === path10.basename(filePath)).map((w) => this.convertWarning(w, content));
         callback(diagnostics);
       } catch {
         callback([]);
@@ -21414,8 +21758,9 @@ var SolhintLinter = class {
     });
     proc.on("error", () => {
       try {
-        fs11.unlinkSync(tmpFile);
-      } catch {
+        fs10.unlinkSync(tmpFile);
+      } catch (err) {
+        console.error(`[solhint] Failed to remove temp file ${tmpFile}:`, err);
       }
       callback([]);
     });
@@ -21447,18 +21792,24 @@ var SolhintLinter = class {
 var solhintLinter = new SolhintLinter();
 
 // src/server.ts
-process.on("uncaughtException", (err) => {
+var crashLogDir = os3.tmpdir();
+var crashLogFile = path11.join(crashLogDir, `foundry-lsp-crash-${crypto2.randomBytes(8).toString("hex")}.log`);
+function writeCrashLog(message) {
   try {
-    require("fs").appendFileSync("/tmp/lsp-crash.log", (/* @__PURE__ */ new Date()).toISOString() + " " + err.stack + "\n");
-  } catch {
+    const fd = fs11.openSync(crashLogFile, fs11.constants.O_CREAT | fs11.constants.O_APPEND | fs11.constants.O_WRONLY, 384);
+    fs11.appendFileSync(fd, message);
+    fs11.closeSync(fd);
+  } catch (err) {
+    process.stderr.write(`[foundry-lsp] Failed to write crash log: ${err}
+`);
   }
+}
+process.on("uncaughtException", (err) => {
+  writeCrashLog((/* @__PURE__ */ new Date()).toISOString() + " " + err.stack + "\n");
   process.exit(1);
 });
 process.on("unhandledRejection", (reason) => {
-  try {
-    require("fs").appendFileSync("/tmp/lsp-crash.log", (/* @__PURE__ */ new Date()).toISOString() + " UNHANDLED: " + String(reason) + "\n");
-  } catch {
-  }
+  writeCrashLog((/* @__PURE__ */ new Date()).toISOString() + " UNHANDLED: " + String(reason) + "\n");
 });
 var diagnosticStore = /* @__PURE__ */ new Map();
 function pushDiagnostics(uri, source, diags) {
@@ -21471,7 +21822,7 @@ function pushDiagnostics(uri, source, diags) {
   const merged = [...entry.compiler, ...entry.solhint];
   connection.sendDiagnostics({ uri, diagnostics: merged });
 }
-connection.onInitialize((params) => {
+connection.onInitialize(async (params) => {
   connection.console.log(
     `foundry-lsp starting \u2014 client: ${params.clientInfo?.name ?? "unknown"}`
   );
@@ -21496,7 +21847,7 @@ connection.onInitialize((params) => {
       message: "Foundry Sol: Node.js not found. Please install Node.js to use the LSP."
     });
   }
-  projectManager.init(params.workspaceFolders ?? null);
+  await projectManager.init(params.workspaceFolders ?? null);
   return {
     capabilities: SERVER_CAPABILITIES,
     serverInfo: {
@@ -21529,7 +21880,7 @@ documents.onDidOpen((event) => {
   });
   const project = projectManager.getProject(uri);
   if (project) {
-    const filePath = require_umd().URI.parse(uri).fsPath;
+    const filePath = URI.parse(uri).fsPath;
     solhintLinter.lint(uri, filePath, content, (lintDiags) => {
       pushDiagnostics(uri, "solhint", lintDiags);
     });
@@ -21545,13 +21896,13 @@ documents.onDidChangeContent((change) => {
   });
   const project = projectManager.getProject(uri);
   if (project) {
-    const filePath = require_umd().URI.parse(uri).fsPath;
+    const filePath = URI.parse(uri).fsPath;
     solhintLinter.lint(uri, filePath, content, (lintDiags) => {
       pushDiagnostics(uri, "solhint", lintDiags);
     });
   }
 });
-connection.onCompletion((params) => {
+connection.onCompletion(async (params) => {
   try {
     const uri = params.textDocument.uri;
     const document = documents.get(uri);
@@ -21559,7 +21910,7 @@ connection.onCompletion((params) => {
     const project = projectManager.getProject(uri);
     const result = compilerManager.getCachedResult(uri);
     if (!result?.ast) return [];
-    return provideCompletion(result.ast, document, params.position, result, project);
+    return await provideCompletion(result.ast, document, params.position, result, project);
   } catch (error) {
     return [];
   }
@@ -21583,7 +21934,7 @@ connection.onHover((params) => {
     return null;
   }
 });
-connection.onDefinition((params) => {
+connection.onDefinition(async (params) => {
   try {
     const uri = params.textDocument.uri;
     const document = documents.get(uri);
@@ -21598,7 +21949,7 @@ connection.onDefinition((params) => {
       return null;
     }
     connection.console.log(`[def] Resolving definition at ${params.position.line}:${params.position.character}`);
-    return provideDefinition(result.ast, document, params.position, result, project);
+    return await provideDefinition(result.ast, document, params.position, result, project);
   } catch (error) {
     connection.console.log(`[def] Error: ${error}`);
     return null;
@@ -21628,14 +21979,14 @@ connection.onDocumentSymbol((params) => {
     return [];
   }
 });
-connection.onReferences((params) => {
+connection.onReferences(async (params) => {
   try {
     const uri = params.textDocument.uri;
     const document = documents.get(uri);
     if (!document) return [];
     const result = compilerManager.getCachedResult(uri);
     if (!result?.ast) return [];
-    return provideReferences(
+    return await provideReferences(
       result.ast,
       document,
       params.position,
@@ -21656,14 +22007,19 @@ connection.onDocumentFormatting(async (params) => {
     return [];
   }
 });
-connection.onRenameRequest((params) => {
+connection.onRenameRequest(async (params) => {
   try {
     const uri = params.textDocument.uri;
     const document = documents.get(uri);
     if (!document) return null;
     const result = compilerManager.getCachedResult(uri);
     if (!result?.ast) return null;
-    return provideRename(result.ast, document, params.position, params.newName, result);
+    const renameResult = await provideRename(result.ast, document, params.position, params.newName, result);
+    if (!renameResult) return null;
+    for (const affectedUri of renameResult.affectedUris) {
+      globalIndex.removeFile(URI.parse(affectedUri).fsPath);
+    }
+    return renameResult.edits;
   } catch (error) {
     return null;
   }
@@ -21675,34 +22031,33 @@ connection.onPrepareRename((params) => {
     if (!document) return null;
     const result = compilerManager.getCachedResult(uri);
     if (!result?.ast) return null;
-    const { findNodeAtPosition: findNodeAtPosition3 } = (init_traversal(), __toCommonJS(traversal_exports));
-    const node = findNodeAtPosition3(result.ast, document.getText(), params.position);
+    const node = findNodeAtPosition(result.ast, document.getText(), params.position);
     if (!node || !node.name) return null;
     return { defaultBehavior: true };
   } catch (error) {
     return null;
   }
 });
-connection.onTypeDefinition((params) => {
+connection.onTypeDefinition(async (params) => {
   try {
     const uri = params.textDocument.uri;
     const document = documents.get(uri);
     if (!document) return null;
     const result = compilerManager.getCachedResult(uri);
     if (!result?.ast) return null;
-    return provideTypeDefinition(result.ast, document, params.position, result);
+    return await provideTypeDefinition(result.ast, document, params.position, result);
   } catch (error) {
     return null;
   }
 });
-connection.onImplementation((params) => {
+connection.onImplementation(async (params) => {
   try {
     const uri = params.textDocument.uri;
     const document = documents.get(uri);
     if (!document) return null;
     const result = compilerManager.getCachedResult(uri);
     if (!result?.ast) return null;
-    return provideImplementation(result.ast, document, params.position, result);
+    return await provideImplementation(result.ast, document, params.position, result);
   } catch (error) {
     return null;
   }
@@ -21731,9 +22086,9 @@ connection.onSignatureHelp((params) => {
     return null;
   }
 });
-connection.onWorkspaceSymbol((params) => {
+connection.onWorkspaceSymbol(async (params) => {
   try {
-    return provideWorkspaceSymbols(params.query);
+    return await provideWorkspaceSymbols(params.query);
   } catch (error) {
     return [];
   }

@@ -46,6 +46,26 @@ export class GlobalIndex {
     this.nodeMap.clear();
   }
 
+  removeFile(filePath: string): void {
+    const uri = URI.file(filePath).toString();
+    const oldEntries = this.fileIndex.get(uri);
+    if (!oldEntries) return;
+    for (const entry of oldEntries) {
+      const symbolEntries = this.symbols.get(entry.name);
+      if (symbolEntries) {
+        const idx = symbolEntries.indexOf(entry);
+        if (idx !== -1) symbolEntries.splice(idx, 1);
+        if (symbolEntries.length === 0) this.symbols.delete(entry.name);
+      }
+      if (entry.nodeId !== undefined) this.nodeMap.delete(entry.nodeId);
+    }
+    this.fileIndex.delete(uri);
+  }
+
+  getIndexedFiles(): Set<string> {
+    return new Set(this.fileIndex.keys());
+  }
+
   indexFile(filePath: string, ast: AstNode): void {
     try {
       const uri = URI.file(filePath).toString();

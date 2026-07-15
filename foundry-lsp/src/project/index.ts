@@ -20,7 +20,7 @@ export class ProjectManager {
   private watchers = new Map<string, FileWatcher>();
   private workspaceFolders: string[] = [];
 
-  init(workspaceFolders: WorkspaceFolder[] | null): void {
+  async init(workspaceFolders: WorkspaceFolder[] | null): Promise<void> {
     if (!workspaceFolders) return;
 
     for (const folder of workspaceFolders) {
@@ -28,7 +28,7 @@ export class ProjectManager {
       this.workspaceFolders.push(root);
       // Search for foundry.toml upward from workspace root
       const projectRoot = this.findProjectRoot(root);
-      this.loadProject(projectRoot);
+      await this.loadProject(projectRoot);
     }
   }
 
@@ -55,7 +55,10 @@ export class ProjectManager {
           }
         }
       }
-    } catch {}
+    } catch (err) {
+      // Directory read failure during project root search — fall through to default
+      console.error(`[project] Error searching for project root in ${startDir}:`, err);
+    }
 
     return startDir; // fallback to workspace root
   }
@@ -73,9 +76,9 @@ export class ProjectManager {
     return undefined;
   }
 
-  private loadProject(root: string): FoundryProject {
+  private async loadProject(root: string): Promise<FoundryProject> {
     const config = parseFoundryToml(root);
-    const remappings = loadRemappings(root);
+    const remappings = await loadRemappings(root);
 
     const srcDir = path.join(root, config.src);
     const solFiles = findSolFiles(srcDir);
@@ -105,12 +108,12 @@ export class ProjectManager {
     return project;
   }
 
-  private reloadProject(root: string): void {
+  private async reloadProject(root: string): Promise<void> {
     const existing = this.projects.get(root);
     if (!existing) return;
 
     existing.config = parseFoundryToml(root);
-    existing.remappings = loadRemappings(root);
+    existing.remappings = await loadRemappings(root);
 
     const srcDir = path.join(root, existing.config.src);
     existing.solFiles = findSolFiles(srcDir);

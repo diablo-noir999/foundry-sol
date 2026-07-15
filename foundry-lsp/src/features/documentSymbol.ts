@@ -54,7 +54,7 @@ export function provideDocumentSymbols(
     } else if (isErrorDefinition(node)) {
       const sym = createErrorSymbol(node, content);
       if (sym) symbols.push(sym);
-    } else     if (isModifierDefinition(node)) {
+    } else if (isModifierDefinition(node)) {
       const sym = createModifierSymbol(node, content);
       if (sym) symbols.push(sym);
     } else if ((node as any).nodeType === 'UserDefinedValueTypeDefinition') {
@@ -123,11 +123,41 @@ function createFunctionSymbol(node: AstNode, content: string): DocumentSymbol | 
   const range = safeRange(node.src, content);
   const symbolKind = getFunctionSymbolKind(node);
 
+  // Collect input parameters and return parameters as children
+  const children: DocumentSymbol[] = [];
+  const params = (node as any).parameters;
+  if (params?.parameters) {
+    for (const param of params.parameters) {
+      if (param.name) {
+        children.push({
+          name: param.name,
+          kind: SymbolKind.Variable,
+          range: safeRange(param.src, content),
+          selectionRange: safeRange(param.src, content),
+        });
+      }
+    }
+  }
+  const returnParams = (node as any).returnParameters;
+  if (returnParams?.parameters) {
+    for (const param of returnParams.parameters) {
+      if (param.name) {
+        children.push({
+          name: param.name,
+          kind: SymbolKind.Variable,
+          range: safeRange(param.src, content),
+          selectionRange: safeRange(param.src, content),
+        });
+      }
+    }
+  }
+
   return {
     name,
     kind: symbolKind,
     range,
     selectionRange: range,
+    children: children.length > 0 ? children : undefined,
   };
 }
 

@@ -11,13 +11,14 @@ import {
 import { findNodeAtPosition, srcToRange, walkAst } from '../ast/traversal';
 import { CompileResult } from '../compiler/cache';
 import { globalIndex } from '../indexer';
+import { readFileContentAsync } from '../utils';
 
-export function provideImplementation(
+export async function provideImplementation(
   ast: AstNode,
   document: TextDocument,
   position: Position,
   compileResult: CompileResult
-): Definition | null {
+): Promise<Definition | null> {
   const content = document.getText();
   const node = findNodeAtPosition(ast, content, position);
   if (!node) return null;
@@ -47,7 +48,7 @@ export function provideImplementation(
       const baseNames = bases.map((b: any) => b.name ?? b);
       if (baseNames.includes(contractName)) {
         if (entry.node.src) {
-          const entryContent = readFileContent(entry.filePath);
+          const entryContent = await readFileContentAsync(entry.filePath);
           if (entryContent) {
             const range = srcToRange(entry.node.src, entryContent);
             if (range) {
@@ -62,7 +63,7 @@ export function provideImplementation(
       for (const base of baseNameNodes) {
         if (base?.name === contractName) {
           if (entry.node.src && !results.some(r => r.uri === entry.uri)) {
-            const entryContent = readFileContent(entry.filePath);
+            const entryContent = await readFileContentAsync(entry.filePath);
             if (entryContent) {
               const range = srcToRange(entry.node.src, entryContent);
               if (range) {
@@ -91,7 +92,7 @@ export function provideImplementation(
       // Check if it has override specifier
       const hasOverride = (entry.node as any).overrides?.length > 0;
       if (hasOverride && entry.node.src) {
-        const entryContent = readFileContent(entry.filePath);
+        const entryContent = await readFileContentAsync(entry.filePath);
         if (entryContent) {
           const range = srcToRange(entry.node.src, entryContent);
           if (range) {
@@ -103,12 +104,4 @@ export function provideImplementation(
   }
 
   return results.length > 0 ? results : null;
-}
-
-function readFileContent(filePath: string): string | null {
-  try {
-    return require('fs').readFileSync(filePath, 'utf-8');
-  } catch {
-    return null;
-  }
 }

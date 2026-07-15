@@ -8,16 +8,17 @@ import {
 import { findNodeAtPosition, srcToRange, walkAst } from '../ast/traversal';
 import { CompileResult } from '../compiler/cache';
 import { globalIndex } from '../indexer';
+import { readFileContentAsync } from '../utils';
 import * as fs from 'fs';
 import * as path from 'path';
 
-export function provideReferences(
+export async function provideReferences(
   ast: AstNode,
   document: TextDocument,
   position: Position,
   compileResult: CompileResult,
   includeDeclaration: boolean
-): Location[] {
+): Promise<Location[]> {
   const content = document.getText();
   const node = findNodeAtPosition(ast, content, position);
   if (!node) return [];
@@ -57,10 +58,10 @@ export function provideReferences(
 
   for (const [entryUri, entries] of fileEntries) {
     const filePath = entries[0].filePath;
-    const entryAst = readAstForFile(filePath);
+    const entryAst = await readAstForFile(filePath);
     if (!entryAst) continue;
 
-    const fileContent = readFileContent(filePath);
+    const fileContent = await readFileContentAsync(filePath);
     if (!fileContent) continue;
 
     collectReferencesInAst(entryAst, fileContent, entryUri, defId, results);
@@ -125,15 +126,7 @@ function collectReferencesInAst(
   });
 }
 
-function readFileContent(filePath: string): string | null {
-  try {
-    return fs.readFileSync(filePath, 'utf-8');
-  } catch {
-    return null;
-  }
-}
-
-function readAstForFile(filePath: string): AstNode | null {
+async function readAstForFile(filePath: string): Promise<AstNode | null> {
   try {
     const outDir = path.join(
       path.dirname(filePath),
@@ -141,12 +134,14 @@ function readAstForFile(filePath: string): AstNode | null {
       'out',
       path.basename(filePath)
     );
-    if (!fs.existsSync(outDir)) {
+    const exists = await fs.promises.access(outDir).then(() => true, () => false);
+    if (!exists) {
       // Try relative to project root
-      const projectRoot = findProjectRoot(filePath);
+      const projectRoot = await findProjectRoot(filePath);
       if (!projectRoot) return null;
       const altOutDir = path.join(projectRoot, 'out', path.basename(filePath));
-      if (!fs.existsSync(altOutDir)) return null;
+      const altExists = await fs.promises.access(altOutDir).then(() => true, () => false);
+      if (!altExists) return null;
       return readAstFromOutDir(altOutDir);
     }
     return readAstFromOutDir(outDir);
@@ -155,21 +150,21 @@ function readAstForFile(filePath: string): AstNode | null {
   }
 }
 
-function readAstFromOutDir(outDir: string): AstNode | null {
+async function readAstFromOutDir(outDir: string): Promise<AstNode | null> {
   try {
-    const files = fs.readdirSync(outDir).filter((f) => f.endsWith('.json'));
+    const files = (await fs.promises.readdir(outDir)).filter((f) => f.endsWith('.json'));
     if (files.length === 0) return null;
-    const artifact = JSON.parse(fs.readFileSync(path.join(outDir, files[0]), 'utf-8'));
+    const artifact = JSON.parse(await fs.promises.readFile(path.join(outDir, files[0]), 'utf-8'));
     return artifact.ast || null;
   } catch {
     return null;
   }
 }
 
-function findProjectRoot(filePath: string): string | null {
+async function findProjectRoot(filePath: string): Promise<string | null> {
   let dir = path.dirname(filePath);
   while (dir) {
-    if (fs.existsSync(path.join(dir, 'foundry.toml'))) {
+    if (await fs.promises.access(path.join(dir, 'foundry.toml')).then(() => true, () => false)) {
       return dir;
     }
     const parent = path.dirname(dir);

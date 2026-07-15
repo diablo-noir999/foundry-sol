@@ -14,6 +14,7 @@ import {
   ContractDefinition,
   FunctionDefinition,
   StateVariableDeclaration,
+  VariableDeclaration,
   isContractDefinition,
   isFunctionDefinition,
   isStateVariableDeclaration,
@@ -23,12 +24,14 @@ import {
   isErrorDefinition,
   isModifierDefinition,
   isImportDirective,
+  isVariableDeclaration,
   Identifier,
   isIdentifier,
 } from '../ast/types';
 import { CompileResult } from '../compiler/cache';
 import { FoundryProject } from '../project';
-import { parseSrc } from '../ast/traversal';
+import { parseSrc, walkAst, positionToOffset } from '../ast/traversal';
+import { extractNatSpec, extractTypeName } from '../utils';
 
 const SOLIDITY_KEYWORDS: [string, string][] = [
   ['pragma', 'pragma solidity ^0.8.0;'],
@@ -210,13 +213,32 @@ const ADDRESS_MEMBERS: [string, string, string, string][] = [
   ['send', 'send(${1:uint256 amount})', 'bool', 'Send wei to the address (returns false on failure)'],
 ];
 
-export function provideCompletion(
+// ─── Dir cache for import completions (2s TTL) ───
+const dirCache = new Map<string, { entries: fs.Dirent[]; timestamp: number }>();
+const DIR_CACHE_TTL = 2000;
+
+async function readdirCached(dir: string): Promise<fs.Dirent[]> {
+  const now = Date.now();
+  const cached = dirCache.get(dir);
+  if (cached && now - cached.timestamp < DIR_CACHE_TTL) {
+    return cached.entries;
+  }
+  try {
+    const entries = await fs.promises.readdir(dir, { withFileTypes: true });
+    dirCache.set(dir, { entries, timestamp: now });
+    return entries;
+  } catch {
+    return [];
+  }
+}
+
+export async function provideCompletion(
   ast: AstNode,
   document: TextDocument,
   position: Position,
   _compileResult: CompileResult,
   project: FoundryProject | undefined
-): CompletionItem[] {
+): Promise<CompletionItem[]> {
   const content = document.getText();
   const fullLine = document.getText({
     start: { line: position.line, character: 0 },
@@ -241,7 +263,7 @@ export function provideCompletion(
   // 1. Import path completion
   const importMatch = fullLine.match(/import\s+"([^"]*)$/);
   if (importMatch) {
-    return provideImportCompletion(importMatch[1], position, project);
+    return await provideImportCompletion(importMatch[1], position, project);
   }
 
   // 2. Emit trigger — list events
@@ -335,7 +357,28 @@ export function provideCompletion(
     });
   }
 
-  // 10. AST identifiers
+  // 10. Local variable scope resolution (function params, local vars, for-loop vars)
+  const offset = positionToOffset(content, position);
+  const scopedVars = findVariableDeclarationsInScope(ast, offset, content);
+  const scopedNames = new Set<string>();
+  for (const v of scopedVars) {
+    if (scopedNames.has(v.name)) continue;
+    scopedNames.add(v.name);
+    if (prefix && !v.name.toLowerCase().startsWith(prefix.toLowerCase())) continue;
+    items.push({
+      label: v.name,
+      kind: CompletionItemKind.Variable,
+      detail: `${v.typeName} ${v.name}`,
+      documentation: {
+        kind: MarkupKind.Markdown,
+        value: v.blockOffset === 0
+          ? `*(parameter)* ${v.typeName} ${v.name}`
+          : `*(local variable)* ${v.typeName} ${v.name}`,
+      },
+    });
+  }
+
+  // 10.5. AST identifiers (contracts, structs, enums, etc.)
   const idItems = collectIdentifiers(ast, content, prefix);
   items.push(...idItems);
 
@@ -454,80 +497,35 @@ function provideDotCompletion(
   const parts = expression.split('.');
   const rootName = parts[0];
 
-  // 11.1: `this.` — resolve to current contract's own members
+  // 11.1: `this.` — resolve to current contract's members (including inherited)
   if (rootName === 'this') {
     const enclosingContract = findEnclosingContract(ast, position, content);
-    if (enclosingContract) {
-      const nodes = (enclosingContract as ContractDefinition).nodes ?? [];
-      const items: CompletionItem[] = [];
-      for (const member of nodes) {
-        const vis = (member as any).visibility;
-        // Show non-private members (public, internal, external)
-        if (vis === 'private') continue;
-        if (isFunctionDefinition(member)) {
-          const fn = member as FunctionDefinition;
-          const params = fn.parameters?.parameters
-            ?.map((p) => `${extractTypeName(p.typeName as AstNode)} ${p.name}`)
-            .join(', ') ?? '';
-          items.push({
-            label: fn.name!,
-            kind: CompletionItemKind.Function,
-            detail: `${fn.visibility} function ${fn.name}(${params})`,
-          });
-        } else if (isStateVariableDeclaration(member)) {
-          const sv = member as StateVariableDeclaration;
-          items.push({
-            label: sv.name!,
-            kind: CompletionItemKind.Property,
-            detail: `${sv.visibility} ${extractTypeName(sv.typeName as AstNode)} ${sv.name}`,
-          });
-        } else if (isEventDefinition(member)) {
-          items.push({ label: member.name!, kind: CompletionItemKind.Event });
-        } else if (isErrorDefinition(member)) {
-          items.push({ label: member.name!, kind: CompletionItemKind.Enum });
-        }
-      }
-      return items;
+    if (enclosingContract && isContractDefinition(enclosingContract)) {
+      return collectContractMembers(enclosingContract, ast, {
+        includeOwn: true,
+        includeOwnPrivate: true,
+      });
     }
   }
 
-  // 11.2: `super.` — resolve to parent contract's non-private members
+  // 11.2: `super.` — resolve to parent contracts' non-private members (full chain)
   if (rootName === 'super') {
     const enclosingContract = findEnclosingContract(ast, position, content);
-    if (enclosingContract) {
-      const baseContracts = (enclosingContract as any).baseContracts ?? [];
+    if (enclosingContract && isContractDefinition(enclosingContract)) {
+      // Walk direct base contracts and their full inheritance chains
       const items: CompletionItem[] = [];
       const seen = new Set<string>();
+      const visited = new Set<number>();
+      const baseContracts = (enclosingContract as any).baseContracts ?? [];
       for (const base of baseContracts) {
         const baseName = base.baseName?.name;
         if (!baseName) continue;
         const baseType = findTypeByName(ast, baseName);
-        if (!baseType || !isContractDefinition(baseType)) continue;
-        const nodes = (baseType as ContractDefinition).nodes ?? [];
-        for (const member of nodes) {
-          const vis = (member as any).visibility;
-          if (vis === 'private') continue;
-          if (member.name && !seen.has(member.name)) {
-            seen.add(member.name);
-            if (isFunctionDefinition(member)) {
-              const fn = member as FunctionDefinition;
-              const params = fn.parameters?.parameters
-                ?.map((p) => `${extractTypeName(p.typeName as AstNode)} ${p.name}`)
-                .join(', ') ?? '';
-              items.push({
-                label: fn.name!,
-                kind: CompletionItemKind.Function,
-                detail: `${fn.visibility} function ${fn.name}(${params})`,
-              });
-            } else if (isStateVariableDeclaration(member)) {
-              const sv = member as StateVariableDeclaration;
-              items.push({
-                label: sv.name!,
-                kind: CompletionItemKind.Property,
-                detail: `${sv.visibility} ${extractTypeName(sv.typeName as AstNode)} ${sv.name}`,
-              });
-            }
-          }
+        if (baseType && isContractDefinition(baseType)) {
+          collectContractMembersInto(baseType, ast, items, seen, visited, {
+            includeOwn: true,
+            includeOwnPrivate: false,
+          });
         }
       }
       return items;
@@ -607,19 +605,8 @@ function resolveTypeFromMember(ast: AstNode, typeName: string, memberName: strin
   if (!typeDef) return null;
 
   if (isContractDefinition(typeDef)) {
-    const nodes = (typeDef as ContractDefinition).nodes ?? [];
-    for (const member of nodes) {
-      if (isFunctionDefinition(member) && member.name === memberName) {
-        const retParams = (member as FunctionDefinition).returnParameters?.parameters;
-        if (retParams && retParams.length > 0) {
-          return extractTypeName(retParams[0].typeName as AstNode);
-        }
-        return null;
-      }
-      if (isStateVariableDeclaration(member) && member.name === memberName) {
-        return extractTypeName((member as StateVariableDeclaration).typeName as AstNode);
-      }
-    }
+    // Walk the full inheritance chain to find the member
+    return resolveContractMemberType(typeDef, ast, memberName);
   }
 
   if (isStructDefinition(typeDef)) {
@@ -639,59 +626,12 @@ function getMembersOfType(typeName: string, ast: AstNode, content: string): Comp
   const typeDef = findTypeByName(ast, typeName);
 
   if (typeDef && isContractDefinition(typeDef)) {
-    const nodes = (typeDef as ContractDefinition).nodes ?? [];
-    for (const member of nodes) {
-      if (isFunctionDefinition(member)) {
-        const fn = member as FunctionDefinition;
-        const params =
-          fn.parameters?.parameters
-            ?.map((p) => {
-              const tn = extractTypeName(p.typeName as AstNode);
-              return `${tn} ${p.name}`;
-            })
-            .join(', ') ?? '';
-        const docs = extractNatSpec(fn);
-        items.push({
-          label: fn.name!,
-          kind: CompletionItemKind.Function,
-          detail: `${fn.visibility} function ${fn.name}(${params})`,
-          documentation: docs ? { kind: MarkupKind.Markdown, value: docs } : undefined,
-        });
-      } else if (isStateVariableDeclaration(member)) {
-        const sv = member as StateVariableDeclaration;
-        items.push({
-          label: sv.name!,
-          kind: CompletionItemKind.Property,
-          detail: `${sv.visibility} ${extractTypeName(sv.typeName as AstNode)} ${sv.name}`,
-        });
-      } else if (isStructDefinition(member)) {
-        items.push({
-          label: member.name!,
-          kind: CompletionItemKind.Struct,
-        });
-      } else if (isEnumDefinition(member)) {
-        items.push({
-          label: member.name!,
-          kind: CompletionItemKind.Enum,
-        });
-      } else if (isEventDefinition(member)) {
-        items.push({
-          label: member.name!,
-          kind: CompletionItemKind.Event,
-        });
-      } else if (isErrorDefinition(member)) {
-        items.push({
-          label: member.name!,
-          kind: CompletionItemKind.Enum,
-        });
-      } else if (isModifierDefinition(member)) {
-        items.push({
-          label: member.name!,
-          kind: CompletionItemKind.Function,
-          detail: 'modifier',
-        });
-      }
-    }
+    // Walk full inheritance chain — private members from parent contracts excluded,
+    // but private members from the contract itself are included (accessible within same source unit)
+    return collectContractMembers(typeDef, ast, {
+      includeOwn: true,
+      includeOwnPrivate: true,
+    });
   }
 
   if (typeDef && isStructDefinition(typeDef)) {
@@ -770,11 +710,11 @@ function provideUsingLibraryCompletion(
   return items;
 }
 
-function provideImportCompletion(
+async function provideImportCompletion(
   partial: string,
   position: Position,
   project: FoundryProject | undefined
-): CompletionItem[] {
+): Promise<CompletionItem[]> {
   if (!project) return [];
 
   const items: CompletionItem[] = [];
@@ -788,9 +728,9 @@ function provideImportCompletion(
 
   for (const searchDir of searchDirs) {
     const targetDir = dir ? path.join(searchDir, dir) : searchDir;
-    if (!fs.existsSync(targetDir)) continue;
+    const entries = await readdirCached(targetDir);
+    if (entries.length === 0) continue;
 
-    const entries = fs.readdirSync(targetDir, { withFileTypes: true });
     for (const entry of entries) {
       if (!entry.name.endsWith('.sol')) continue;
       if (prefix && !entry.name.startsWith(prefix)) continue;
@@ -886,57 +826,195 @@ function findTypeByName(ast: AstNode, name: string): AstNode | null {
   return found;
 }
 
-function extractTypeName(node: AstNode): string {
-  if (!node) return 'unknown';
-  if (node.nodeType === 'ElementaryTypeName') return node.name!;
-  if (node.nodeType === 'UserDefinedTypeName') return node.name ?? (node as any).pathNode?.name ?? 'unknown';
-  if (node.nodeType === 'Mapping') {
-    const key = extractTypeName(node.keyType as AstNode);
-    const value = extractTypeName(node.valueType as AstNode);
-    return `mapping(${key} => ${value})`;
-  }
-  if (node.nodeType === 'ArrayTypeName') {
-    const base = extractTypeName(node.baseType as AstNode);
-    return `${base}[]`;
-  }
-  const typeDesc = node.typeDescriptions as { typeString?: string } | undefined;
-  return typeDesc?.typeString ?? 'unknown';
+/**
+ * Collect all visible members from a contract's full inheritance chain.
+ * Respects Solidity visibility rules:
+ *  - private members: only visible from the defining contract (never inherited)
+ *  - internal / public / external: inherited and visible
+ *
+ * Circular inheritance is handled via a visited set keyed on contract id.
+ *
+ * @param contract        The contract whose members to collect
+ * @param ast             Full AST root (needed to resolve base contract names)
+ * @param includeOwn      Whether to include the contract's own members (default true)
+ * @param includeOwnPrivate  Whether to include private members from the contract itself
+ *                           (useful for this. and external instance access where we are
+ *                           conceptually inside the contract; default false)
+ */
+function collectContractMembers(
+  contract: ContractDefinition,
+  ast: AstNode,
+  opts: { includeOwn?: boolean; includeOwnPrivate?: boolean } = {}
+): CompletionItem[] {
+  const items: CompletionItem[] = [];
+  const seen = new Set<string>();
+  const visited = new Set<number>();
+
+  collectContractMembersInto(contract, ast, items, seen, visited, {
+    includeOwn: opts.includeOwn !== false,
+    includeOwnPrivate: opts.includeOwnPrivate === true,
+  });
+
+  return items;
 }
 
-function extractNatSpec(node: AstNode): string {
-  const doc = node.documentation as
-    | { nodeType?: string; text?: string }
-    | undefined;
-  if (!doc?.text) return '';
+/**
+ * Recursively collect members from a contract and its ancestors into the
+ * provided arrays, deduplicating by name (first-declared wins).
+ */
+function collectContractMembersInto(
+  contract: ContractDefinition,
+  ast: AstNode,
+  items: CompletionItem[],
+  seen: Set<string>,
+  visited: Set<number>,
+  opts: { includeOwn: boolean; includeOwnPrivate: boolean }
+): void {
+  if (visited.has(contract.id)) return;
+  visited.add(contract.id);
 
-  const lines = doc.text
-    .split('\n')
-    .map((l) => l.trim())
-    .filter(Boolean);
+  if (opts.includeOwn) {
+    const nodes = contract.nodes ?? [];
+    for (const member of nodes) {
+      if (member.name && seen.has(member.name)) continue;
 
-  const parts: string[] = [];
-  for (const line of lines) {
-    if (line.startsWith('@notice')) {
-      parts.push(line.replace('@notice', '').trim());
-    } else if (line.startsWith('@dev')) {
-      parts.push(line.replace('@dev', '').trim());
-    } else if (line.startsWith('@param')) {
-      parts.push(line);
-    } else if (line.startsWith('@return')) {
-      parts.push(line);
+      const vis = (member as any).visibility as string | undefined;
+      // Private members are only visible within their own contract
+      if (vis === 'private') {
+        if (!opts.includeOwnPrivate) continue;
+      }
+
+      const item = contractMemberToCompletionItem(member);
+      if (item) {
+        if (member.name) seen.add(member.name);
+        items.push(item);
+      }
     }
   }
 
-  return parts.join('\n');
-}
+  // Walk base contracts (the inheritance chain)
+  const baseContracts = (contract as any).baseContracts ?? [];
+  for (const base of baseContracts) {
+    const baseName = base.baseName?.name;
+    if (!baseName) continue;
 
-function walkAst(node: AstNode, callback: (node: AstNode) => boolean): void {
-  if (!callback(node)) return;
-  if (node.nodes) {
-    for (const child of node.nodes) {
-      walkAst(child, callback);
+    const baseType = findTypeByName(ast, baseName);
+    if (baseType && isContractDefinition(baseType)) {
+      // For base contracts, always include their members (never private)
+      collectContractMembersInto(baseType, ast, items, seen, visited, {
+        includeOwn: true,
+        includeOwnPrivate: false,
+      });
     }
   }
+}
+
+/**
+ * Convert a single contract member AST node into a CompletionItem.
+ * Returns undefined for node types that don't produce completions.
+ */
+function contractMemberToCompletionItem(member: AstNode): CompletionItem | undefined {
+  if (isFunctionDefinition(member)) {
+    const fn = member as FunctionDefinition;
+    const params =
+      fn.parameters?.parameters
+        ?.map((p) => {
+          const tn = extractTypeName(p.typeName as AstNode);
+          return `${tn} ${p.name}`;
+        })
+        .join(', ') ?? '';
+    const docs = extractNatSpec(fn);
+    return {
+      label: fn.name!,
+      kind: CompletionItemKind.Function,
+      detail: `${fn.visibility} function ${fn.name}(${params})`,
+      documentation: docs ? { kind: MarkupKind.Markdown, value: docs } : undefined,
+    };
+  }
+
+  if (isStateVariableDeclaration(member)) {
+    const sv = member as StateVariableDeclaration;
+    return {
+      label: sv.name!,
+      kind: CompletionItemKind.Property,
+      detail: `${sv.visibility} ${extractTypeName(sv.typeName as AstNode)} ${sv.name}`,
+    };
+  }
+
+  if (isStructDefinition(member)) {
+    return { label: member.name!, kind: CompletionItemKind.Struct };
+  }
+
+  if (isEnumDefinition(member)) {
+    return { label: member.name!, kind: CompletionItemKind.Enum };
+  }
+
+  if (isEventDefinition(member)) {
+    return { label: member.name!, kind: CompletionItemKind.Event };
+  }
+
+  if (isErrorDefinition(member)) {
+    return { label: member.name!, kind: CompletionItemKind.Enum };
+  }
+
+  if (isModifierDefinition(member)) {
+    return { label: member.name!, kind: CompletionItemKind.Function, detail: 'modifier' };
+  }
+
+  return undefined;
+}
+
+/**
+ * Look up a member on a contract type, walking the inheritance chain.
+ * Returns the resolved return-type string, or null.
+ */
+function resolveContractMemberType(
+  contract: ContractDefinition,
+  ast: AstNode,
+  memberName: string
+): string | null {
+  const visited = new Set<number>();
+  return resolveContractMemberTypeImpl(contract, ast, memberName, visited);
+}
+
+function resolveContractMemberTypeImpl(
+  contract: ContractDefinition,
+  ast: AstNode,
+  memberName: string,
+  visited: Set<number>
+): string | null {
+  if (visited.has(contract.id)) return null;
+  visited.add(contract.id);
+
+  const nodes = contract.nodes ?? [];
+  for (const member of nodes) {
+    if (member.name !== memberName) continue;
+
+    if (isFunctionDefinition(member)) {
+      const retParams = (member as FunctionDefinition).returnParameters?.parameters;
+      if (retParams && retParams.length > 0) {
+        return extractTypeName(retParams[0].typeName as AstNode);
+      }
+      return null;
+    }
+    if (isStateVariableDeclaration(member)) {
+      return extractTypeName((member as StateVariableDeclaration).typeName as AstNode);
+    }
+  }
+
+  // Walk base contracts
+  const baseContracts = (contract as any).baseContracts ?? [];
+  for (const base of baseContracts) {
+    const baseName = base.baseName?.name;
+    if (!baseName) continue;
+    const baseType = findTypeByName(ast, baseName);
+    if (baseType && isContractDefinition(baseType)) {
+      const result = resolveContractMemberTypeImpl(baseType, ast, memberName, visited);
+      if (result) return result;
+    }
+  }
+
+  return null;
 }
 
 function findEnclosingContract(ast: AstNode, position: Position, content: string): AstNode | null {
@@ -961,9 +1039,10 @@ function findEnclosingContract(ast: AstNode, position: Position, content: string
 function provideNatSpecCompletion(ast: AstNode, position: Position, content: string): CompletionItem[] {
   const items: CompletionItem[] = [];
 
-  // Determine context: are we inside a function, contract, etc.?
+  // Determine context: are we inside a function, contract, event, etc.?
   const enclosingContract = findEnclosingContract(ast, position, content);
   const enclosingFunction = findEnclosingFunction(ast, position, content);
+  const enclosingEvent = findEnclosingEvent(ast, position, content);
 
   // If inside a function, offer auto-generated NatSpec block with @param/@return
   if (enclosingFunction) {
@@ -989,11 +1068,55 @@ function provideNatSpecCompletion(ast: AstNode, position: Position, content: str
     }
 
     items.push({
-      label: '/** NatSpec block */',
+      label: '/** NatSpec block for function */',
       kind: CompletionItemKind.Snippet,
       insertText: autoBlock.trimEnd(),
       insertTextFormat: InsertTextFormat.Snippet,
-      detail: `Auto-generate NatSpec for ${fn.name ?? 'function'} with ${params.length} params`,
+      detail: `Auto-generate NatSpec for ${fn.name ?? 'function'} with ${params.length} params, ${returnParams.length} returns`,
+    });
+  }
+
+  // If inside a contract (but not inside a function), offer contract-level template
+  if (enclosingContract && !enclosingFunction) {
+    const contractName = (enclosingContract as ContractDefinition).name ?? 'Contract';
+    const contractKind = (enclosingContract as ContractDefinition).contractKind ?? 'contract';
+
+    let contractBlock = '';
+    contractBlock += `@title ${contractName}\n`;
+    contractBlock += '@author ${1:Author name}\n';
+    contractBlock += `@notice \${2:Explain to an end user what this ${contractKind} does}\n`;
+    contractBlock += '@dev ${3:Explain to a developer any extra details}\n';
+
+    items.push({
+      label: '/** NatSpec block for contract */',
+      kind: CompletionItemKind.Snippet,
+      insertText: contractBlock.trimEnd(),
+      insertTextFormat: InsertTextFormat.Snippet,
+      detail: `Auto-generate NatSpec for ${contractKind} ${contractName}`,
+    });
+  }
+
+  // If inside an event, offer event-level template
+  if (enclosingEvent) {
+    const eventName = (enclosingEvent as any).name ?? 'Event';
+    const eventParams = (enclosingEvent as any).parameters?.parameters ?? [];
+
+    let eventBlock = '';
+    eventBlock += `@notice \${1:Emit when ...}\n`;
+    eventBlock += '@dev ${2:Developer details}\n';
+    for (let i = 0; i < eventParams.length; i++) {
+      const p = eventParams[i];
+      const paramName = p.name ?? `param${i}`;
+      const snippetIndex = i + 3;
+      eventBlock += `@param ${paramName} \${${snippetIndex}:${paramName} description}\n`;
+    }
+
+    items.push({
+      label: '/** NatSpec block for event */',
+      kind: CompletionItemKind.Snippet,
+      insertText: eventBlock.trimEnd(),
+      insertTextFormat: InsertTextFormat.Snippet,
+      detail: `Auto-generate NatSpec for event ${eventName} with ${eventParams.length} params`,
     });
   }
 
@@ -1006,9 +1129,14 @@ function provideNatSpecCompletion(ast: AstNode, position: Position, content: str
     ['@title', '@title ${1:A title that should describe this}', 'Title'],
   ];
 
-  if (enclosingFunction) {
+  if (enclosingFunction || enclosingEvent) {
     tags.push(
       ['@param', '@param ${1:name} ${2:Describe the parameter}', 'Parameter documentation'],
+    );
+  }
+
+  if (enclosingFunction) {
+    tags.push(
       ['@return', '@return ${1:Describe the return value}', 'Return value documentation'],
     );
   }
@@ -1045,13 +1173,309 @@ function findEnclosingFunction(ast: AstNode, position: Position, content: string
   return found;
 }
 
-function positionToOffset(content: string, position: Position): number {
-  const lines = content.split('\n');
-  let byteOffset = 0;
-  for (let i = 0; i < position.line && i < lines.length; i++) {
-    byteOffset += Buffer.byteLength(lines[i], 'utf-8') + 1;
+// ─── Local variable scope resolution ───
+
+interface VariableInScope {
+  name: string;
+  typeName: string;
+  /** Byte offset where this declaration starts in the source */
+  declOffset: number;
+  /** Byte offset where the enclosing block starts (0 for function params) */
+  blockOffset: number;
+}
+
+/**
+ * Find all variable declarations that are in scope at a given byte offset.
+ *
+ * Walks the enclosing function's AST to collect:
+ * - Function parameters (always in scope)
+ * - State variables from the enclosing contract
+ * - Local variable declarations (VariableDeclarationStatement)
+ * - For-loop variable declarations
+ * - Catch clause parameters
+ *
+ * A variable is considered "in scope" if:
+ * 1. It is declared before the cursor offset
+ * 2. Its declaration is in a block that contains the cursor position
+ *
+ * This mirrors the reference implementation's findVariableDeclarationsInScope.
+ */
+export function findVariableDeclarationsInScope(
+  ast: AstNode,
+  offset: number,
+  content: string
+): VariableInScope[] {
+  const enclosingFunction = findEnclosingFunctionByOffset(ast, offset);
+  if (!enclosingFunction) return [];
+
+  const fn = enclosingFunction as FunctionDefinition;
+  const results: VariableInScope[] = [];
+
+  // 1. Function parameters are always in scope
+  const params = fn.parameters?.parameters ?? [];
+  for (const param of params) {
+    if (param.name) {
+      results.push({
+        name: param.name,
+        typeName: extractTypeName(param.typeName as AstNode),
+        declOffset: 0, // params are always in scope
+        blockOffset: 0,
+      });
+    }
   }
-  const targetLine = lines[position.line] || '';
-  byteOffset += Buffer.byteLength(targetLine.substring(0, position.character), 'utf-8');
-  return byteOffset;
+
+  // 2. Walk the function body to find local variable declarations
+  const body = fn.body;
+  if (body) {
+    collectDeclarationsInScope(body, offset, results);
+  }
+
+  // 3. State variables from the enclosing contract are also in scope
+  const enclosingContract = findEnclosingContractByOffset(ast, offset);
+  if (enclosingContract) {
+    const contract = enclosingContract as ContractDefinition;
+    const nodes = contract.nodes ?? [];
+    for (const member of nodes) {
+      if (isStateVariableDeclaration(member) && member.name) {
+        results.push({
+          name: member.name,
+          typeName: extractTypeName((member as StateVariableDeclaration).typeName as AstNode),
+          declOffset: 0, // state variables are always in scope within the contract
+          blockOffset: 0,
+        });
+      }
+    }
+  }
+
+  return results;
+}
+
+/**
+ * Find the enclosing function at a given byte offset.
+ */
+function findEnclosingFunctionByOffset(ast: AstNode, offset: number): AstNode | null {
+  let found: AstNode | null = null;
+
+  walkAst(ast, (node) => {
+    if (found) return false;
+    if (isFunctionDefinition(node) && node.src) {
+      const parsed = parseSrc(node.src);
+      if (parsed && offset >= parsed.start && offset <= parsed.start + parsed.length) {
+        found = node;
+        return false;
+      }
+    }
+    return true;
+  });
+
+  return found;
+}
+
+/**
+ * Find the enclosing contract at a given byte offset.
+ */
+function findEnclosingContractByOffset(ast: AstNode, offset: number): AstNode | null {
+  let found: AstNode | null = null;
+
+  walkAst(ast, (node) => {
+    if (found) return false;
+    if (isContractDefinition(node) && node.src) {
+      const parsed = parseSrc(node.src);
+      if (parsed && offset >= parsed.start && offset <= parsed.start + parsed.length) {
+        found = node;
+        return false;
+      }
+    }
+    return true;
+  });
+
+  return found;
+}
+
+/**
+ * Recursively collect variable declarations from a Block node that are in scope
+ * at the given byte offset.
+ *
+ * Handles:
+ * - VariableDeclarationStatement (local variables)
+ * - ForStatement (loop variable declarations in init)
+ * - TryCatchClause (catch clause parameters)
+ * - Nested blocks (recurses into children)
+ */
+function collectDeclarationsInScope(
+  node: AstNode,
+  targetOffset: number,
+  results: VariableInScope[]
+): void {
+  // Only process Block nodes (function bodies, if/else/for/while/try/catch blocks)
+  if (node.nodeType !== 'Block') return;
+
+  const blockParsed = parseSrc(node.src);
+  if (!blockParsed) return;
+
+  // Check if this block contains the target offset
+  const blockStart = blockParsed.start;
+  const blockEnd = blockStart + blockParsed.length;
+  if (targetOffset < blockStart || targetOffset > blockEnd) return;
+
+  // Process statements in this block
+  const statements = (node as any).statements ?? [];
+  for (const stmt of statements) {
+    if (!stmt.src) continue;
+
+    const stmtParsed = parseSrc(stmt.src);
+    if (!stmtParsed) continue;
+
+    // Only include statements declared before the target offset
+    if (stmtParsed.start >= targetOffset) continue;
+
+    // VariableDeclarationStatement: contains declarations array
+    if (stmt.nodeType === 'VariableDeclarationStatement') {
+      const declarations = (stmt as any).declarations ?? [];
+      for (const decl of declarations) {
+        if (decl.name && decl.src) {
+          const declParsed = parseSrc(decl.src);
+          if (declParsed && declParsed.start < targetOffset) {
+            results.push({
+              name: decl.name,
+              typeName: extractTypeName(decl.typeName as AstNode),
+              declOffset: declParsed.start,
+              blockOffset: blockStart,
+            });
+          }
+        }
+      }
+    }
+
+    // ForStatement: check init for variable declarations
+    if (stmt.nodeType === 'ForStatement') {
+      const initializations = (stmt as any).initializations ?? [];
+      for (const init of initializations) {
+        if (init.nodeType === 'VariableDeclarationStatement') {
+          const declarations = (init as any).declarations ?? [];
+          for (const decl of declarations) {
+            if (decl.name && decl.src) {
+              const declParsed = parseSrc(decl.src);
+              if (declParsed && declParsed.start < targetOffset) {
+                results.push({
+                  name: decl.name,
+                  typeName: extractTypeName(decl.typeName as AstNode),
+                  declOffset: declParsed.start,
+                  blockOffset: blockStart,
+                });
+              }
+            }
+          }
+        }
+      }
+
+      // Also check the loop body block for nested declarations
+      const body = (stmt as any).body;
+      if (body) {
+        collectDeclarationsInScope(body, targetOffset, results);
+      }
+    }
+
+    // Recurse into nested blocks (if/else bodies, while/for bodies, etc.)
+    collectNestedBlockDeclarations(stmt, targetOffset, results);
+  }
+}
+
+/**
+ * Recursively collect variable declarations from nested block structures.
+ * Handles IfStatement, WhileStatement, DoWhileStatement, UncheckedStatement,
+ * Block (inline blocks), and TryStatement (try body + catch clauses).
+ */
+function collectNestedBlockDeclarations(
+  node: AstNode,
+  targetOffset: number,
+  results: VariableInScope[]
+): void {
+  // IfStatement: trueBody and falseBody are Blocks
+  if (node.nodeType === 'IfStatement') {
+    const trueBody = (node as any).trueBody;
+    const falseBody = (node as any).falseBody;
+    if (trueBody) collectDeclarationsInScope(trueBody, targetOffset, results);
+    if (falseBody) collectDeclarationsInScope(falseBody, targetOffset, results);
+  }
+
+  // WhileStatement: body is a Block
+  if (node.nodeType === 'WhileStatement') {
+    const body = (node as any).body;
+    if (body) collectDeclarationsInScope(body, targetOffset, results);
+  }
+
+  // DoWhileStatement: body is a Block
+  if (node.nodeType === 'DoWhileStatement') {
+    const body = (node as any).body;
+    if (body) collectDeclarationsInScope(body, targetOffset, results);
+  }
+
+  // UncheckedStatement: body is a Block
+  if (node.nodeType === 'UncheckedStatement') {
+    const body = (node as any).body;
+    if (body) collectDeclarationsInScope(body, targetOffset, results);
+  }
+
+  // Block (inline block: { ... })
+  if (node.nodeType === 'Block') {
+    collectDeclarationsInScope(node, targetOffset, results);
+  }
+
+  // TryStatement: try body + catch clauses
+  if (node.nodeType === 'TryStatement') {
+    const body = (node as any).body;
+    if (body) collectDeclarationsInScope(body, targetOffset, results);
+
+    const clauses = (node as any).clauses ?? [];
+    for (const clause of clauses) {
+      if (clause.nodeType === 'TryCatchClause') {
+        // Check catch clause parameters
+        const parameters = (clause as any).parameters;
+        if (parameters && Array.isArray(parameters)) {
+          for (const param of parameters) {
+            if (param.name && param.src) {
+              const paramParsed = parseSrc(param.src);
+              if (paramParsed && paramParsed.start < targetOffset) {
+                results.push({
+                  name: param.name,
+                  typeName: extractTypeName(param.typeName as AstNode),
+                  declOffset: paramParsed.start,
+                  blockOffset: 0,
+                });
+              }
+            }
+          }
+        }
+
+        // Recurse into catch clause body
+        const clauseBody = (clause as any).block;
+        if (clauseBody) {
+          collectDeclarationsInScope(clauseBody, targetOffset, results);
+        }
+      }
+    }
+  }
+
+  // EmitStatement, ExpressionStatement, ReturnStatement, etc. — no nested blocks
+  // AssemblyBlock — not handling assembly variables for now
+}
+
+function findEnclosingEvent(ast: AstNode, position: Position, content: string): AstNode | null {
+  let found: AstNode | null = null;
+  const offset = positionToOffset(content, position);
+
+  walkAst(ast, (node) => {
+    if (found) return false;
+    if (isEventDefinition(node) && node.src) {
+      const parsed = parseSrc(node.src);
+      if (parsed && offset >= parsed.start && offset <= parsed.start + parsed.length) {
+        found = node;
+        return false;
+      }
+    }
+    return true;
+  });
+
+  return found;
 }

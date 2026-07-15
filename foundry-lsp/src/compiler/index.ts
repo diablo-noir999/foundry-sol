@@ -12,6 +12,7 @@ import { parseDiagnostics } from './diagnostics';
 import { globalIndex } from '../indexer';
 import { findImports } from '../ast/traversal';
 import { documents } from '../documents';
+import { diagnosticDeduplicate } from '../features/codeAction';
 
 const execFileAsync = promisify(execFile);
 
@@ -20,6 +21,9 @@ export class CompilerManager {
   private debounceTimers = new Map<string, NodeJS.Timeout>();
   private dependencyGraph = new Map<string, Set<string>>();
   private inverseDeps = new Map<string, Set<string>>();
+  /** Per-URI counter that increments on each compile request. Used by
+   *  compileWithDebounce to detect and discard stale results. */
+  private validationCounters = new Map<string, number>();
 
   async compile(uri: string, content: string): Promise<CompileResult | null> {
     try {
@@ -53,7 +57,7 @@ export class CompilerManager {
 
     // Pre-read existing AST before forge potentially wipes it on failure
     try {
-      const preRead = readAstFromDisk(project, filePath);
+      const preRead = await readAstFromDisk(project, filePath);
       ast = preRead?.ast ?? null;
       sourceFileMap = preRead?.sourceFileMap ?? new Map();
     } catch (error) {
@@ -81,7 +85,7 @@ export class CompilerManager {
     // If forge succeeded, re-read AST, rebuild sourceFileMap, index files, and get structured diagnostics
     if (forgeSucceeded) {
       try {
-        const freshRead = readAstFromDisk(project, filePath);
+        const freshRead = await readAstFromDisk(project, filePath);
         if (freshRead?.ast) ast = freshRead.ast;
         if (freshRead?.sourceFileMap && freshRead.sourceFileMap.size > 0) {
           sourceFileMap = freshRead.sourceFileMap;
@@ -92,14 +96,14 @@ export class CompilerManager {
 
       // Index all compiled files for cross-file resolution
       try {
-        indexCompiledFiles(project, sourceFileMap);
+        await indexCompiledFiles(project, sourceFileMap);
       } catch (error) {
         console.error(`[compiler] indexCompiledFiles error:`, error);
       }
 
       // Merge structured diagnostics from forge's JSON output with text-based ones
       try {
-        const jsonDiagnostics = readForgeJsonDiagnostics(project, filePath);
+        const jsonDiagnostics = await readForgeJsonDiagnostics(project, filePath);
         if (jsonDiagnostics.length > 0) {
           // JSON diagnostics take priority for overlapping ranges
           const seen = new Set(jsonDiagnostics.map(
@@ -114,6 +118,10 @@ export class CompilerManager {
         console.error(`[compiler] readForgeJsonDiagnostics error:`, error);
       }
     }
+
+    // Deduplicate diagnostics: remove errors superseded by more specific ones
+    // at the same source location (e.g. "abstract" blocks "override" + "visibility")
+    diagnostics = diagnosticDeduplicate(diagnostics);
 
     const result: CompileResult = {
       uri,
@@ -151,6 +159,10 @@ export class CompilerManager {
       fs.writeFileSync(path.join(srcDir, basename), content);
 
       let diagnostics: Diagnostic[] = [];
+      let ast: SourceUnit | null = null;
+      let sourceFileMap = new Map<number, string>();
+      let forgeSucceeded = false;
+
       try {
         const { stdout, stderr } = await execFileAsync('forge', ['build', '--ast'], {
           cwd: tempDir,
@@ -159,18 +171,36 @@ export class CompilerManager {
           maxBuffer: 50 * 1024 * 1024,
         });
         diagnostics = parseForgeOutput(stdout, stderr);
+        forgeSucceeded = true;
       } catch (error: any) {
         if (error.stderr || error.stdout) {
           diagnostics = parseForgeOutput(error.stdout || '', error.stderr || '');
         }
       }
 
+      // Read AST from the temp project before the temp directory is deleted
+      if (forgeSucceeded && tempDir) {
+        try {
+          const tempProject: FoundryProject = {
+            root: tempDir,
+            config: { src: 'src', out: 'out', libs: ['lib'], solcVersion: null },
+            remappings: new Map(),
+            solFiles: new Set(),
+          };
+          const astRead = await readAstFromDisk(tempProject, filePath);
+          if (astRead.ast) ast = astRead.ast;
+          if (astRead.sourceFileMap.size > 0) sourceFileMap = astRead.sourceFileMap;
+        } catch (error) {
+          console.error(`[compiler] compileOutOfProject readAstFromDisk error:`, error);
+        }
+      }
+
       const result: CompileResult = {
         uri,
         diagnostics,
-        ast: null,
+        ast,
         timestamp: Date.now(),
-        sourceFileMap: new Map(),
+        sourceFileMap,
       };
 
       this.cache.set(uri, content, result);
@@ -179,7 +209,9 @@ export class CompilerManager {
       return null;
     } finally {
       if (tempDir) {
-        try { fs.rmSync(tempDir, { recursive: true, force: true }); } catch {}
+        try { fs.rmSync(tempDir, { recursive: true, force: true }); } catch (err) {
+          console.error(`[compiler] Failed to clean temp dir ${tempDir}:`, err);
+        }
       }
     }
   }
@@ -194,9 +226,23 @@ export class CompilerManager {
       clearTimeout(existingTimer);
     }
 
+    // Increment validation counter — any compile currently in-flight for this
+    // URI will become stale once we bump this number.
+    const validationId = (this.validationCounters.get(uri) ?? 0) + 1;
+    this.validationCounters.set(uri, validationId);
+
     const timer = setTimeout(async () => {
       this.debounceTimers.delete(uri);
       const result = await this.compile(uri, content);
+
+      // Stale result check: if the counter has advanced since we started
+      // this compile, a newer request is already in-flight. Discard these
+      // results to avoid flashing outdated diagnostics.
+      if (this.validationCounters.get(uri) !== validationId) {
+        console.log(`[compiler] Discarding stale results for ${uri} (validationId ${validationId} ≠ ${this.validationCounters.get(uri)})`);
+        return;
+      }
+
       callback(result?.diagnostics ?? []);
 
       // Recompile dependent files
@@ -213,6 +259,10 @@ export class CompilerManager {
             if (!depDoc) continue;
             // Recompile (forge already ran, just re-read AST)
             const recompiled = await this.compile(depUri, depDoc.getText());
+            // Stale check for dependent files too
+            if (this.validationCounters.get(uri) !== validationId) {
+              continue;
+            }
             // Push diagnostics for dependent files
             callback(recompiled?.diagnostics ?? []);
           }
@@ -305,6 +355,7 @@ export class CompilerManager {
       clearTimeout(timer);
     }
     this.debounceTimers.clear();
+    this.validationCounters.clear();
     this.cache.clear();
   }
 }
@@ -314,7 +365,7 @@ interface AstReadResult {
   sourceFileMap: Map<number, string>;
 }
 
-function readAstFromDisk(project: FoundryProject, filePath: string): AstReadResult {
+async function readAstFromDisk(project: FoundryProject, filePath: string): Promise<AstReadResult> {
   const sourceFileMap = new Map<number, string>();
   let ast: SourceUnit | null = null;
 
@@ -323,15 +374,15 @@ function readAstFromDisk(project: FoundryProject, filePath: string): AstReadResu
     if (!fs.existsSync(outDir)) return { ast: null, sourceFileMap };
 
     // Read all artifact directories to build sourceFileMap
-    const entries = fs.readdirSync(outDir, { withFileTypes: true });
+    const entries = await fs.promises.readdir(outDir, { withFileTypes: true });
     for (const entry of entries) {
       if (!entry.isDirectory()) continue;
       const artifactDir = path.join(outDir, entry.name);
-      const jsonFiles = fs.readdirSync(artifactDir).filter((f) => f.endsWith('.json'));
+      const jsonFiles = (await fs.promises.readdir(artifactDir)).filter((f) => f.endsWith('.json'));
       if (jsonFiles.length === 0) continue;
 
       try {
-        const artifact = JSON.parse(fs.readFileSync(path.join(artifactDir, jsonFiles[0]), 'utf-8'));
+        const artifact = JSON.parse(await fs.promises.readFile(path.join(artifactDir, jsonFiles[0]), 'utf-8'));
         if (artifact.ast?.src) {
           // Extract file index from the first src field: "start:length:fileIndex"
           const srcParts = artifact.ast.src.split(':');
@@ -341,7 +392,7 @@ function readAstFromDisk(project: FoundryProject, filePath: string): AstReadResu
               // Resolve the full file path from the artifact directory name
               // Artifact dirs are named after the source file basename
               // We need to find the actual source file
-              const sourcePath = findSourceFile(project, entry.name);
+              const sourcePath = await findSourceFile(project, entry.name);
               if (sourcePath) {
                 sourceFileMap.set(fileIndex, sourcePath);
               }
@@ -360,9 +411,9 @@ function readAstFromDisk(project: FoundryProject, filePath: string): AstReadResu
     const sourceOutDirRel = path.join(outDir, relPath);
     const resolvedOutDir = fs.existsSync(sourceOutDirRel) ? sourceOutDirRel : sourceOutDir;
     if (fs.existsSync(resolvedOutDir)) {
-      const artifacts = fs.readdirSync(resolvedOutDir).filter((f) => f.endsWith('.json'));
+      const artifacts = (await fs.promises.readdir(resolvedOutDir)).filter((f) => f.endsWith('.json'));
       if (artifacts.length > 0) {
-        const artifact = JSON.parse(fs.readFileSync(path.join(resolvedOutDir, artifacts[0]), 'utf-8'));
+        const artifact = JSON.parse(await fs.promises.readFile(path.join(resolvedOutDir, artifacts[0]), 'utf-8'));
         ast = artifact.ast || null;
       }
     }
@@ -373,7 +424,7 @@ function readAstFromDisk(project: FoundryProject, filePath: string): AstReadResu
   return { ast, sourceFileMap };
 }
 
-function findSourceFile(project: FoundryProject, artifactName: string): string | null {
+async function findSourceFile(project: FoundryProject, artifactName: string): Promise<string | null> {
   // artifactName is like "Contract.sol" — find the actual source file
   const searchDirs = [
     path.join(project.root, project.config.src),
@@ -390,27 +441,27 @@ function findSourceFile(project: FoundryProject, artifactName: string): string |
   // Search recursively in lib directories
   for (const lib of project.config.libs) {
     const libDir = path.join(project.root, lib);
-    const found = findFileRecursive(libDir, artifactName);
+    const found = await findFileRecursive(libDir, artifactName);
     if (found) return found;
   }
 
   // Search recursively in src directory
   const srcDir = path.join(project.root, project.config.src);
-  const found = findFileRecursive(srcDir, artifactName);
+  const found = await findFileRecursive(srcDir, artifactName);
   if (found) return found;
 
   return null;
 }
 
-function findFileRecursive(dir: string, fileName: string): string | null {
+async function findFileRecursive(dir: string, fileName: string): Promise<string | null> {
   try {
-    const entries = fs.readdirSync(dir, { withFileTypes: true });
+    const entries = await fs.promises.readdir(dir, { withFileTypes: true });
     for (const entry of entries) {
       if (entry.name === fileName && entry.isFile()) {
         return path.join(dir, fileName);
       }
       if (entry.isDirectory() && !entry.name.startsWith('.') && entry.name !== 'node_modules') {
-        const found = findFileRecursive(path.join(dir, entry.name), fileName);
+        const found = await findFileRecursive(path.join(dir, entry.name), fileName);
         if (found) return found;
       }
     }
@@ -420,7 +471,7 @@ function findFileRecursive(dir: string, fileName: string): string | null {
   return null;
 }
 
-function readForgeJsonDiagnostics(project: FoundryProject, filePath: string): Diagnostic[] {
+async function readForgeJsonDiagnostics(project: FoundryProject, filePath: string): Promise<Diagnostic[]> {
   try {
     const outDir = path.join(project.root, project.config.out);
     if (!fs.existsSync(outDir)) return [];
@@ -432,12 +483,12 @@ function readForgeJsonDiagnostics(project: FoundryProject, filePath: string): Di
 
     for (const artifactDir of candidateDirs) {
       if (!fs.existsSync(artifactDir)) continue;
-      const jsonFiles = fs.readdirSync(artifactDir).filter((f) => f.endsWith('.json'));
+      const jsonFiles = (await fs.promises.readdir(artifactDir)).filter((f) => f.endsWith('.json'));
       if (jsonFiles.length === 0) continue;
 
       try {
         const artifact = JSON.parse(
-          fs.readFileSync(path.join(artifactDir, jsonFiles[0]), 'utf-8')
+          await fs.promises.readFile(path.join(artifactDir, jsonFiles[0]), 'utf-8')
         );
 
         if (artifact.errors && Array.isArray(artifact.errors)) {
@@ -460,30 +511,62 @@ function readForgeJsonDiagnostics(project: FoundryProject, filePath: string): Di
   return [];
 }
 
-function indexCompiledFiles(
+async function indexCompiledFiles(
   project: FoundryProject,
   sourceFileMap: Map<number, string>
-): void {
+): Promise<void> {
   try {
     const outDir = path.join(project.root, project.config.out);
     if (!fs.existsSync(outDir)) return;
 
-    globalIndex.clear();
+    // Collect all files that will be re-indexed
+    const newFilePaths = new Set<string>();
 
-    const entries = fs.readdirSync(outDir, { withFileTypes: true });
+    const entries = await fs.promises.readdir(outDir, { withFileTypes: true });
     for (const entry of entries) {
       if (!entry.isDirectory()) continue;
       const artifactDir = path.join(outDir, entry.name);
-      const jsonFiles = fs.readdirSync(artifactDir).filter((f) => f.endsWith('.json'));
+      const jsonFiles = (await fs.promises.readdir(artifactDir)).filter((f) => f.endsWith('.json'));
       if (jsonFiles.length === 0) continue;
 
       try {
         const artifact = JSON.parse(
-          fs.readFileSync(path.join(artifactDir, jsonFiles[0]), 'utf-8')
+          await fs.promises.readFile(path.join(artifactDir, jsonFiles[0]), 'utf-8')
         );
         if (artifact.ast) {
-          // Resolve the source file path
-          const filePath = findSourceFile(project, entry.name);
+          const filePath = await findSourceFile(project, entry.name);
+          if (filePath) {
+            newFilePaths.add(filePath);
+          }
+        }
+      } catch {
+        // Skip malformed artifacts
+      }
+    }
+
+    // Remove old files that are no longer in the output
+    const oldFiles = globalIndex.getIndexedFiles();
+    for (const oldUri of oldFiles) {
+      // Extract filePath from URI
+      const oldFilePath = URI.parse(oldUri).fsPath;
+      if (!newFilePaths.has(oldFilePath)) {
+        globalIndex.removeFile(oldFilePath);
+      }
+    }
+
+    // Index new files
+    for (const entry of entries) {
+      if (!entry.isDirectory()) continue;
+      const artifactDir = path.join(outDir, entry.name);
+      const jsonFiles = (await fs.promises.readdir(artifactDir)).filter((f) => f.endsWith('.json'));
+      if (jsonFiles.length === 0) continue;
+
+      try {
+        const artifact = JSON.parse(
+          await fs.promises.readFile(path.join(artifactDir, jsonFiles[0]), 'utf-8')
+        );
+        if (artifact.ast) {
+          const filePath = await findSourceFile(project, entry.name);
           if (filePath) {
             globalIndex.indexFile(filePath, artifact.ast);
           }

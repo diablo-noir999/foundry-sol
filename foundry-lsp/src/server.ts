@@ -9,6 +9,11 @@ import {
   Location,
   Diagnostic,
 } from 'vscode-languageserver';
+import * as crypto from 'crypto';
+import * as fs from 'fs';
+import * as os from 'os';
+import * as path from 'path';
+import { URI } from 'vscode-uri';
 import { connection } from './connection';
 import { documents } from './documents';
 import { SERVER_CAPABILITIES } from './capabilities';
@@ -21,21 +26,40 @@ import { provideCodeActions } from './features/codeAction';
 import { provideDocumentSymbols } from './features/documentSymbol';
 import { provideReferences } from './features/references';
 import { provideFormatting } from './features/formatting';
-import { provideRename } from './features/rename';
+import { provideRename, RenameResult } from './features/rename';
 import { provideTypeDefinition } from './features/typeDefinition';
 import { provideSemanticTokens } from './features/semanticTokens';
 import { provideSignatureHelp } from './features/signatureHelp';
 import { provideWorkspaceSymbols } from './features/workspaceSymbol';
 import { provideImplementation } from './features/implementation';
+import { findNodeAtPosition } from './ast/traversal';
 import { solhintLinter } from './linter/solhint';
+import { globalIndex } from './indexer';
 
-// Global error handler
+// SECURITY: Create crash log in OS temp directory with unpredictable name
+// to prevent symlink attacks. Uses restricted permissions (owner-only read/write).
+const crashLogDir = os.tmpdir();
+const crashLogFile = path.join(crashLogDir, `foundry-lsp-crash-${crypto.randomBytes(8).toString('hex')}.log`);
+
+function writeCrashLog(message: string): void {
+  try {
+    // Create file with restrictive permissions (0o600 = owner read/write only)
+    // O_CREAT | O_APPEND ensures we create or append atomically
+    const fd = fs.openSync(crashLogFile, fs.constants.O_CREAT | fs.constants.O_APPEND | fs.constants.O_WRONLY, 0o600);
+    fs.appendFileSync(fd, message);
+    fs.closeSync(fd);
+  } catch (err) {
+    // Crash log write failure is non-fatal — log to stderr for diagnostics
+    process.stderr.write(`[foundry-lsp] Failed to write crash log: ${err}\n`);
+  }
+}
+
 process.on('uncaughtException', (err) => {
-  try { require('fs').appendFileSync('/tmp/lsp-crash.log', new Date().toISOString() + ' ' + err.stack + '\n'); } catch {}
+  writeCrashLog(new Date().toISOString() + ' ' + err.stack + '\n');
   process.exit(1);
 });
 process.on('unhandledRejection', (reason) => {
-  try { require('fs').appendFileSync('/tmp/lsp-crash.log', new Date().toISOString() + ' UNHANDLED: ' + String(reason) + '\n'); } catch {}
+  writeCrashLog(new Date().toISOString() + ' UNHANDLED: ' + String(reason) + '\n');
 });
 
 // Diagnostics manager: merge compiler + solhint diagnostics per URI
@@ -52,7 +76,7 @@ function pushDiagnostics(uri: string, source: 'compiler' | 'solhint', diags: Dia
   connection.sendDiagnostics({ uri, diagnostics: merged });
 }
 
-connection.onInitialize((params: InitializeParams): InitializeResult => {
+connection.onInitialize(async (params: InitializeParams): Promise<InitializeResult> => {
   connection.console.log(
     `foundry-lsp starting — client: ${params.clientInfo?.name ?? 'unknown'}`
   );
@@ -78,7 +102,7 @@ connection.onInitialize((params: InitializeParams): InitializeResult => {
     });
   }
 
-  projectManager.init(params.workspaceFolders ?? null);
+  await projectManager.init(params.workspaceFolders ?? null);
 
   return {
     capabilities: SERVER_CAPABILITIES,
@@ -120,7 +144,7 @@ documents.onDidOpen((event) => {
   // Also run solhint linter
   const project = projectManager.getProject(uri);
   if (project) {
-    const filePath = require('vscode-uri').URI.parse(uri).fsPath;
+    const filePath = URI.parse(uri).fsPath;
     solhintLinter.lint(uri, filePath, content, (lintDiags) => {
       pushDiagnostics(uri, 'solhint', lintDiags);
     });
@@ -140,7 +164,7 @@ documents.onDidChangeContent((change) => {
   // Also run solhint linter
   const project = projectManager.getProject(uri);
   if (project) {
-    const filePath = require('vscode-uri').URI.parse(uri).fsPath;
+    const filePath = URI.parse(uri).fsPath;
     solhintLinter.lint(uri, filePath, content, (lintDiags) => {
       pushDiagnostics(uri, 'solhint', lintDiags);
     });
@@ -149,7 +173,7 @@ documents.onDidChangeContent((change) => {
 
 // ─── Phase 4: Feature Providers ───
 
-connection.onCompletion((params): CompletionItem[] => {
+connection.onCompletion(async (params): Promise<CompletionItem[]> => {
   try {
     const uri = params.textDocument.uri;
     const document = documents.get(uri);
@@ -160,7 +184,7 @@ connection.onCompletion((params): CompletionItem[] => {
 
     if (!result?.ast) return [];
 
-    return provideCompletion(result.ast, document, params.position, result, project);
+    return await provideCompletion(result.ast, document, params.position, result, project);
   } catch (error) {
     return [];
   }
@@ -189,7 +213,7 @@ connection.onHover((params): Hover | null => {
   }
 });
 
-connection.onDefinition((params): Definition | null => {
+connection.onDefinition(async (params): Promise<Definition | null> => {
   try {
     const uri = params.textDocument.uri;
     const document = documents.get(uri);
@@ -207,7 +231,7 @@ connection.onDefinition((params): Definition | null => {
     }
 
     connection.console.log(`[def] Resolving definition at ${params.position.line}:${params.position.character}`);
-    return provideDefinition(result.ast, document, params.position, result, project);
+    return await provideDefinition(result.ast, document, params.position, result, project);
   } catch (error) {
     connection.console.log(`[def] Error: ${error}`);
     return null;
@@ -246,7 +270,7 @@ connection.onDocumentSymbol((params): DocumentSymbol[] => {
   }
 });
 
-connection.onReferences((params): Location[] => {
+connection.onReferences(async (params): Promise<Location[]> => {
   try {
     const uri = params.textDocument.uri;
     const document = documents.get(uri);
@@ -256,7 +280,7 @@ connection.onReferences((params): Location[] => {
 
     if (!result?.ast) return [];
 
-    return provideReferences(
+    return await provideReferences(
       result.ast,
       document,
       params.position,
@@ -280,7 +304,7 @@ connection.onDocumentFormatting(async (params) => {
   }
 });
 
-connection.onRenameRequest((params) => {
+connection.onRenameRequest(async (params) => {
   try {
     const uri = params.textDocument.uri;
     const document = documents.get(uri);
@@ -289,7 +313,16 @@ connection.onRenameRequest((params) => {
     const result = compilerManager.getCachedResult(uri);
     if (!result?.ast) return null;
 
-    return provideRename(result.ast, document, params.position, params.newName, result);
+    const renameResult = await provideRename(result.ast, document, params.position, params.newName, result);
+    if (!renameResult) return null;
+
+    // Stale reference prevention: invalidate GlobalIndex entries for affected files
+    // so they don't serve stale symbol data during the compilation debounce window.
+    for (const affectedUri of renameResult.affectedUris) {
+      globalIndex.removeFile(URI.parse(affectedUri).fsPath);
+    }
+
+    return renameResult.edits;
   } catch (error) {
     return null;
   }
@@ -304,7 +337,6 @@ connection.onPrepareRename((params) => {
     const result = compilerManager.getCachedResult(uri);
     if (!result?.ast) return null;
 
-    const { findNodeAtPosition } = require('./ast/traversal');
     const node = findNodeAtPosition(result.ast, document.getText(), params.position);
     if (!node || !node.name) return null;
 
@@ -314,7 +346,7 @@ connection.onPrepareRename((params) => {
   }
 });
 
-connection.onTypeDefinition((params) => {
+connection.onTypeDefinition(async (params) => {
   try {
     const uri = params.textDocument.uri;
     const document = documents.get(uri);
@@ -323,13 +355,13 @@ connection.onTypeDefinition((params) => {
     const result = compilerManager.getCachedResult(uri);
     if (!result?.ast) return null;
 
-    return provideTypeDefinition(result.ast, document, params.position, result);
+    return await provideTypeDefinition(result.ast, document, params.position, result);
   } catch (error) {
     return null;
   }
 });
 
-connection.onImplementation((params) => {
+connection.onImplementation(async (params) => {
   try {
     const uri = params.textDocument.uri;
     const document = documents.get(uri);
@@ -338,7 +370,7 @@ connection.onImplementation((params) => {
     const result = compilerManager.getCachedResult(uri);
     if (!result?.ast) return null;
 
-    return provideImplementation(result.ast, document, params.position, result);
+    return await provideImplementation(result.ast, document, params.position, result);
   } catch (error) {
     return null;
   }
@@ -374,9 +406,9 @@ connection.onSignatureHelp((params) => {
   }
 });
 
-connection.onWorkspaceSymbol((params) => {
+connection.onWorkspaceSymbol(async (params) => {
   try {
-    return provideWorkspaceSymbols(params.query);
+    return await provideWorkspaceSymbols(params.query);
   } catch (error) {
     return [];
   }

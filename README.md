@@ -6,22 +6,23 @@ Solidity language support for Zed, built for Foundry projects.
 
 - **Syntax highlighting** — tree-sitter grammar for `.sol` and `.yul` (including `nonpayable` modifier)
 - **LSP** — full language server with 13 capabilities:
-  - Completion (keywords, types, globals, NatSpec, imports, dot-access for msg./block./tx./abi./this./super.)
-  - Hover (functions, variables, contracts, structs, enums, events, errors, modifiers, types)
-  - Go-to-definition (cross-file, remappings-aware)
+  - Completion (keywords, types, globals, NatSpec, imports, dot-access, local variables, inherited members)
+  - Hover (functions, variables, contracts, structs, enums, events, errors, modifiers, types, `@inheritdoc` resolution)
+  - Go-to-definition (cross-file, remappings-aware, struct/enum scoped access)
   - Find references (cross-file via AST `referencedDeclaration` IDs)
-  - Rename (cross-file workspace edits)
-  - Code actions (9 quickfixes + 4 ERC templates + implement interface)
-  - Document symbols (nested contract hierarchy with functions, variables, structs, enums, events, errors, modifiers)
-  - Formatting (`forge fmt` via stdin)
-  - Semantic tokens (19 node types)
+  - Rename (cross-file workspace edits with GlobalIndex invalidation)
+  - Code actions (9 error-code-based quickfixes + 4 ERC templates + via-ir suggestion + implement interface)
+  - Document symbols (nested hierarchy with function parameters as children)
+  - Formatting (`forge fmt` via stdin with fallback when forge unavailable)
+  - Semantic tokens (19 node types + string/number/comment literals)
   - Type definition
-  - Signature help (functions, events, modifiers, errors with NatSpec docs)
+  - Signature help (functions, events, modifiers, errors with NatSpec docs, overload resolution)
   - Workspace symbols (fuzzy search)
   - Implementation (interface → implementing contracts)
-- **Foundry project detection** — reads `foundry.toml`, resolves remappings
+- **Foundry project detection** — reads `foundry.toml`, resolves remappings (with `remappings.txt` fallback)
 - **50+ snippets** — core Solidity, ERC interfaces, Foundry templates, patterns
 - **Dependency checking** — auto-installs Foundry if missing
+- **Standalone .sol support** — works on files outside Foundry projects via temp-project compilation
 
 ## Installation
 
@@ -35,7 +36,7 @@ Requires:
 
 ### Completion
 - Solidity keywords with snippets
-- Elementary types sorted by frequency: `uint`, `uint256`, `uint128`, `uint64`, `uint32`, `uint16`, `uint8`, `int`, `int256`, `int128`, `int64`, `int32`, `int16`, `int8`, `bytes4`, `bytes8`, `bytes16`, `bytes20`, `bytes32`, `bytes96`, `bytes112`, `bytes160`
+- Elementary types sorted by frequency
 - Global functions (assert, require, keccak256, abi.encode, etc.)
 - Global variables (msg.sender, block.timestamp, tx.origin, etc.)
 - Global object sub-properties (msg., block., tx., abi.)
@@ -44,25 +45,67 @@ Requires:
 - `emit` trigger → events only
 - `revert` trigger → custom errors only
 - `using` trigger → library suggestions
-- NatSpec auto-generation with @param/@return
-- `this.` and `super.` member completion
+- NatSpec auto-generation with @param/@return (`*` trigger in comments)
+- `this.` and `super.` member completion with full inheritance walk
+- **Local variable scope** — function parameters, local variables, for-loop variables, catch parameters
+- **Inherited members** — dot completion walks full inheritance chain with visibility filtering
 
-### Quickfixes
-- Add SPDX license identifier
-- Add visibility (public/internal/external)
-- Add override specifier
-- Add virtual specifier
-- Mark contract as abstract
-- Add data location (memory/storage/calldata)
-- Add pragma version
-- Add mutability (view)
+### Hover
+- Functions, state variables, contracts, structs, enums, events, errors, modifiers
+- Elementary type descriptions (e.g., "Unsigned integer (256 bits)")
+- NatSpec extraction (@notice, @dev, @param, @return, @title, @author)
+- **`@inheritdoc` resolution** — follows inheritance chain to fetch documentation from parent contracts/interfaces
+
+### Go-to-Definition
+- Cross-file via GlobalIndex and `sourceFileMap`
+- Import resolution with remappings (longest-prefix-first matching)
+- Named import symbol resolution (`import {Foo} from "..."`)
+- **Struct/enum scoped access** — `MyContract.MyStruct` resolves to the correct definition
+
+### Signature Help
+- Functions, events, modifiers, errors with NatSpec documentation
+- Parameter label offsets for active parameter highlighting
+- Built-in signatures (require, assert, revert, blockhash)
+- **Overload resolution** — best match by argument count, shows all overloads
+
+### Code Actions
+- Error code-based quickfix dispatch (9 registered handlers)
+- Error deduplication (group-by-location, blocked code filtering)
+- SPDX license identifier
+- Missing visibility (public/internal/external)
+- Missing override/virtual/abstract specifiers
+- State mutability restriction (view/pure)
+- Data location (memory/storage/calldata)
+- Compiler version pragma
+- Address checksum
+- **via-ir suggestion** for contract code size errors
 - Implement interface (generate function stubs)
+- ERC templates (ERC-20, ERC-721, ERC-1155, Ownable)
 
-### ERC Templates
-- ERC-20 Token
-- ERC-721 NFT
-- ERC-1155 Multi-Token
-- Ownable Contract
+### Formatting
+- `forge fmt` via stdin (primary)
+- **Fallback formatting** — brace placement + whitespace cleanup when forge unavailable
+
+### Semantic Tokens
+- 19 node types: contracts, functions, variables, structs, enums, events, errors, modifiers, imports
+- Token modifiers: declaration, definition, readonly, static, deprecated, abstract
+- **String/number/comment literals** — highlighted in editor
+
+### Document Symbols
+- Contracts, functions, state variables, constants, structs, enums, events, errors, modifiers, UDVTs
+- Nested hierarchy (contract members, struct members)
+- **Function parameters as children** — input and return params nested under functions
+
+### Project Detection
+- Foundry project detection via `foundry.toml` (search upward + children + fallback)
+- Remappings via `forge remappings` with **`remappings.txt` fallback**
+- File watcher for `foundry.toml`, `remappings.txt`, and `.sol` files
+- **Standalone .sol support** — compiles via temp Foundry project, reads AST before cleanup
+
+### Indexing
+- GlobalIndex with 12 symbol kinds (contract, interface, library, function, variable, struct, enum, event, error, modifier, typedef, constant)
+- **Incremental indexing** — only re-indexes changed files instead of full rebuild
+- **Rename invalidation** — removes stale entries from GlobalIndex after rename
 
 ## Snippets
 
@@ -110,7 +153,7 @@ Requires:
 
 ## Formatting
 
-Formatting is built-in via `forge fmt`. No additional configuration needed.
+Formatting is built-in via `forge fmt`. Falls back to basic brace placement + whitespace cleanup if forge is unavailable.
 
 ## Fetching Verified Contracts
 
@@ -132,13 +175,20 @@ foundry-sol/
 ├── foundry-lsp/            ← TypeScript LSP server (bundled with esbuild)
 │   ├── src/
 │   │   ├── server.ts       ← Entry point
+│   │   ├── capabilities.ts ← SERVER_CAPABILITIES (single source of truth)
+│   │   ├── connection.ts   ← LSP connection (stdio)
+│   │   ├── documents.ts    ← TextDocuments manager
+│   │   ├── indexer.ts      ← GlobalIndex (cross-file symbol index, incremental)
 │   │   ├── features/       ← 13 LSP feature providers
-│   │   ├── compiler/       ← forge build --ast pipeline
-│   │   ├── project/        ← foundry.toml, remappings
-│   │   ├── ast/            ← Solidity AST types + traversal
-│   │   ├── linter/         ← solhint integration (tmp files in os.tmpdir())
-│   │   └── indexer.ts      ← GlobalIndex (cross-file symbol index)
-│   └── out/server.js       ← Bundled server (self-contained, no node_modules needed)
+│   │   ├── compiler/       ← forge build --ast pipeline (incremental, async I/O)
+│   │   ├── project/        ← foundry.toml, remappings (with fallback)
+│   │   ├── ast/            ← Solidity AST types + traversal (O(log n) position lookup)
+│   │   ├── linter/         ← solhint integration (secure temp files)
+│   │   └── utils.ts        ← Shared utilities (NatSpec, type extraction, etc.)
+│   ├── out/server.js       ← Bundled server (self-contained, no node_modules needed)
+│   └── test-project/
+│       ├── test-lsp.js     ← LSP integration tests
+│       └── test-parity.js  ← Comprehensive parity test suite (40 tests)
 ├── languages/solidity/     ← Tree-sitter query files
 ├── grammars/               ← tree-sitter-solidity, tree-sitter-yul
 ├── snippets/               ← 50+ Solidity snippets
@@ -147,16 +197,32 @@ foundry-sol/
 
 ## Testing
 
-Run the LSP test suite against a Foundry project:
+Run the LSP test suite:
 
 ```bash
-cd <foundry-project>
-node /path/to/foundry-sol/test-lsp.js
+cd foundry-lsp/test-project
+node test-lsp.js        # Core LSP tests
+node test-parity.js     # Parity improvement tests (40 test cases)
 ```
 
 Tests cover: diagnostics, completions, hover, go-to-definition, find references,
 type definition, code actions, formatting, document symbols, semantic tokens,
-workspace symbols, signature help, rename, and library file support.
+workspace symbols, signature help, rename, local variable scope, inheritance walk,
+@inheritdoc resolution, overload resolution, and more.
+
+## Security
+
+- Temp files use `crypto.randomBytes()` (not predictable timestamps)
+- Crash logs use random filenames with `0o600` permissions
+- All errors are logged for debugging (no silent failures)
+
+## Performance
+
+- O(log n) position lookup via pre-computed line offset tables
+- Async file I/O throughout (no blocking `readFileSync`)
+- Incremental indexing (only re-indexes changed files)
+- Cached directory listings for import completion (2s TTL)
+- Validation ID deduplication (stale results discarded)
 
 ## License
 

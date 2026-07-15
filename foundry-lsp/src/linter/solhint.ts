@@ -1,5 +1,6 @@
 import { Diagnostic, DiagnosticSeverity, Range } from 'vscode-languageserver';
 import { spawn } from 'child_process';
+import * as crypto from 'crypto';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
@@ -42,8 +43,10 @@ export class SolhintLinter {
     const projectRoot = path.dirname(filePath);
 
     // Write content to a temp file for solhint in OS temp directory
+    // SECURITY: Use crypto.randomBytes for unpredictable temp filenames to prevent race conditions
     const tmpDir = os.tmpdir();
-    const tmpFile = path.join(tmpDir, `solhint-${path.basename(filePath)}.${Date.now()}`);
+    const randomSuffix = crypto.randomBytes(8).toString('hex');
+    const tmpFile = path.join(tmpDir, `solhint-${randomSuffix}.sol`);
     try {
       fs.writeFileSync(tmpFile, content, 'utf-8');
     } catch {
@@ -72,7 +75,9 @@ export class SolhintLinter {
     proc.on('close', () => {
       try {
         fs.unlinkSync(tmpFile);
-      } catch {}
+      } catch (err) {
+        console.error(`[solhint] Failed to remove temp file ${tmpFile}:`, err);
+      }
 
       try {
         const results: SolhintWarning[] = JSON.parse(stdout);
@@ -86,7 +91,9 @@ export class SolhintLinter {
     });
 
     proc.on('error', () => {
-      try { fs.unlinkSync(tmpFile); } catch {}
+      try { fs.unlinkSync(tmpFile); } catch (err) {
+        console.error(`[solhint] Failed to remove temp file ${tmpFile}:`, err);
+      }
       callback([]);
     });
   }

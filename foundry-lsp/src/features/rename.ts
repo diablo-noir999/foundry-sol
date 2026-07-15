@@ -12,15 +12,21 @@ import {
 import { findNodeAtPosition, srcToRange, walkAst, offsetToPosition, parseSrc } from '../ast/traversal';
 import { CompileResult } from '../compiler/cache';
 import { globalIndex } from '../indexer';
-import * as fs from 'fs';
+import { findNodeById, readFileContentAsync } from '../utils';
 
-export function provideRename(
+export interface RenameResult {
+  edits: WorkspaceEdit;
+  /** URIs whose GlobalIndex entries should be invalidated after applying edits. */
+  affectedUris: string[];
+}
+
+export async function provideRename(
   ast: AstNode,
   document: TextDocument,
   position: Position,
   newName: string,
   compileResult: CompileResult
-): WorkspaceEdit | null {
+): Promise<RenameResult | null> {
   const content = document.getText();
   const node = findNodeAtPosition(ast, content, position);
   if (!node) return null;
@@ -35,18 +41,20 @@ export function provideRename(
   if (oldName === newName) return null;
 
   const edits = new Map<string, TextEdit[]>();
+  const affectedUris: string[] = [];
 
   // Collect edits in the current file
   const currentEdits = collectRenamesInAst(ast, content, defId, oldName, newName);
   if (currentEdits.length > 0) {
     edits.set(document.uri, currentEdits);
+    affectedUris.push(document.uri);
   }
 
   // Collect edits in all other indexed files
   const indexedEntries = globalIndex.findByName(oldName);
   for (const entry of indexedEntries) {
     if (entry.uri === document.uri) continue;
-    const fileContent = readFileContent(entry.filePath);
+    const fileContent = await readFileContentAsync(entry.filePath);
     if (!fileContent) continue;
 
     const fileEdits = collectRenamesInAst(entry.node, fileContent, defId, oldName, newName);
@@ -57,10 +65,17 @@ export function provideRename(
       } else {
         edits.set(entry.uri, fileEdits);
       }
+      if (!affectedUris.includes(entry.uri)) {
+        affectedUris.push(entry.uri);
+      }
     }
   }
 
-  return edits.size > 0 ? { changes: Object.fromEntries(edits) } : null;
+  if (edits.size === 0) return null;
+  return {
+    edits: { changes: Object.fromEntries(edits) },
+    affectedUris,
+  };
 }
 
 function collectRenamesInAst(
@@ -119,7 +134,6 @@ function resolveDefinitionId(node: AstNode, ast: AstNode): number | undefined {
   }
   if (node.id !== undefined) return node.id;
   if (node.name) {
-    // 11.9: If node is a modifier invocation inside a constructor, resolve to the modifier definition
     if ((node as any).nodeType === 'ModifierInvocation' || (node as any).nodeType === 'UserDefinedTypeName') {
       const def = findModifierDefinition(ast, node.name);
       if (def?.id !== undefined) return def.id;
@@ -128,16 +142,6 @@ function resolveDefinitionId(node: AstNode, ast: AstNode): number | undefined {
     if (def?.id !== undefined) return def.id;
   }
   return undefined;
-}
-
-function findNodeById(ast: AstNode, id: number): AstNode | null {
-  let found: AstNode | null = null;
-  walkAst(ast, (node) => {
-    if (found) return false;
-    if (node.id === id) { found = node; return false; }
-    return true;
-  });
-  return found;
 }
 
 function findNodeByName(ast: AstNode, name: string): AstNode | null {
@@ -161,12 +165,4 @@ function findModifierDefinition(ast: AstNode, name: string): AstNode | null {
     return true;
   });
   return found;
-}
-
-function readFileContent(filePath: string): string | null {
-  try {
-    return fs.readFileSync(filePath, 'utf-8');
-  } catch {
-    return null;
-  }
 }

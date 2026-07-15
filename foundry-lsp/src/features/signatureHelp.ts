@@ -16,6 +16,7 @@ import {
 import { findNodeAtPosition, walkAst, parseSrc, positionToOffset } from '../ast/traversal';
 import { CompileResult } from '../compiler/cache';
 import { globalIndex } from '../indexer';
+import { extractNatSpec } from '../utils';
 import * as fs from 'fs';
 
 const BUILTINS: Record<string, SignatureInformation> = {
@@ -79,21 +80,29 @@ export function provideSignatureHelp(
     };
   }
 
-  // Find the function definition (current file or indexed)
-  const funcDef = findFunctionDefinition(funcName, ast, content, compileResult);
-  if (!funcDef) return null;
+  // Find all function definitions with this name (handles overloads)
+  const funcDefs = findAllFunctionDefinitions(funcName, ast, content, compileResult);
+  if (funcDefs.length === 0) return null;
 
-  // Build signature
-  const sig = buildSignature(funcDef, content);
-  if (!sig) return null;
+  // Build signatures for all overloads
+  const signatures: SignatureInformation[] = [];
+  for (const funcDef of funcDefs) {
+    const sig = buildSignature(funcDef, content);
+    if (sig) signatures.push(sig);
+  }
+  if (signatures.length === 0) return null;
 
   // Determine active parameter based on cursor position
   const activeParam = countCommasBeforePosition(content, position, callNode);
 
+  // Find the best matching overload based on argument count
+  // activeParam is 0-based (comma count), so arg count = activeParam + 1
+  const bestIndex = findBestOverload(signatures, activeParam + 1);
+
   return {
-    signatures: [sig],
-    activeSignature: 0,
-    activeParameter: Math.min(activeParam, (sig.parameters?.length ?? 1) - 1),
+    signatures,
+    activeSignature: bestIndex,
+    activeParameter: Math.min(activeParam, (signatures[bestIndex].parameters?.length ?? 1) - 1),
   };
 }
 
@@ -131,41 +140,88 @@ function findFunctionCallAtPosition(ast: AstNode, content: string, position: Pos
   return found;
 }
 
-function findFunctionDefinition(
+function findAllFunctionDefinitions(
   name: string,
   ast: AstNode,
   content: string,
   compileResult: CompileResult
-): AstNode | null {
-  // Search current file
-  let found: AstNode | null = null;
+): AstNode[] {
+  const results: AstNode[] = [];
+
+  // Search current file for all matching functions
   walkAst(ast, (node) => {
-    if (found) return false;
     if (isFunctionDefinition(node) && node.name === name) {
-      found = node;
-      return false;
+      results.push(node);
     }
     return true;
   });
-  if (found) return found;
 
-  // Search indexed files
-  const entries = globalIndex.findByNameAndKind(name, 'function');
-  if (entries.length > 0) {
-    return entries[0].node;
+  // Search indexed files for all matching functions
+  const funcEntries = globalIndex.findByNameAndKind(name, 'function');
+  for (const entry of funcEntries) {
+    // Avoid duplicates (same node might be in both current file and index)
+    if (!results.includes(entry.node)) {
+      results.push(entry.node);
+    }
   }
 
-  // Also check modifiers and events
+  // Also check modifiers and events (these typically don't have overloads, but handle them)
   const modEntries = globalIndex.findByNameAndKind(name, 'modifier');
-  if (modEntries.length > 0) return modEntries[0].node;
+  for (const entry of modEntries) {
+    if (!results.includes(entry.node)) {
+      results.push(entry.node);
+    }
+  }
 
   const evtEntries = globalIndex.findByNameAndKind(name, 'event');
-  if (evtEntries.length > 0) return evtEntries[0].node;
+  for (const entry of evtEntries) {
+    if (!results.includes(entry.node)) {
+      results.push(entry.node);
+    }
+  }
 
   const errEntries = globalIndex.findByNameAndKind(name, 'error');
-  if (errEntries.length > 0) return errEntries[0].node;
+  for (const entry of errEntries) {
+    if (!results.includes(entry.node)) {
+      results.push(entry.node);
+    }
+  }
 
-  return null;
+  return results;
+}
+
+/**
+ * Find the best matching overload based on argument count.
+ * Returns the index of the best matching signature.
+ */
+function findBestOverload(signatures: SignatureInformation[], argCount: number): number {
+  if (signatures.length === 0) return 0;
+  if (signatures.length === 1) return 0;
+
+  // Try to find an exact match first
+  for (let i = 0; i < signatures.length; i++) {
+    const paramCount = signatures[i].parameters?.length ?? 0;
+    if (paramCount === argCount) {
+      return i;
+    }
+  }
+
+  // No exact match - find the closest one
+  // Prefer overloads with more parameters (they're typically the more specific ones)
+  let bestIndex = 0;
+  let bestDiff = Infinity;
+
+  for (let i = 0; i < signatures.length; i++) {
+    const paramCount = signatures[i].parameters?.length ?? 0;
+    const diff = Math.abs(paramCount - argCount);
+
+    if (diff < bestDiff || (diff === bestDiff && paramCount > (signatures[bestIndex].parameters?.length ?? 0))) {
+      bestDiff = diff;
+      bestIndex = i;
+    }
+  }
+
+  return bestIndex;
 }
 
 function buildSignature(node: AstNode, content: string): SignatureInformation | null {
@@ -205,25 +261,7 @@ function buildSignature(node: AstNode, content: string): SignatureInformation | 
   });
 
   // 11.4: NatSpec documentation as markdown
-  let documentation: string | undefined;
-  if (docs) {
-    const lines: string[] = [];
-    const natSpecLines = docs.split('\n').filter(Boolean);
-    for (const line of natSpecLines) {
-      if (line.startsWith('@notice')) {
-        lines.push(line.replace('@notice', '').trim());
-      } else if (line.startsWith('@dev')) {
-        lines.push('', line.replace('@dev', '**Dev:** ').trim());
-      } else if (line.startsWith('@param')) {
-        lines.push(line);
-      } else if (line.startsWith('@return')) {
-        lines.push(line);
-      } else {
-        lines.push(line);
-      }
-    }
-    documentation = lines.join('\n');
-  }
+  const documentation = docs || undefined;
 
   return {
     label,
@@ -256,12 +294,6 @@ function extractReturns(node: AstNode, content: string): Array<{ type: string; n
   }
 
   return returns;
-}
-
-function extractNatSpec(node: AstNode): string {
-  const doc = (node as any).documentation;
-  if (!doc?.text) return '';
-  return doc.text.split('\n').map((l: string) => l.trim()).filter(Boolean).join('\n');
 }
 
 function countCommasBeforePosition(content: string, position: Position, callNode: AstNode): number {

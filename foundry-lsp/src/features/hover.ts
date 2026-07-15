@@ -33,6 +33,7 @@ import {
   parseSrc,
 } from '../ast/traversal';
 import { CompileResult } from '../compiler/cache';
+import { findNodeById, resolveNatSpec, extractTypeName, findImportForSymbol } from '../utils';
 
 export function provideHover(
   ast: AstNode,
@@ -199,7 +200,7 @@ function hoverFunction(
   range: ReturnType<typeof srcToRange>
 ): Hover {
   const sig = buildFunctionSignature(node, content);
-  const docs = extractNatSpec(node);
+  const docs = resolveNatSpec(node);
   const lines = ['```solidity', sig, '```'];
   if (docs) lines.push('', docs);
 
@@ -214,7 +215,7 @@ function hoverStateVariable(
   content: string,
   range: ReturnType<typeof srcToRange>
 ): Hover {
-  const typeName = extractTypeName(node.typeName as AstNode, content);
+  const typeName = extractTypeName(node.typeName as AstNode);
   const mutability = node.constant
     ? 'constant'
     : node.immutable
@@ -222,7 +223,7 @@ function hoverStateVariable(
     : '';
   const vis = node.visibility;
   const decl = `${mutability ? mutability + ' ' : ''}${vis} ${typeName} ${node.name}`;
-  const docs = extractNatSpec(node);
+  const docs = resolveNatSpec(node);
   const lines = ['```solidity', decl.trim(), '```'];
   if (docs) lines.push('', docs);
 
@@ -237,7 +238,7 @@ function hoverContract(
   range: ReturnType<typeof srcToRange>
 ): Hover {
   const kind = node.contractKind;
-  const docs = extractNatSpec(node);
+  const docs = resolveNatSpec(node);
   const lines = [`**${kind}** \`${node.name}\``];
   if (docs) lines.push('', docs);
 
@@ -251,7 +252,7 @@ function hoverParameter(
   node: VariableDeclaration,
   range: ReturnType<typeof srcToRange>
 ): Hover {
-  const typeName = extractTypeName(node.typeName as AstNode, '');
+  const typeName = extractTypeName(node.typeName as AstNode);
   const lines = ['```solidity', `${typeName} ${node.name}`, '```'];
 
   return {
@@ -349,7 +350,7 @@ function hoverTypeDefinition(
   const lines = ['```solidity', `${kind} ${node.name} {`];
   for (const m of members) {
     if (node.nodeType === 'StructDefinition') {
-      const typeName = extractTypeName((m as VariableDeclaration).typeName as AstNode, content);
+      const typeName = extractTypeName((m as VariableDeclaration).typeName as AstNode);
       lines.push(`  ${typeName} ${(m as VariableDeclaration).name};`);
     } else {
       lines.push(`  ${(m as { name: string }).name},`);
@@ -371,7 +372,7 @@ function hoverEvent(
   const params = (node as unknown as { parameters: { parameters: VariableDeclaration[] } }).parameters;
   const paramList = params?.parameters
     ?.map((p) => {
-      const typeName = extractTypeName(p.typeName as AstNode, content);
+      const typeName = extractTypeName(p.typeName as AstNode);
       return `${typeName} ${p.name}`;
     })
     .join(', ') ?? '';
@@ -392,7 +393,7 @@ function hoverError(
   const params = (node as unknown as { parameters: { parameters: VariableDeclaration[] } }).parameters;
   const paramList = params?.parameters
     ?.map((p) => {
-      const typeName = extractTypeName(p.typeName as AstNode, content);
+      const typeName = extractTypeName(p.typeName as AstNode);
       return `${typeName} ${p.name}`;
     })
     .join(', ') ?? '';
@@ -413,7 +414,7 @@ function hoverModifier(
   const params = (node as unknown as { parameters?: { parameters: VariableDeclaration[] } }).parameters;
   const paramList = params?.parameters
     ?.map((p) => {
-      const typeName = extractTypeName(p.typeName as AstNode, content);
+      const typeName = extractTypeName(p.typeName as AstNode);
       return `${typeName} ${p.name}`;
     })
     .join(', ') ?? '';
@@ -466,8 +467,8 @@ function hoverMapping(
   content: string,
   range: ReturnType<typeof srcToRange>
 ): Hover {
-  const keyType = extractTypeName(node.keyType as AstNode, content);
-  const valueType = extractTypeName(node.valueType as AstNode, content);
+  const keyType = extractTypeName(node.keyType as AstNode);
+  const valueType = extractTypeName(node.valueType as AstNode);
   const lines = ['```solidity', `mapping(${keyType} => ${valueType})`, '```'];
 
   return {
@@ -481,7 +482,7 @@ function hoverArray(
   content: string,
   range: ReturnType<typeof srcToRange>
 ): Hover {
-  const baseType = extractTypeName(node.baseType as AstNode, content);
+  const baseType = extractTypeName(node.baseType as AstNode);
   const lines = ['```solidity', `${baseType}[]`, '```'];
 
   return {
@@ -499,7 +500,7 @@ function buildFunctionSignature(
   const params =
     node.parameters?.parameters
       ?.map((p) => {
-        const typeName = extractTypeName(p.typeName as AstNode, content);
+        const typeName = extractTypeName(p.typeName as AstNode);
         return `${typeName}${p.name ? ' ' + p.name : ''}`;
       })
       .join(', ') ?? '';
@@ -507,7 +508,7 @@ function buildFunctionSignature(
   const returns =
     node.returnParameters?.parameters
       ?.map((p) => {
-        const typeName = extractTypeName(p.typeName as AstNode, content);
+        const typeName = extractTypeName(p.typeName as AstNode);
         return `${typeName}${p.name ? ' ' + p.name : ''}`;
       })
       .join(', ') ?? '';
@@ -539,113 +540,6 @@ function buildFunctionSignature(
 
   const returnStr = returns ? ` returns (${returns})` : '';
   return `${parts.join(' ')} function ${node.name}(${params})${returnStr}`;
-}
-
-function extractTypeName(node: AstNode, content: string): string {
-  if (!node) return 'unknown';
-
-  if (isElementaryTypeName(node)) {
-    return node.name!;
-  }
-
-  if (isUserDefinedTypeName(node)) {
-    return node.name ?? (node as any).pathNode?.name ?? 'unknown';
-  }
-
-  if (isMapping(node)) {
-    const key = extractTypeName(node.keyType as AstNode, content);
-    const value = extractTypeName(node.valueType as AstNode, content);
-    return `mapping(${key} => ${value})`;
-  }
-
-  if (isArrayTypeName(node)) {
-    const base = extractTypeName(node.baseType as AstNode, content);
-    return `${base}[]`;
-  }
-
-  // Fallback: try to extract from typeDescriptions
-  const typeDesc = node.typeDescriptions as { typeString?: string } | undefined;
-  if (typeDesc?.typeString) {
-    return typeDesc.typeString;
-  }
-
-  return node.name ?? 'unknown';
-}
-
-function extractNatSpec(node: AstNode): string {
-  const doc = node.documentation as
-    | { nodeType?: string; text?: string }
-    | undefined;
-
-  if (!doc?.text) return '';
-
-  const lines = doc.text
-    .split('\n')
-    .map((l) => l.trim())
-    .filter(Boolean);
-
-  const parts: string[] = [];
-  for (const line of lines) {
-    if (line.startsWith('@notice')) {
-      parts.push(line.replace('@notice', '').trim());
-    } else if (line.startsWith('@dev')) {
-      parts.push(line.replace('@dev', '').trim());
-    } else if (line.startsWith('@param')) {
-      parts.push(line);
-    } else if (line.startsWith('@return')) {
-      parts.push(line);
-    } else if (line.startsWith('@title')) {
-      parts.push(line.replace('@title', '').trim());
-    } else if (line.startsWith('@author')) {
-      parts.push(line.replace('@author', '').trim());
-    } else {
-      parts.push(line);
-    }
-  }
-
-  return parts.join('\n');
-}
-
-function findNodeById(ast: AstNode, id: number): AstNode | null {
-  let found: AstNode | null = null;
-
-  const walk = (node: AstNode) => {
-    if (found) return;
-    if (node.id === id) {
-      found = node;
-      return;
-    }
-    if (node.nodes) {
-      for (const child of node.nodes) {
-        walk(child);
-      }
-    }
-    if (node.body && typeof node.body === 'object' && 'nodeType' in node.body) {
-      walk(node.body as AstNode);
-    }
-    if (Array.isArray(node.statements)) {
-      for (const stmt of node.statements) {
-        if (stmt && typeof stmt === 'object' && 'nodeType' in stmt) walk(stmt as AstNode);
-      }
-    }
-    if (Array.isArray(node.parameters)) {
-      for (const p of node.parameters) {
-        if (p && typeof p === 'object' && 'nodeType' in p) walk(p as AstNode);
-      }
-    }
-    if (node.expression && typeof node.expression === 'object' && 'nodeType' in node.expression) {
-      walk(node.expression as AstNode);
-    }
-    if (node.subExpression && typeof node.subExpression === 'object' && 'nodeType' in node.subExpression) {
-      walk(node.subExpression as AstNode);
-    }
-    if (node.typeName && typeof node.typeName === 'object' && 'nodeType' in node.typeName) {
-      walk(node.typeName as AstNode);
-    }
-  };
-
-  walk(ast);
-  return found;
 }
 
 function findDefinitionByName(ast: AstNode, name: string): AstNode | null {
@@ -709,29 +603,6 @@ function getSolidityTypeDescription(name: string): string {
   };
 
   return descriptions[name] ?? `${name} type`;
-}
-
-function findImportForSymbol(ast: AstNode, symbolName: string): string | null {
-  let result: string | null = null;
-
-  const walk = (node: AstNode) => {
-    if (result) return;
-    if (isImportDirective(node) && node.symbolAliases) {
-      for (const alias of node.symbolAliases) {
-        const foreign = alias.foreign as unknown as { name?: string };
-        if (foreign?.name === symbolName) {
-          result = node.file || null;
-          return;
-        }
-      }
-    }
-    if (node.nodes) {
-      for (const child of node.nodes) walk(child);
-    }
-  };
-
-  walk(ast);
-  return result;
 }
 
 function resolveTypeName(

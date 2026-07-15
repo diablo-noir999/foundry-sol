@@ -72,6 +72,7 @@ export function provideSemanticTokens(
 ): SemanticTokens {
   const builder = new SemanticTokensBuilder();
 
+  // Emit semantic tokens for AST nodes
   walkAst(ast, (node) => {
     const token = nodeToSemanticToken(node, content);
     if (token) {
@@ -79,6 +80,9 @@ export function provideSemanticTokens(
     }
     return true;
   });
+
+  // Emit comment tokens by scanning source text (comments aren't in the AST)
+  emitCommentTokens(content, builder);
 
   return builder.build();
 }
@@ -208,5 +212,86 @@ function nodeToSemanticToken(node: AstNode, content: string): TokenInfo | null {
     return { line: pos.line, character: pos.character, length: name?.length ?? 0, type: T.type, modifiers: M.definition };
   }
 
+  // 11.14: Literal nodes — string literals, number literals, hex literals
+  if ((node as any).nodeType === 'Literal') {
+    const value = (node as any).value as string | undefined;
+    const kind = (node as any).kind as string | undefined;
+
+    // String literals: "string" kind or value starts with quote
+    if (kind === 'string' || (typeof value === 'string' && value.startsWith('"'))) {
+      // Use src length for the token
+      return { line: pos.line, character: pos.character, length: parsed.length, type: T.string, modifiers: 0 };
+    }
+
+    // Number literals: "number" kind or value is purely numeric
+    if (kind === 'number' || (typeof value === 'string' && /^\d/.test(value))) {
+      return { line: pos.line, character: pos.character, length: parsed.length, type: T.number, modifiers: 0 };
+    }
+
+    // Hex literals: "hex" kind or hex string
+    if (kind === 'hex' || (typeof value === 'string' && /^0x/i.test(value))) {
+      return { line: pos.line, character: pos.character, length: parsed.length, type: T.number, modifiers: 0 };
+    }
+
+    // Boolean literals
+    if (kind === 'bool' || value === 'true' || value === 'false') {
+      return { line: pos.line, character: pos.character, length: parsed.length, type: T.keyword, modifiers: 0 };
+    }
+  }
+
   return null;
+}
+
+function emitCommentTokens(content: string, builder: SemanticTokensBuilder): void {
+  const lines = content.split('\n');
+  let inBlockComment = false;
+
+  for (let lineIdx = 0; lineIdx < lines.length; lineIdx++) {
+    const line = lines[lineIdx];
+    let i = 0;
+
+    while (i < line.length) {
+      // Inside a block comment — find the end
+      if (inBlockComment) {
+        const endIdx = line.indexOf('*/', i);
+        if (endIdx >= 0) {
+          const commentLength = endIdx + 2 - i;
+          builder.push(lineIdx, i, commentLength, T.comment, 0);
+          inBlockComment = false;
+          i = endIdx + 2;
+        } else {
+          // Rest of line is comment
+          builder.push(lineIdx, i, line.length - i, T.comment, 0);
+          i = line.length;
+        }
+        continue;
+      }
+
+      const ch = line[i];
+
+      // Single-line comment: //
+      if (ch === '/' && i + 1 < line.length && line[i + 1] === '/') {
+        builder.push(lineIdx, i, line.length - i, T.comment, 0);
+        break; // Rest of line is comment
+      }
+
+      // Multi-line comment start: /*
+      if (ch === '/' && i + 1 < line.length && line[i + 1] === '*') {
+        const endIdx = line.indexOf('*/', i + 2);
+        if (endIdx >= 0) {
+          const commentLength = endIdx + 2 - i;
+          builder.push(lineIdx, i, commentLength, T.comment, 0);
+          i = endIdx + 2;
+        } else {
+          // Multi-line comment continues to next lines
+          builder.push(lineIdx, i, line.length - i, T.comment, 0);
+          inBlockComment = true;
+          i = line.length;
+        }
+        continue;
+      }
+
+      i++;
+    }
+  }
 }

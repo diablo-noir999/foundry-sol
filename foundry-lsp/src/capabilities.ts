@@ -3,7 +3,7 @@ import { ServerCapabilities, TextDocumentSyncKind } from 'vscode-languageserver'
 export const SERVER_CAPABILITIES: ServerCapabilities = {
   textDocumentSync: TextDocumentSyncKind.Incremental,
   completionProvider: {
-    triggerCharacters: ['.', '"', '/'],
+    triggerCharacters: ['.', '"', '/', '*'],
     resolveProvider: false,
   },
   definitionProvider: true,

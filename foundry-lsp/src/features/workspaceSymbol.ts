@@ -6,6 +6,7 @@ import {
 import { URI } from 'vscode-uri';
 import { globalIndex, SymbolKind as IndexSymbolKind } from '../indexer';
 import { srcToRange } from '../ast/traversal';
+import { readFileContentAsync } from '../utils';
 
 const KIND_MAP: Record<IndexSymbolKind, SymbolKind> = {
   contract: SymbolKind.Class,
@@ -22,7 +23,7 @@ const KIND_MAP: Record<IndexSymbolKind, SymbolKind> = {
   constant: SymbolKind.Constant,
 };
 
-export function provideWorkspaceSymbols(query: string): SymbolInformation[] {
+export async function provideWorkspaceSymbols(query: string): Promise<SymbolInformation[]> {
   if (!query) return [];
 
   const entries = globalIndex.searchFuzzy(query);
@@ -31,7 +32,7 @@ export function provideWorkspaceSymbols(query: string): SymbolInformation[] {
   for (const entry of entries) {
     if (!entry.node.src) continue;
 
-    const content = readFileContent(entry.filePath);
+    const content = await readFileContentAsync(entry.filePath);
     if (!content) continue;
 
     const range = srcToRange(entry.node.src, content);
@@ -64,13 +65,4 @@ function findContainerName(node: any): string | undefined {
     }
   }
   return undefined;
-}
-
-function readFileContent(filePath: string): string | null {
-  try {
-    const fs = require('fs');
-    return fs.readFileSync(filePath, 'utf-8');
-  } catch {
-    return null;
-  }
 }

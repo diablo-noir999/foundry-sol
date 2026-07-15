@@ -26,14 +26,16 @@ import {
 import { findNodeAtPosition, srcToRange, positionToOffset, parseSrc } from '../ast/traversal';
 import { CompileResult } from '../compiler/cache';
 import { FoundryProject } from '../project';
+import { globalIndex } from '../indexer';
+import { findNodeById, readFileContent, findImportForSymbol } from '../utils';
 
-export function provideDefinition(
+export async function provideDefinition(
   ast: AstNode,
   document: TextDocument,
   position: Position,
   compileResult: CompileResult,
   project: FoundryProject | undefined
-): Definition | null {
+): Promise<Definition | null> {
   const content = document.getText();
   const node = findNodeAtPosition(ast, content, position);
   if (!node) return null;
@@ -55,7 +57,7 @@ export function provideDefinition(
 
   // MemberAccess — resolve member
   if (isMemberAccess(node)) {
-    return resolveMemberAccess(node, ast, content, project, sourceFileMap);
+    return await resolveMemberAccess(node, ast, content, project, sourceFileMap);
   }
 
   return null;
@@ -148,13 +150,13 @@ function resolveIdentifier(
   return null;
 }
 
-function resolveMemberAccess(
+async function resolveMemberAccess(
   node: MemberAccess,
   ast: AstNode,
   content: string,
   project: FoundryProject | undefined,
   sourceFileMap: Map<number, string>
-): Location | null {
+): Promise<Location | null> {
   const memberName = node.memberName;
 
   // First try referencedDeclaration (cross-file resolution)
@@ -169,6 +171,12 @@ function resolveMemberAccess(
       }
     }
   }
+
+  // Scoped member access: ContractName.StructName / ContractName.EnumName
+  // When expression is an Identifier referencing a contract/interface/library,
+  // search that contract's members for the right-hand side.
+  const scopedResult = resolveScopedMemberAccess(node, ast, content, sourceFileMap);
+  if (scopedResult) return scopedResult;
 
   // Find all definitions with that name in current file
   const results: Location[] = [];
@@ -206,7 +214,6 @@ function resolveMemberAccess(
 
   // Fallback: search by name in all indexed files
   if (project) {
-    const { globalIndex } = require('../indexer');
     const entries = globalIndex.findByName(memberName);
     for (const entry of entries) {
       if (entry.node.src) {
@@ -218,6 +225,95 @@ function resolveMemberAccess(
           }
         }
       }
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Resolve `ContractName.MemberName` — scoped member access.
+ *
+ * When a MemberAccess node's expression is an Identifier that references a
+ * contract, interface, or library, we find that type definition via GlobalIndex
+ * and walk its AST children to locate the member (struct, enum, event, error,
+ * function, state variable, modifier).
+ *
+ * This handles patterns like:
+ *   MyContract.MyStruct
+ *   IToken.Transfer
+ *   MathLib.sqrt
+ */
+function resolveScopedMemberAccess(
+  node: MemberAccess,
+  ast: AstNode,
+  content: string,
+  sourceFileMap: Map<number, string>
+): Location | null {
+  const expression = node.expression as AstNode;
+  if (!expression) return null;
+
+  // The expression must be an Identifier (e.g., the `MyContract` in `MyContract.MyStruct`)
+  if (!isIdentifier(expression) || !expression.name) return null;
+
+  const containerName = expression.name;
+  const memberName = node.memberName;
+
+  // Step 1: Find the container type (contract/interface/library) via GlobalIndex
+  const containerEntries = globalIndex.findByNameAndKind(containerName, 'contract')
+    .concat(globalIndex.findByNameAndKind(containerName, 'interface'))
+    .concat(globalIndex.findByNameAndKind(containerName, 'library'));
+
+  if (containerEntries.length === 0) return null;
+
+  // Step 2: Walk the container's AST children to find the member.
+  // Contract members (structs, enums, events, errors, functions, etc.)
+  // are always direct children of the ContractDefinition node.
+  for (const entry of containerEntries) {
+    const contractNode = entry.node;
+    if (!contractNode.nodes) continue;
+
+    const memberContent = readFileContent(entry.filePath) ?? content;
+
+    const found = findMemberInAst(contractNode.nodes, memberName);
+    if (found?.src) {
+      const memberRange = srcToRange(found.src, memberContent);
+      if (memberRange) {
+        return Location.create(entry.uri, memberRange);
+      }
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Deep-walk an AST subtree looking for a named definition node.
+ * Searches all definition types that can appear as contract members.
+ */
+function findMemberInAst(
+  nodes: AstNode[],
+  memberName: string
+): AstNode | null {
+  for (const child of nodes) {
+    if (child.name === memberName) {
+      if (
+        isStructDefinition(child) ||
+        isEnumDefinition(child) ||
+        isEventDefinition(child) ||
+        isErrorDefinition(child) ||
+        isFunctionDefinition(child) ||
+        isStateVariableDeclaration(child) ||
+        isModifierDefinition(child)
+      ) {
+        return child;
+      }
+    }
+
+    // Recurse into children
+    if (child.nodes) {
+      const found = findMemberInAst(child.nodes, memberName);
+      if (found) return found;
     }
   }
 
@@ -279,29 +375,6 @@ function resolveImportSymbolDef(
   return null;
 }
 
-function findImportForSymbol(ast: AstNode, symbolName: string): string | null {
-  let result: string | null = null;
-
-  const walk = (node: AstNode) => {
-    if (result) return;
-    if (isImportDirective(node) && node.symbolAliases) {
-      for (const alias of node.symbolAliases) {
-        const foreign = alias.foreign as unknown as { name?: string };
-        if (foreign?.name === symbolName) {
-          result = node.file || null;
-          return;
-        }
-      }
-    }
-    if (node.nodes) {
-      for (const child of node.nodes) walk(child);
-    }
-  };
-
-  walk(ast);
-  return result;
-}
-
 function resolveImportPath(importPath: string, project: FoundryProject): Location | null {
   // Resolve through remappings
   const resolved = applyRemappings(importPath, project);
@@ -327,43 +400,6 @@ function resolveImportPath(importPath: string, project: FoundryProject): Locatio
   }
 
   return null;
-}
-
-function findNodeById(ast: AstNode, id: number): AstNode | null {
-  let found: AstNode | null = null;
-
-  const walk = (node: AstNode) => {
-    if (found) return;
-    if (node.id === id) {
-      found = node;
-      return;
-    }
-    if (node.nodes) {
-      for (const child of node.nodes) {
-        walk(child);
-      }
-    }
-    if (node.body && typeof node.body === 'object' && 'nodeType' in node.body) {
-      walk(node.body as AstNode);
-    }
-    if (Array.isArray(node.statements)) {
-      for (const stmt of node.statements) {
-        if (stmt && typeof stmt === 'object' && 'nodeType' in stmt) walk(stmt as AstNode);
-      }
-    }
-    if (node.expression && typeof node.expression === 'object' && 'nodeType' in node.expression) {
-      walk(node.expression as AstNode);
-    }
-    if (node.subExpression && typeof node.subExpression === 'object' && 'nodeType' in node.subExpression) {
-      walk(node.subExpression as AstNode);
-    }
-    if (node.typeName && typeof node.typeName === 'object' && 'nodeType' in node.typeName) {
-      walk(node.typeName as AstNode);
-    }
-  };
-
-  walk(ast);
-  return found;
 }
 
 function findDefinitionByNameLocation(
@@ -429,12 +465,4 @@ function documentUri(node: AstNode, sourceFileMap: Map<number, string>): string 
   }
 
   return '';
-}
-
-function readFileContent(filePath: string): string | null {
-  try {
-    return fs.readFileSync(filePath, 'utf-8');
-  } catch {
-    return null;
-  }
 }

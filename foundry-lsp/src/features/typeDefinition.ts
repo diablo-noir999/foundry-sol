@@ -1,4 +1,3 @@
-import * as fs from 'fs';
 import { Definition, Location, Position, Range } from 'vscode-languageserver';
 import { TextDocument } from 'vscode-languageserver-textdocument';
 import { URI } from 'vscode-uri';
@@ -13,13 +12,14 @@ import {
 import { findNodeAtPosition, srcToRange, walkAst } from '../ast/traversal';
 import { CompileResult } from '../compiler/cache';
 import { globalIndex } from '../indexer';
+import { readFileContentAsync } from '../utils';
 
-export function provideTypeDefinition(
+export async function provideTypeDefinition(
   ast: AstNode,
   document: TextDocument,
   position: Position,
   compileResult: CompileResult
-): Definition | null {
+): Promise<Definition | null> {
   const content = document.getText();
   const node = findNodeAtPosition(ast, content, position);
   if (!node) return null;
@@ -49,7 +49,7 @@ export function provideTypeDefinition(
   if (indexed.length > 0) {
     const entry = indexed[0];
     if (entry.node.src) {
-      const entryContent = readFileContent(entry.filePath);
+      const entryContent = await readFileContentAsync(entry.filePath);
       if (entryContent) {
         const range = srcToRange(entry.node.src, entryContent);
         if (range) {
@@ -170,12 +170,4 @@ function resolveUri(node: AstNode, compileResult: CompileResult): string {
   }
 
   return '';
-}
-
-function readFileContent(filePath: string): string | null {
-  try {
-    return fs.readFileSync(filePath, 'utf-8');
-  } catch {
-    return null;
-  }
 }
