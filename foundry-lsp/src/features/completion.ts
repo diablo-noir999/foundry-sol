@@ -78,8 +78,10 @@ const SOLIDITY_KEYWORDS: [string, string][] = [
   ['memory', 'memory'],
   ['storage', 'storage'],
   ['calldata', 'calldata'],
+  ['transient', 'transient'],
   ['anonymous', 'anonymous'],
   ['indexed', 'indexed'],
+  ['nonpayable', 'nonpayable'],
 ];
 
 const GLOBAL_FUNCTIONS: [string, string, string][] = [
@@ -349,6 +351,7 @@ export async function provideCompletion(
 
   // 9. Keywords
   for (const [keyword, snippet] of SOLIDITY_KEYWORDS) {
+    if (prefix && !keyword.toLowerCase().startsWith(prefix.toLowerCase())) continue;
     items.push({
       label: keyword,
       kind: CompletionItemKind.Keyword,

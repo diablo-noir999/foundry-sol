@@ -19243,8 +19243,10 @@ var SOLIDITY_KEYWORDS = [
   ["memory", "memory"],
   ["storage", "storage"],
   ["calldata", "calldata"],
+  ["transient", "transient"],
   ["anonymous", "anonymous"],
-  ["indexed", "indexed"]
+  ["indexed", "indexed"],
+  ["nonpayable", "nonpayable"]
 ];
 var GLOBAL_FUNCTIONS = [
   ["assert", "assert(${1:condition})", "Aborts execution with panic error"],
@@ -19470,6 +19472,7 @@ async function provideCompletion(ast, document, position, _compileResult, projec
     });
   }
   for (const [keyword, snippet] of SOLIDITY_KEYWORDS) {
+    if (prefix && !keyword.toLowerCase().startsWith(prefix.toLowerCase())) continue;
     items.push({
       label: keyword,
       kind: import_vscode_languageserver7.CompletionItemKind.Keyword,
