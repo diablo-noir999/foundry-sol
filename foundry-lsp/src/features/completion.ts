@@ -295,6 +295,11 @@ export async function provideCompletion(
     return provideUsingLibraryCompletion(ast, content, prefix);
   }
 
+  // 11.5: Inheritance `is` completions — suggest contracts, interfaces, libraries
+  if (/\b(is|,)\s+\w*$/.test(lineText) && /\b(contract|interface|library)\s+\w+\s+(is[\s,]*)?$/.test(fullLine)) {
+    return provideInheritanceCompletion(ast, content, prefix);
+  }
+
   const items: CompletionItem[] = [];
 
   // 5. Global functions
@@ -738,6 +743,56 @@ function provideUsingLibraryCompletion(
         label: lib,
         kind: CompletionItemKind.Module,
         detail: 'OpenZeppelin library',
+      });
+    }
+  }
+
+  return items;
+}
+
+function provideInheritanceCompletion(
+  ast: AstNode,
+  content: string,
+  prefix: string
+): CompletionItem[] {
+  const items: CompletionItem[] = [];
+  const seen = new Set<string>();
+
+  // Collect all contracts, interfaces, and libraries from the AST
+  walkAst(ast, (node) => {
+    if ((isContractDefinition(node) || node.nodeType === 'LibraryDefinition') && node.name && !seen.has(node.name)) {
+      seen.add(node.name);
+      const kind = node.nodeType === 'ContractDefinition'
+        ? (node.kind === 'interface' ? CompletionItemKind.Interface : CompletionItemKind.Class)
+        : CompletionItemKind.Module;
+      const detail = node.nodeType === 'ContractDefinition' ? String((node as any).kind ?? 'contract') : 'library';
+      items.push({
+        label: node.name,
+        kind,
+        detail,
+      });
+    }
+    return true;
+  });
+
+  // Also suggest common OpenZeppelin contracts/interfaces for inheritance
+  const commonInheritable = [
+    'ERC165', 'ERC20', 'ERC721', 'ERC1155', 'ERC777',
+    'Ownable', 'AccessControl', 'AccessControlEnumerable',
+    'IAccessControl', 'IERC20', 'IERC721', 'IERC1155',
+    'ReentrancyGuard', 'Pausable', 'Initializable',
+    'UUPSUpgradeable', 'TransparentUpgradeableProxy',
+    'ERC1967Proxy', 'ERC1967Upgrade',
+    'Governor', 'GovernorSettings', 'GovernorCountingSimple',
+    'GovernorVotes', 'GovernorTimelockControl',
+  ];
+
+  for (const name of commonInheritable) {
+    if (!seen.has(name) && (!prefix || name.toLowerCase().startsWith(prefix.toLowerCase()))) {
+      items.push({
+        label: name,
+        kind: CompletionItemKind.Class,
+        detail: 'OpenZeppelin',
       });
     }
   }
