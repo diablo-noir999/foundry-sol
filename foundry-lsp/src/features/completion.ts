@@ -80,7 +80,7 @@ const SOLIDITY_KEYWORDS: [string, string][] = [
   ['calldata', 'calldata'],
   ['transient', 'transient'],
   ['anonymous', 'anonymous'],
-  ['indexed', 'indexed'],
+  ['indexed', 'indexed ${1:param}'],
   ['nonpayable', 'nonpayable'],
 ];
 

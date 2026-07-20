@@ -19245,7 +19245,7 @@ var SOLIDITY_KEYWORDS = [
   ["calldata", "calldata"],
   ["transient", "transient"],
   ["anonymous", "anonymous"],
-  ["indexed", "indexed"],
+  ["indexed", "indexed ${1:param}"],
   ["nonpayable", "nonpayable"]
 ];
 var GLOBAL_FUNCTIONS = [
