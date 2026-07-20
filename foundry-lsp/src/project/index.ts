@@ -78,7 +78,7 @@ export class ProjectManager {
 
   private async loadProject(root: string): Promise<FoundryProject> {
     const config = parseFoundryToml(root);
-    const remappings = await loadRemappings(root);
+    const remappings = await loadRemappings(root, config.remappings);
 
     const srcDir = path.join(root, config.src);
     const solFiles = findSolFiles(srcDir);
@@ -113,7 +113,7 @@ export class ProjectManager {
     if (!existing) return;
 
     existing.config = parseFoundryToml(root);
-    existing.remappings = await loadRemappings(root);
+    existing.remappings = await loadRemappings(root, existing.config.remappings);
 
     const srcDir = path.join(root, existing.config.src);
     existing.solFiles = findSolFiles(srcDir);

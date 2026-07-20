@@ -54,6 +54,7 @@ const SOLIDITY_KEYWORDS: [string, string][] = [
   ['while', 'while (${1:condition}) {\n\t$0\n}'],
   ['do', 'do {\n\t$0\n} while (${1:condition});'],
   ['return', 'return ${1:value};'],
+  ['returns', 'returns (${1:bool})'],
   ['try', 'try ${1:expression}() {\n\t$0\n} catch {\n\t\n}'],
   ['catch', 'catch (${1:error}) {\n\t$0\n}'],
   ['delete', 'delete ${1:variable};'],
@@ -382,18 +383,49 @@ export async function provideCompletion(
   const idItems = collectIdentifiers(ast, content, prefix);
   items.push(...idItems);
 
-  // Sort: prefix matches first, then by kind priority, then alphabetically
+  // Sort: prefix matches first, then by usage frequency, then kind, then alphabetical
+  // Lower rank = appears first in results
+  const USAGE_RANK: Record<string, number> = {
+    // Most common Solidity patterns
+    'function': 1, 'struct': 2, 'mapping': 3, 'event': 4, 'modifier': 5,
+    'enum': 6, 'error': 7, 'constructor': 8, 'fallback': 9, 'receive': 10,
+    // Types (high frequency)
+    'uint256': 11, 'uint': 12, 'address': 13, 'bool': 14, 'string': 15,
+    'bytes32': 16, 'bytes': 17, 'int256': 18, 'int': 19, 'bytes4': 20,
+    // Common keywords
+    'returns': 21, 'return': 22, 'if': 23, 'else': 24, 'for': 25,
+    'while': 26, 'emit': 27, 'require': 28, 'revert': 29, 'assert': 30,
+    // Visibility/modifiers
+    'public': 31, 'external': 32, 'internal': 33, 'private': 34,
+    'view': 35, 'pure': 36, 'payable': 37, 'nonpayable': 38,
+    'virtual': 39, 'override': 40, 'abstract': 41,
+    // Data location
+    'memory': 42, 'storage': 43, 'calldata': 44, 'transient': 45,
+    // Declarations
+    'contract': 46, 'interface': 47, 'library': 48, 'import': 49,
+    'using': 50, 'pragma': 51,
+    // Other
+    'constant': 52, 'immutable': 53, 'indexed': 54, 'anonymous': 55,
+    'assembly': 56, 'unchecked': 57, 'try': 58, 'catch': 59, 'delete': 60, 'new': 61,
+    'true': 62, 'false': 63,
+  };
+
   items.sort((a, b) => {
     const aLabel = a.label.toLowerCase();
     const bLabel = b.label.toLowerCase();
     const pfx = prefix?.toLowerCase() ?? '';
 
-    // Prefix match priority
+    // 1. Exact prefix match first
     const aStarts = aLabel.startsWith(pfx) ? 0 : 1;
     const bStarts = bLabel.startsWith(pfx) ? 0 : 1;
     if (aStarts !== bStarts) return aStarts - bStarts;
 
-    // Kind priority (higher priority first)
+    // 2. Usage frequency (lower rank = higher priority)
+    const aRank = USAGE_RANK[aLabel] ?? 100;
+    const bRank = USAGE_RANK[bLabel] ?? 100;
+    if (aRank !== bRank) return aRank - bRank;
+
+    // 3. Kind priority
     const kindPriority: Record<number, number> = {
       [CompletionItemKind.Variable]: 1,
       [CompletionItemKind.Function]: 2,
@@ -406,7 +438,7 @@ export async function provideCompletion(
     const bPriority = kindPriority[b.kind ?? 0] ?? 10;
     if (aPriority !== bPriority) return aPriority - bPriority;
 
-    // Alphabetical
+    // 4. Alphabetical fallback
     return aLabel.localeCompare(bLabel);
   });
 

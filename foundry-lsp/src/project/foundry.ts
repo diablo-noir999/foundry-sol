@@ -7,6 +7,7 @@ export interface FoundryConfig {
   out: string;
   libs: string[];
   solcVersion: string | null;
+  remappings: Map<string, string>;
 }
 
 const DEFAULT_CONFIG: FoundryConfig = {
@@ -14,6 +15,7 @@ const DEFAULT_CONFIG: FoundryConfig = {
   out: 'out',
   libs: ['lib'],
   solcVersion: null,
+  remappings: new Map(),
 };
 
 export function parseFoundryToml(projectRoot: string): FoundryConfig {
@@ -49,6 +51,31 @@ export function parseFoundryToml(projectRoot: string): FoundryConfig {
     const solcVersion = parsed.solc_version ?? parsed.solc ?? profile.solc_version ?? profile.solc;
     if (typeof solcVersion === 'string') {
       config.solcVersion = solcVersion;
+    }
+
+    // Parse remappings from foundry.toml
+    // Format 1: remappings = ["@oz/=lib/oz/"]
+    const remappingsArray = parsed.remappings ?? profile.remappings;
+    if (Array.isArray(remappingsArray)) {
+      for (const entry of remappingsArray) {
+        if (typeof entry === 'string') {
+          const eqIdx = entry.indexOf('=');
+          if (eqIdx > 0) {
+            const prefix = entry.slice(0, eqIdx).trim();
+            const target = entry.slice(eqIdx + 1).trim();
+            if (prefix && target) config.remappings.set(prefix, target);
+          }
+        }
+      }
+    }
+    // Format 2: [profile.default.remappings]  @oz = "lib/oz/"
+    const remappingsTable = parsed.profile?.[profileName]?.remappings ?? profile?.remappings;
+    if (remappingsTable && typeof remappingsTable === 'object' && !Array.isArray(remappingsTable)) {
+      for (const [prefix, target] of Object.entries(remappingsTable)) {
+        if (typeof target === 'string') {
+          config.remappings.set(prefix, target);
+        }
+      }
     }
 
     return config;

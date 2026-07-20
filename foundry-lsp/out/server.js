@@ -16838,7 +16838,8 @@ var DEFAULT_CONFIG = {
   src: "src",
   out: "out",
   libs: ["lib"],
-  solcVersion: null
+  solcVersion: null,
+  remappings: /* @__PURE__ */ new Map()
 };
 function parseFoundryToml(projectRoot) {
   const tomlPath = path.join(projectRoot, "foundry.toml");
@@ -16862,6 +16863,27 @@ function parseFoundryToml(projectRoot) {
     const solcVersion = parsed.solc_version ?? parsed.solc ?? profile.solc_version ?? profile.solc;
     if (typeof solcVersion === "string") {
       config.solcVersion = solcVersion;
+    }
+    const remappingsArray = parsed.remappings ?? profile.remappings;
+    if (Array.isArray(remappingsArray)) {
+      for (const entry of remappingsArray) {
+        if (typeof entry === "string") {
+          const eqIdx = entry.indexOf("=");
+          if (eqIdx > 0) {
+            const prefix = entry.slice(0, eqIdx).trim();
+            const target = entry.slice(eqIdx + 1).trim();
+            if (prefix && target) config.remappings.set(prefix, target);
+          }
+        }
+      }
+    }
+    const remappingsTable = parsed.profile?.[profileName]?.remappings ?? profile?.remappings;
+    if (remappingsTable && typeof remappingsTable === "object" && !Array.isArray(remappingsTable)) {
+      for (const [prefix, target] of Object.entries(remappingsTable)) {
+        if (typeof target === "string") {
+          config.remappings.set(prefix, target);
+        }
+      }
     }
     return config;
   } catch {
@@ -16890,24 +16912,41 @@ function parseRemappingsFile(content) {
   }
   return remappings;
 }
-async function loadRemappings(projectRoot) {
+async function loadRemappings(projectRoot, foundryTomlRemappings) {
+  const merged = /* @__PURE__ */ new Map();
+  if (foundryTomlRemappings) {
+    for (const [prefix, target] of foundryTomlRemappings) {
+      merged.set(prefix, target);
+    }
+  }
   try {
     const { stdout } = await execFileAsync("forge", ["remappings"], {
       cwd: projectRoot,
       timeout: 5e3,
       encoding: "utf-8"
     });
-    return parseRemappingsFile(stdout);
+    const forgeRemappings = parseRemappingsFile(stdout);
+    for (const [prefix, target] of forgeRemappings) {
+      if (!merged.has(prefix)) {
+        merged.set(prefix, target);
+      }
+    }
+    return merged;
   } catch {
   }
   const remappingsPath = (0, import_path.join)(projectRoot, "remappings.txt");
   try {
     await (0, import_promises.access)(remappingsPath);
     const content = await (0, import_promises.readFile)(remappingsPath, "utf-8");
-    return parseRemappingsFile(content);
+    const fileRemappings = parseRemappingsFile(content);
+    for (const [prefix, target] of fileRemappings) {
+      if (!merged.has(prefix)) {
+        merged.set(prefix, target);
+      }
+    }
   } catch {
   }
-  return /* @__PURE__ */ new Map();
+  return merged;
 }
 
 // src/project/workspace.ts
@@ -17034,7 +17073,7 @@ var ProjectManager = class {
   }
   async loadProject(root) {
     const config = parseFoundryToml(root);
-    const remappings = await loadRemappings(root);
+    const remappings = await loadRemappings(root, config.remappings);
     const srcDir = path4.join(root, config.src);
     const solFiles = findSolFiles(srcDir);
     for (const lib of config.libs) {
@@ -17059,7 +17098,7 @@ var ProjectManager = class {
     const existing = this.projects.get(root);
     if (!existing) return;
     existing.config = parseFoundryToml(root);
-    existing.remappings = await loadRemappings(root);
+    existing.remappings = await loadRemappings(root, existing.config.remappings);
     const srcDir = path4.join(root, existing.config.src);
     existing.solFiles = findSolFiles(srcDir);
     for (const lib of existing.config.libs) {
@@ -18277,7 +18316,7 @@ var CompilerManager = class {
         try {
           const tempProject = {
             root: tempDir,
-            config: { src: "src", out: "out", libs: ["lib"], solcVersion: null },
+            config: { src: "src", out: "out", libs: ["lib"], solcVersion: null, remappings: /* @__PURE__ */ new Map() },
             remappings: /* @__PURE__ */ new Map(),
             solFiles: /* @__PURE__ */ new Set()
           };
@@ -19180,6 +19219,7 @@ var SOLIDITY_KEYWORDS = [
   ["while", "while (${1:condition}) {\n	$0\n}"],
   ["do", "do {\n	$0\n} while (${1:condition});"],
   ["return", "return ${1:value};"],
+  ["returns", "returns (${1:bool})"],
   ["try", "try ${1:expression}() {\n	$0\n} catch {\n	\n}"],
   ["catch", "catch (${1:error}) {\n	$0\n}"],
   ["delete", "delete ${1:variable};"],
@@ -19457,6 +19497,78 @@ async function provideCompletion(ast, document, position, _compileResult, projec
   }
   const idItems = collectIdentifiers(ast, content, prefix);
   items.push(...idItems);
+  const USAGE_RANK = {
+    // Most common Solidity patterns
+    "function": 1,
+    "struct": 2,
+    "mapping": 3,
+    "event": 4,
+    "modifier": 5,
+    "enum": 6,
+    "error": 7,
+    "constructor": 8,
+    "fallback": 9,
+    "receive": 10,
+    // Types (high frequency)
+    "uint256": 11,
+    "uint": 12,
+    "address": 13,
+    "bool": 14,
+    "string": 15,
+    "bytes32": 16,
+    "bytes": 17,
+    "int256": 18,
+    "int": 19,
+    "bytes4": 20,
+    // Common keywords
+    "returns": 21,
+    "return": 22,
+    "if": 23,
+    "else": 24,
+    "for": 25,
+    "while": 26,
+    "emit": 27,
+    "require": 28,
+    "revert": 29,
+    "assert": 30,
+    // Visibility/modifiers
+    "public": 31,
+    "external": 32,
+    "internal": 33,
+    "private": 34,
+    "view": 35,
+    "pure": 36,
+    "payable": 37,
+    "nonpayable": 38,
+    "virtual": 39,
+    "override": 40,
+    "abstract": 41,
+    // Data location
+    "memory": 42,
+    "storage": 43,
+    "calldata": 44,
+    "transient": 45,
+    // Declarations
+    "contract": 46,
+    "interface": 47,
+    "library": 48,
+    "import": 49,
+    "using": 50,
+    "pragma": 51,
+    // Other
+    "constant": 52,
+    "immutable": 53,
+    "indexed": 54,
+    "anonymous": 55,
+    "assembly": 56,
+    "unchecked": 57,
+    "try": 58,
+    "catch": 59,
+    "delete": 60,
+    "new": 61,
+    "true": 62,
+    "false": 63
+  };
   items.sort((a, b) => {
     const aLabel = a.label.toLowerCase();
     const bLabel = b.label.toLowerCase();
@@ -19464,6 +19576,9 @@ async function provideCompletion(ast, document, position, _compileResult, projec
     const aStarts = aLabel.startsWith(pfx) ? 0 : 1;
     const bStarts = bLabel.startsWith(pfx) ? 0 : 1;
     if (aStarts !== bStarts) return aStarts - bStarts;
+    const aRank = USAGE_RANK[aLabel] ?? 100;
+    const bRank = USAGE_RANK[bLabel] ?? 100;
+    if (aRank !== bRank) return aRank - bRank;
     const kindPriority = {
       [import_vscode_languageserver7.CompletionItemKind.Variable]: 1,
       [import_vscode_languageserver7.CompletionItemKind.Function]: 2,

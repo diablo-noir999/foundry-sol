@@ -183,7 +183,7 @@ export class CompilerManager {
         try {
           const tempProject: FoundryProject = {
             root: tempDir,
-            config: { src: 'src', out: 'out', libs: ['lib'], solcVersion: null },
+            config: { src: 'src', out: 'out', libs: ['lib'], solcVersion: null, remappings: new Map() },
             remappings: new Map(),
             solFiles: new Set(),
           };
